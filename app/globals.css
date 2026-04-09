@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui;
+
+  --color-background: #091421;
+  --color-foreground: #D9E3F6;
+
+  --color-surface: #091421;
+  --color-surface-low: #121C2A;
+  --color-surface-high: #212B39;
+  --color-surface-highest: #2B3544;
+  --color-surface-bright: #303A48;
+
+  --color-primary: #D0BCFF;
+  --color-primary-container: #A078FF;
+  --color-on-primary: #3C0091;
+  --color-on-primary-container: #340080;
+
+  --color-secondary: #4AE176;
+  --color-on-secondary: #003915;
+
+  --color-tertiary: #4CD6FF;
+
+  --color-outline: rgba(149, 142, 160, 0.15);
+  --color-outline-variant: rgba(73, 68, 84, 0.15);
+
+  --radius-md: 0.375rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
+
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 10px rgba(208, 188, 255, 0.2);
+    }
+
+    to {
+      box-shadow: 0 0 25px rgba(208, 188, 255, 0.5);
+    }
+  }
+}
+
+:root {
+  --background: #091421;
+  --foreground: #D9E3F6;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-surface-low/60 backdrop-blur-3xl;
+    border: 1px solid var(--color-outline);
+  }
+
+  .glass-card {
+    @apply bg-surface-highest/40 backdrop-blur-2xl;
+    border: 1px solid var(--color-outline-variant);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(208, 188, 255, 0.3);
+  }
+
+  .ambient-shadow {
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+  }
+
+  .ghost-border {
+    border: 1px solid var(--color-outline-variant);
+  }
+
+  .input-field {
+    @apply bg-transparent border-b border-outline-variant transition-all duration-300;
+  }
+
+  .input-field:focus {
+    @apply border-b-secondary bg-surface-bright/5;
+  }
+}
