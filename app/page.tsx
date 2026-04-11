@@ -5,12 +5,13 @@ import { MarketingSide } from "./components/marketing-side";
 import { SignInForm } from "./components/signin-form";
 import { SignUpForm } from "./components/signup-form";
 import { VerifyForm } from "./components/verify-form";
+import { ForgotPasswordForm } from "./components/forgot-password-form";
 import { Logo } from "./components/logo";
 import { motion, AnimatePresence } from "framer-motion";
 import { DynamicBackground } from "./components/dynamic-background";
 
 export default function SignInPage() {
-  const [step, setStep] = useState<"signin" | "signup" | "verify">("signin");
+  const [step, setStep] = useState<"signin" | "signup" | "verify" | "forgot-password">("signin");
   const [email, setEmail] = useState("");
 
   const handleSignInNext = (emailValue: string) => {
@@ -26,61 +27,106 @@ export default function SignInPage() {
     setStep("signup");
   };
 
+  const handleGoToForgotPassword = () => {
+    setStep("forgot-password");
+  };
+
+  const renderForm = () => {
+    switch (step) {
+      case "signin":
+        return <SignInForm onNext={handleSignInNext} onSignUp={handleGoToSignUp} onForgotPassword={handleGoToForgotPassword} />;
+      case "signup":
+        return <SignUpForm onSignIn={handleBackToSignIn} />;
+      case "verify":
+        return <VerifyForm email={email} onBack={handleBackToSignIn} />;
+      case "forgot-password":
+        return <ForgotPasswordForm onBack={handleBackToSignIn} />;
+    }
+  };
+
   return (
-    <main className="min-h-screen w-full relative flex flex-col transition-colors duration-1000 snap-y snap-mandatory h-screen overflow-y-auto lg:h-auto lg:overflow-visible lg:snap-none scroll-smooth">
+    <main className="min-h-screen lg:min-h-0 lg:h-svh lg:max-h-svh lg:overflow-hidden w-full relative">
       <DynamicBackground />
-      {/* Absolute Global Logo - Hidden when Marketing Side shows its own in Verify/SignUp Mode */}
-      <AnimatePresence>
-        {step === "signin" && (
+
+      {/* ═══════════════════════════════════════════════════════════ */}
+      {/* MOBILE LAYOUT — Single screen, no scroll, no marketing    */}
+      {/* ═══════════════════════════════════════════════════════════ */}
+      <div className="lg:hidden relative z-10 min-h-screen flex flex-col">
+        {/* Mobile Header */}
+        <div className="flex items-center justify-between px-6 pt-6 pb-2 shrink-0">
+          <Logo />
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+              {step === "signin" ? "Sign In" : step === "signup" ? "Sign Up" : step === "forgot-password" ? "Reset Auth" : "Verify"}
+            </span>
+          </div>
+        </div>
+
+        {/* Mobile Form - Centered */}
+        <div className="flex-1 flex flex-col justify-center px-6 py-6 overflow-y-auto overflow-x-hidden">
+          <div className="w-full max-w-md mx-auto">
+            {renderForm()}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════ */}
+      {/* DESKTOP LAYOUT — Two-panel: Marketing + Form              */}
+      {/* ═══════════════════════════════════════════════════════════ */}
+      <div className="hidden lg:grid lg:grid-cols-2 lg:h-svh lg:max-h-svh lg:min-h-0 w-full relative z-10 overflow-hidden">
+        {/* Logo - Desktop only */}
+        <AnimatePresence>
+          {step === "signin" && (
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              className="absolute top-8 left-10 z-50 pointer-events-auto min-[1441px]:left-14"
+            >
+              <Logo />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Marketing Hero - Desktop only */}
+        <AnimatePresence mode="wait">
           <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
-            className="absolute top-6 left-6 sm:top-8 sm:left-12 lg:left-20 z-50 pointer-events-auto"
+            key={`marketing-${step}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-col overflow-hidden min-h-0 lg:h-full relative origin-center transition-transform duration-300 [@media(max-height:800px)]:scale-95 [@media(max-height:700px)]:scale-[0.85] [@media(max-height:600px)]:scale-[0.75]"
           >
-            <Logo />
+            <MarketingSide mode={step} />
           </motion.div>
-        )}
-      </AnimatePresence>
+        </AnimatePresence>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[42%_58%] min-h-screen w-full relative z-10">
-        {/* Marketing Hero (Stacked on mobile, Sidebar on desktop) */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: false, amount: 0.1 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col overflow-hidden h-screen lg:h-auto lg:min-h-full relative snap-start"
-        >
-          <MarketingSide mode={step} />
-        </motion.div>
-
-        {/* Right side (Form) */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98, y: 10 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.1 }}
-          transition={{ duration: 1, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col justify-center items-center px-6 py-8 sm:p-8 lg:p-12 relative h-screen lg:h-auto lg:min-h-full overflow-y-auto snap-start"
-        >
-          {/* Subtle background glow - Shifts color based on step */}
+        {/* Form Side - Desktop */}
+        <div className="flex flex-col min-h-0 lg:h-full lg:px-8 xl:px-12 min-[1441px]:px-16 relative lg:overflow-hidden overflow-y-auto overscroll-y-contain">
+          {/* Subtle background glow — stronger on ultra-wide */}
           <div
-            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[700px] h-[300px] sm:h-[700px] rounded-full blur-[100px] sm:blur-[180px] pointer-events-none transition-colors duration-1000 ${step === "signin" ? "bg-[#22C55E]/5" : step === "signup" ? "bg-[#3B82F6]/8" : "bg-[#A855F7]/8"
+            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(100%,400px)] h-[min(100vh,440px)] max-h-[80svh] min-[1441px]:w-[min(100%,520px)] min-[1441px]:h-[min(100vh,520px)] min-[1441px]:max-h-[85svh] min-[1441px]:blur-[140px] rounded-full blur-[120px] pointer-events-none transition-colors duration-1000 ${step === "signin" ? "bg-[#22C55E]/5 min-[1441px]:bg-[#22C55E]/[0.09]" : step === "signup" ? "bg-[#3B82F6]/8 min-[1441px]:bg-[#3B82F6]/12" : "bg-[#A855F7]/8 min-[1441px]:bg-[#A855F7]/12"
               }`}
           />
 
-          <div className="w-full max-w-md relative z-10">
-            {step === "signin" ? (
-              <SignInForm onNext={handleSignInNext} onSignUp={handleGoToSignUp} />
-            ) : step === "signup" ? (
-              <SignUpForm onSignIn={handleBackToSignIn} />
-            ) : (
-              <VerifyForm email={email} onBack={handleBackToSignIn} />
-            )}
+          <div className="w-full max-w-md min-[1441px]:max-w-lg relative z-10 grid mx-auto my-auto shrink-0 origin-center transition-transform duration-300 [@media(max-height:800px)]:scale-95 [@media(max-height:700px)]:scale-[0.85] [@media(max-height:600px)]:scale-[0.75]">
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={`form-${step}`}
+                className="col-start-1 row-start-1 w-full"
+                initial={{ opacity: 0, filter: "blur(4px)", scale: 0.98, y: 10 }}
+                animate={{ opacity: 1, filter: "blur(0px)", scale: 1, y: 0 }}
+                exit={{ opacity: 0, filter: "blur(4px)", scale: 0.98, y: -10 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {renderForm()}
+              </motion.div>
+            </AnimatePresence>
           </div>
-        </motion.div>
+        </div>
       </div>
     </main>
-
   );
 }
