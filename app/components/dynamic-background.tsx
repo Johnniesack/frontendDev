@@ -118,6 +118,34 @@ export const DynamicBackground = () => {
         <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full border border-[#22C55E]/20" />
         <div className="absolute top-1/2 right-0 translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] rounded-full border border-[#22C55E]/15" />
       </motion.div>
+
+      {/* Ultra-wide (≥1441px): extra ambient depth — slow, low-contrast motion */}
+      <div className="pointer-events-none absolute inset-0 z-0 hidden min-[1441px]:block overflow-hidden">
+        <motion.div
+          className="absolute -left-[10%] top-[12%] h-[55vh] w-[55vw] max-w-[980px] rounded-full bg-[#22C55E]/[0.07] blur-[120px]"
+          animate={{ opacity: [0.35, 0.55, 0.35], x: [0, 18, 0], y: [0, 12, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute left-[18%] bottom-[5%] h-[42vh] w-[48vw] max-w-[820px] rounded-full bg-[#14B8A6]/[0.06] blur-[100px]"
+          animate={{ opacity: [0.25, 0.45, 0.25], x: [0, -14, 0] }}
+          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+        />
+        <motion.div
+          className="absolute right-[-8%] top-[28%] h-[48vh] w-[42vw] max-w-[760px] rounded-full bg-[#A855F7]/[0.055] blur-[110px]"
+          animate={{ opacity: [0.2, 0.38, 0.2], y: [0, -20, 0] }}
+          transition={{ duration: 19, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+        />
+        <motion.div
+          className="absolute inset-0 opacity-[0.035]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.06) 0%, transparent 45%)",
+          }}
+          animate={{ opacity: [0.025, 0.05, 0.025] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
     </div>
   );
 };
