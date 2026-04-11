@@ -46,9 +46,9 @@ export function VerifyForm({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full text-left mb-8 relative z-10"
+        className="w-full text-left mb-6 min-[1920px]:mb-8 relative z-10"
       >
-        <h2 className="text-[32px] sm:text-[40px] font-bold text-white mb-3 tracking-tight">
+        <h2 className="text-[32px] sm:text-[40px] font-bold text-white mb-2 min-[1920px]:mb-3 tracking-tight">
           Check your email
         </h2>
         <p className="text-[13px] sm:text-[14px] text-zinc-400 font-medium leading-relaxed max-w-sm">
@@ -57,7 +57,7 @@ export function VerifyForm({
         </p>
       </motion.div>
 
-      <div className="w-full space-y-8 relative z-10">
+      <div className="w-full space-y-6 min-[1920px]:space-y-8 relative z-10">
         <div className="flex justify-between gap-3 sm:gap-4">
           {otp.map((digit, index) => (
             <motion.div
@@ -89,17 +89,17 @@ export function VerifyForm({
           ))}
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-5 min-[1920px]:space-y-6">
           <motion.button
             whileHover={{ scale: 1.01, backgroundColor: "#4ADE80" }}
             whileTap={{ scale: 0.98 }}
-            className="w-full h-14 rounded-lg bg-[#22C55E] text-[#0A0A0B] font-bold text-base transition-colors flex items-center justify-center gap-2 group shadow-[0_4px_24px_rgba(34,197,94,0.2)]"
+            className="w-full h-12 min-[1920px]:h-14 rounded-lg bg-[#22C55E] text-[#0A0A0B] font-bold text-base transition-colors flex items-center justify-center gap-2 group shadow-[0_4px_24px_rgba(34,197,94,0.2)]"
           >
             <span>Verify</span>
             <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
           </motion.button>
 
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-3 min-[1920px]:space-y-4">
             <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.15em]">
               Haven't received the Code?
             </p>
@@ -110,7 +110,7 @@ export function VerifyForm({
           </div>
         </div>
 
-        <div className="pt-8 pb-12 flex flex-col items-center gap-6">
+        <div className="pt-6 min-[1920px]:pt-8 pb-8 min-[1920px]:pb-12 flex flex-col items-center gap-5 min-[1920px]:gap-6">
           <button
             onClick={onBack}
             className="text-[10px] font-bold text-[#22C55E] uppercase tracking-[0.15em] hover:text-[#4ADE80] transition-colors"
