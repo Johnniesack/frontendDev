@@ -42,16 +42,13 @@ const RotatingWords = ({ words, colorClass = "text-[#22C55E]" }: { words: string
 
   return (
     <div className="h-[1.15em] overflow-hidden inline-block relative align-top min-w-[260px] xs:min-w-[280px] sm:min-w-[340px] lg:min-w-[280px] xl:min-w-[320px]">
-      <AnimatePresence mode="popLayout" initial={false}>
+      <AnimatePresence mode="wait" initial={false}>
         <motion.span
           key={index}
-          initial={{ y: "40%", opacity: 0, filter: "blur(4px)" }}
-          animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-          exit={{ y: "-40%", opacity: 0, filter: "blur(4px)" }}
-          transition={{ 
-            duration: 1.8, 
-            ease: [0.65, 0, 0.35, 1] // Deliberate, sophisticated ease
-          }}
+          initial={{ y: "20%", opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: "-20%", opacity: 0 }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
           className={`absolute inset-x-0 top-0 ${colorClass} drop-shadow-[0_0_20px_rgba(34,197,94,0.35)] whitespace-nowrap`}
         >
           {words[index]}
@@ -61,41 +58,11 @@ const RotatingWords = ({ words, colorClass = "text-[#22C55E]" }: { words: string
   );
 };
 
-export function MarketingSide({ mode = "signin", direction = 0 }: { mode?: "signin" | "signup" | "verify", direction?: number }) {
+export function MarketingSide({ mode = "signin" }: { mode?: "signin" | "signup" | "verify" }) {
   return (
-    <div className="relative flex flex-col justify-center flex-1 px-6 sm:px-12 lg:px-20 pt-28 pb-20 lg:py-20 lg:pb-64 overflow-hidden min-h-full">
+    <div className="relative flex flex-col justify-center flex-1 px-6 sm:px-12 lg:px-20 pt-20 pb-16 lg:py-20 lg:pb-64 overflow-hidden min-h-full">
       <div className="relative z-10 flex flex-col gap-8 lg:gap-12 max-w-lg min-h-[500px] justify-center">
-        <AnimatePresence mode="popLayout" custom={direction} initial={false}>
-          <motion.div
-            key={mode}
-            custom={direction}
-            variants={{
-              enter: (direction: number) => ({
-                x: direction > 0 ? 30 : -30,
-                opacity: 0,
-                filter: "blur(8px)"
-              }),
-              center: {
-                x: 0,
-                opacity: 1,
-                filter: "blur(0px)"
-              },
-              exit: (direction: number) => ({
-                x: direction < 0 ? 30 : -30,
-                opacity: 0,
-                filter: "blur(8px)"
-              })
-            }}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: "spring", stiffness: 100, damping: 25 }, // Softer, more organic spring
-              opacity: { duration: 0.8 },
-              filter: { duration: 0.8 }
-            }}
-            className="flex flex-col gap-8 lg:gap-12"
-          >
+        <div className="flex flex-col gap-8 lg:gap-12">
             {mode === "verify" && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -121,7 +88,7 @@ export function MarketingSide({ mode = "signin", direction = 0 }: { mode?: "sign
                   <p className="text-[10px] font-bold text-[#22C55E] uppercase tracking-[0.3em]">
                     Krifth Intelligence
                   </p>
-                  <h1 className="text-[48px] sm:text-[68px] font-bold text-white leading-[1.3] tracking-tight">
+                  <h1 className="text-[38px] xs:text-[44px] sm:text-[68px] font-bold text-white leading-[1.2] tracking-tight">
                     Build <RotatingWords words={["Faster.", "Better.", "Smarter.", "Stronger."]} /> <br />
                     Grow <RotatingWords words={["Smarter.", "Bolder.", "Wider.", "Beyond."]} />
                   </h1>
@@ -200,8 +167,7 @@ export function MarketingSide({ mode = "signin", direction = 0 }: { mode?: "sign
                 ))}
               </div>
             )}
-          </motion.div>
-        </AnimatePresence>
+        </div>
       </div>
 
     </div>

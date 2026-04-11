@@ -57,18 +57,18 @@ export function SignUpForm({ onSignIn }: { onSignIn: () => void }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full p-6 sm:p-10 lg:p-12 rounded-[32px] bg-[#161B22] border border-white/10 shadow-premium relative overflow-hidden group/card"
+        className="w-full p-0 sm:p-10 lg:p-12 rounded-none sm:rounded-[32px] bg-transparent sm:bg-[#161B22] border-0 sm:border sm:border-white/10 shadow-none sm:shadow-premium relative overflow-hidden group/card"
       >
-        <div className="text-center mb-10 relative z-10">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-2 tracking-tight">
+        <div className="text-center mb-6 sm:mb-10 relative z-10">
+          <h2 className="text-2xl sm:text-4xl font-bold text-white mb-1 sm:mb-2 tracking-tight">
             Create your account
           </h2>
-          <p className="text-sm text-zinc-400 font-medium">
+          <p className="text-xs sm:text-sm text-zinc-400 font-medium">
             Join thousands of creators building with AI
           </p>
         </div>
 
-        <form className="space-y-5 relative z-10" onSubmit={onSubmit}>
+        <form className="space-y-4 sm:space-y-5 relative z-10" onSubmit={onSubmit}>
           {/* Full Name */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
@@ -103,7 +103,7 @@ export function SignUpForm({ onSignIn }: { onSignIn: () => void }) {
                 onFocus={() => setFocusedField("name")}
                 onBlur={handleBlur}
                 placeholder="John Doe"
-                className={`w-full h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border transition-all font-medium focus:outline-none placeholder:text-zinc-600 ${errors.name && (touched.name || isSubmitted)
+                className={`w-full h-12 sm:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border text-sm sm:text-base transition-all font-medium focus:outline-none placeholder:text-zinc-600 ${errors.name && (touched.name || isSubmitted)
                     ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5"
                     : "border-white/5 focus:border-[#22C55E]/50 focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
                   }`}
@@ -145,7 +145,7 @@ export function SignUpForm({ onSignIn }: { onSignIn: () => void }) {
                 onFocus={() => setFocusedField("email")}
                 onBlur={handleBlur}
                 placeholder="john@company.com"
-                className={`w-full h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border transition-all font-medium focus:outline-none placeholder:text-zinc-600 ${errors.email && (touched.email || isSubmitted)
+                className={`w-full h-12 sm:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border text-sm sm:text-base transition-all font-medium focus:outline-none placeholder:text-zinc-600 ${errors.email && (touched.email || isSubmitted)
                     ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5"
                     : "border-white/5 focus:border-[#22C55E]/50 focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
                   }`}
@@ -187,7 +187,7 @@ export function SignUpForm({ onSignIn }: { onSignIn: () => void }) {
                 onFocus={() => setFocusedField("password")}
                 onBlur={handleBlur}
                 placeholder="••••••••"
-                className={`w-full h-14 pl-12 pr-12 rounded-xl bg-[#1A2026] border transition-all font-medium focus:outline-none placeholder:text-zinc-600 ${errors.password && (touched.password || isSubmitted)
+                className={`w-full h-12 sm:h-14 pl-12 pr-12 rounded-xl bg-[#1A2026] border text-sm sm:text-base transition-all font-medium focus:outline-none placeholder:text-zinc-600 ${errors.password && (touched.password || isSubmitted)
                     ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5"
                     : "border-white/5 focus:border-[#22C55E]/50 focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
                   }`}
@@ -221,7 +221,7 @@ export function SignUpForm({ onSignIn }: { onSignIn: () => void }) {
             type="submit"
             whileHover={{ scale: 1.01, backgroundColor: "#4ADE80" }}
             whileTap={{ scale: 0.98 }}
-            className="w-full h-14 rounded-xl bg-[#22C55E] text-black font-bold text-base transition-colors flex items-center justify-center gap-2 group shadow-[0_4px_20px_rgba(34,197,94,0.2)]"
+            className="w-full h-12 sm:h-14 rounded-xl bg-[#22C55E] text-black font-bold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 group shadow-[0_4px_20px_rgba(34,197,94,0.2)]"
           >
             <span>Create Account</span>
             <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
@@ -233,7 +233,7 @@ export function SignUpForm({ onSignIn }: { onSignIn: () => void }) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="mt-12 flex items-center justify-center"
+        className="mt-4 sm:mt-12 flex items-center justify-center"
       >
         <p className="text-sm text-zinc-400 font-medium tracking-tight">
           Already have an account?{" "}
@@ -250,7 +250,7 @@ export function SignUpForm({ onSignIn }: { onSignIn: () => void }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.3 }}
         transition={{ delay: 1.2, duration: 1 }}
-        className="mt-12 text-[10px] uppercase tracking-[0.2em] font-medium text-zinc-500 text-center w-full"
+        className="mt-6 sm:mt-12 text-[10px] uppercase tracking-[0.2em] font-medium text-zinc-500 text-center w-full"
       >
         © 2024 KRIFTH AI. ALL RIGHTS RESERVED.
       </motion.div>

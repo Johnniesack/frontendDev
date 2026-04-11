@@ -11,29 +11,19 @@ import { DynamicBackground } from "./components/dynamic-background";
 
 export default function SignInPage() {
   const [step, setStep] = useState<"signin" | "signup" | "verify">("signin");
-  const [direction, setDirection] = useState(0); // 1 for forward, -1 for backward
   const [email, setEmail] = useState("");
-
-  const steps = ["signin", "signup", "verify"];
-
-  const navigateTo = (newStep: "signin" | "signup" | "verify") => {
-    const currentIndex = steps.indexOf(step);
-    const nextIndex = steps.indexOf(newStep);
-    setDirection(nextIndex > currentIndex ? 1 : -1);
-    setStep(newStep);
-  };
 
   const handleSignInNext = (emailValue: string) => {
     setEmail(emailValue);
-    navigateTo("verify");
+    setStep("verify");
   };
 
   const handleBackToSignIn = () => {
-    navigateTo("signin");
+    setStep("signin");
   };
 
   const handleGoToSignUp = () => {
-    navigateTo("signup");
+    setStep("signup");
   };
 
   return (
@@ -62,7 +52,7 @@ export default function SignInPage() {
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col overflow-hidden h-screen lg:h-auto lg:min-h-full relative snap-start"
         >
-          <MarketingSide mode={step} direction={direction} />
+          <MarketingSide mode={step} />
         </motion.div>
 
         {/* Right side (Form) */}
@@ -71,7 +61,7 @@ export default function SignInPage() {
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: false, amount: 0.1 }}
           transition={{ duration: 1, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col justify-center items-center p-4 sm:p-8 lg:p-12 relative h-screen lg:h-auto lg:min-h-full overflow-hidden snap-start"
+          className="flex flex-col justify-center items-center px-6 py-8 sm:p-8 lg:p-12 relative h-screen lg:h-auto lg:min-h-full overflow-y-auto snap-start"
         >
           {/* Subtle background glow - Shifts color based on step */}
           <div
@@ -79,48 +69,14 @@ export default function SignInPage() {
               }`}
           />
 
-          <div className="w-full max-w-md relative z-10 pt-20 pb-12 sm:pt-28 sm:pb-16 lg:py-0">
-            <AnimatePresence mode="popLayout" custom={direction} initial={false}>
-              <motion.div
-                key={step}
-                custom={direction}
-                variants={{
-                  enter: (direction: number) => ({
-                    x: direction > 0 ? 50 : -50,
-                    opacity: 0,
-                    filter: "blur(4px)"
-                  }),
-                  center: {
-                    zIndex: 1,
-                    x: 0,
-                    opacity: 1,
-                    filter: "blur(0px)"
-                  },
-                  exit: (direction: number) => ({
-                    zIndex: 0,
-                    x: direction < 0 ? 50 : -50,
-                    opacity: 0,
-                    filter: "blur(4px)"
-                  })
-                }}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{
-                  x: { type: "spring", stiffness: 100, damping: 25 }, // Softer, more organic spring
-                  opacity: { duration: 0.6 },
-                  filter: { duration: 0.6 }
-                }}
-              >
-                {step === "signin" ? (
-                  <SignInForm onNext={handleSignInNext} onSignUp={handleGoToSignUp} />
-                ) : step === "signup" ? (
-                  <SignUpForm onSignIn={handleBackToSignIn} />
-                ) : (
-                  <VerifyForm email={email} onBack={handleBackToSignIn} />
-                )}
-              </motion.div>
-            </AnimatePresence>
+          <div className="w-full max-w-md relative z-10">
+            {step === "signin" ? (
+              <SignInForm onNext={handleSignInNext} onSignUp={handleGoToSignUp} />
+            ) : step === "signup" ? (
+              <SignUpForm onSignIn={handleBackToSignIn} />
+            ) : (
+              <VerifyForm email={email} onBack={handleBackToSignIn} />
+            )}
           </div>
         </motion.div>
       </div>
