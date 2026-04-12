@@ -45,14 +45,14 @@ export default function SignInPage() {
   };
 
   return (
-    <main className="min-h-screen lg:min-h-0 lg:h-svh lg:max-h-svh lg:overflow-hidden w-full relative">
+    <main className="h-[100dvh] w-full relative overflow-hidden bg-[#050505] text-white">
       <DynamicBackground />
 
       {/* ═══════════════════════════════════════════════════════════ */}
-      {/* MOBILE LAYOUT — Single screen, no scroll, no marketing    */}
+      {/* MOBILE LAYOUT — Fixed screen, internal scroll, no marketing */}
       {/* ═══════════════════════════════════════════════════════════ */}
-      <div className="lg:hidden relative z-10 min-h-screen flex flex-col">
-        {/* Mobile Header */}
+      <div className="lg:hidden relative z-10 h-full flex flex-col">
+        {/* Mobile Header - Fixed at top */}
         <div className="flex items-center justify-between px-6 pt-6 pb-2 shrink-0">
           <Logo />
           <div className="flex items-center gap-1.5">
@@ -63,9 +63,9 @@ export default function SignInPage() {
           </div>
         </div>
 
-        {/* Mobile Form - Centered */}
-        <div className="flex-1 flex flex-col justify-center px-6 py-6 overflow-y-auto overflow-x-hidden">
-          <div className="w-full max-w-md mx-auto">
+        {/* Mobile Form - Scrolls internally if it exceeds screen height */}
+        <div className="flex-1 flex flex-col justify-center px-6 pt-4 pb-8 overflow-y-auto overflow-x-hidden">
+          <div className="w-full max-w-md mx-auto my-auto">
             {renderForm()}
           </div>
         </div>
