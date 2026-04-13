@@ -9,7 +9,8 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git branch: 'master',
+                git branch: 'main',
+                credentialsId: 'github-creds',
                     url: 'https://github.com/krifthagram/frontend.git'
             }
         }
