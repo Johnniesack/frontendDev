@@ -14,7 +14,7 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitted(true);
-    
+
     if (!email) {
       setError("Email is required");
       return;
@@ -22,7 +22,7 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
       setError("Please enter a valid email address");
       return;
     }
-    
+
     // Simulate API request to send reset link
     setTimeout(() => {
       setIsSuccess(true);
@@ -32,10 +32,7 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
   return (
     <div className="w-full flex flex-col items-center">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
         whileHover={{ y: -5, transition: { duration: 0.3 } }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
         className="w-full p-0 lg:p-6 xl:p-8 min-[1920px]:p-12 rounded-none lg:rounded-[32px] bg-transparent lg:bg-[#161B22] border-0 lg:border lg:border-white/10 shadow-none lg:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6),0_0_20px_rgba(34,197,94,0.05)] relative overflow-hidden group/card"
       >
         {/* Light Green Inside Effects */}
@@ -43,7 +40,7 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
         <div className="hidden lg:block absolute bottom-0 left-0 w-[200px] h-[200px] bg-teal-500/5 rounded-full blur-[60px] -ml-20 -mb-20 pointer-events-none transition-opacity group-hover/card:opacity-100 opacity-30" />
         <div className="hidden lg:block absolute inset-0 border border-[#22C55E]/0 group-hover/card:border-[#22C55E]/20 rounded-[32px] transition-colors duration-500 pointer-events-none" />
 
-        <div className="text-center mb-6 min-[1920px]:mb-10 relative z-10 pt-2">
+        <div className="text-center mb-6 min-[1920px]:mb-10 relative z-10">
           <div className="w-12 h-12 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/20 mx-auto mb-5 flex items-center justify-center">
             <Mail className="text-[#22C55E]" size={20} />
           </div>
@@ -56,7 +53,7 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
         </div>
 
         {isSuccess ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="flex flex-col items-center justify-center space-y-6 relative z-10 py-4"
@@ -65,11 +62,11 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
               <p className="text-sm text-zinc-300 font-medium">Reset link sent to:</p>
               <p className="text-base font-bold text-white tracking-tight">{email}</p>
             </div>
-            
+
             <p className="text-[11px] text-zinc-500 max-w-xs text-center leading-relaxed">
               Didn't receive the email? Check your spam filter, or try another email address.
             </p>
-            
+
             <button
               onClick={() => setIsSuccess(false)}
               className="text-[#22C55E] text-xs font-bold uppercase tracking-widest hover:underline mt-2"
@@ -78,7 +75,7 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
             </button>
           </motion.div>
         ) : (
-          <form className="space-y-5 min-[1920px]:space-y-6 relative z-10" onSubmit={onSubmit}>
+          <form className="space-y-4 min-[1920px]:space-y-6 relative z-10" onSubmit={onSubmit}>
             <div className="space-y-1.5 sm:space-y-2">
               <div className="flex justify-between items-center">
                 <label className="text-[10px] uppercase tracking-widest font-bold text-zinc-500">
@@ -96,24 +93,22 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
               </div>
               <div className="relative group">
                 <Mail
-                  className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${
-                    error ? "text-red-400/40" : focusedField === "email" ? "text-[#22C55E]" : "text-zinc-500"
-                  }`}
+                  className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${error ? "text-red-400/40" : focusedField === "email" ? "text-[#22C55E]" : "text-zinc-500"
+                    }`}
                   size={18}
                 />
                 <input
                   name="email"
                   type="email"
                   value={email}
-                  onChange={(e) => { setEmail(e.target.value); if(error) setError(""); }}
+                  onChange={(e) => { setEmail(e.target.value); if (error) setError(""); }}
                   onFocus={() => setFocusedField("email")}
                   onBlur={() => setFocusedField(null)}
                   placeholder="name@krifth.com"
-                  className={`w-full h-11 sm:h-12 min-[1920px]:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border transition-all font-medium text-sm sm:text-base focus:outline-none placeholder:text-zinc-600 ${
-                    error
+                  className={`w-full h-11 sm:h-12 min-[1920px]:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border transition-all font-medium text-base sm:text-base focus:outline-none placeholder:text-zinc-600 ${error
                       ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5 focus:shadow-[0_0_12px_rgba(239,68,68,0.08)]"
                       : "border-white/5 focus:border-[#22C55E]/50 hover:bg-[#1E252D] focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
-                  }`}
+                    }`}
                 />
               </div>
             </div>
