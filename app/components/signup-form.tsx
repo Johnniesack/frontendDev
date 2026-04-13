@@ -55,11 +55,9 @@ export function SignUpForm({ onSignIn }: { onSignIn: () => void }) {
   return (
     <div className="w-full flex flex-col items-center">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
         className="w-full p-0 lg:p-8 xl:p-10 min-[1920px]:p-12 rounded-none lg:rounded-[32px] bg-transparent lg:bg-[#161B22] border-0 lg:border lg:border-white/10 shadow-none lg:shadow-premium relative overflow-hidden group/card"
       >
-        <div className="text-center mb-6 sm:mb-8 min-[1920px]:mb-10 relative z-10">
+        <div className="text-center mb-6 min-[1920px]:mb-10 relative z-10">
           <h2 className="text-2xl sm:text-4xl font-bold text-white mb-1 sm:mb-2 tracking-tight">
             Create your account
           </h2>
@@ -68,7 +66,7 @@ export function SignUpForm({ onSignIn }: { onSignIn: () => void }) {
           </p>
         </div>
 
-        <form className="space-y-3 sm:space-y-4 min-[1920px]:space-y-5 relative z-10" onSubmit={onSubmit}>
+        <form className="space-y-4 min-[1920px]:space-y-6 relative z-10" onSubmit={onSubmit}>
           {/* Full Name */}
           <div className="space-y-1 sm:space-y-1.5">
             <div className="flex justify-between items-center">
