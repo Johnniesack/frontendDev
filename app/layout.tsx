@@ -23,6 +23,13 @@ export const metadata: Metadata = {
   description: "Set up your storefront and leverage AI-driven streetwear management.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

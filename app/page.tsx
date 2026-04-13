@@ -45,14 +45,14 @@ export default function SignInPage() {
   };
 
   return (
-    <main className="min-h-screen lg:min-h-0 lg:h-svh lg:max-h-svh lg:overflow-hidden w-full relative">
+    <main className="h-[100dvh] w-full relative overflow-hidden bg-[#050505] text-white">
       <DynamicBackground />
 
       {/* ═══════════════════════════════════════════════════════════ */}
-      {/* MOBILE LAYOUT — Single screen, no scroll, no marketing    */}
+      {/* MOBILE LAYOUT — Fixed screen, internal scroll, no marketing */}
       {/* ═══════════════════════════════════════════════════════════ */}
-      <div className="lg:hidden relative z-10 min-h-screen flex flex-col">
-        {/* Mobile Header */}
+      <div className="lg:hidden relative z-10 h-full flex flex-col">
+        {/* Mobile Header - Fixed at top */}
         <div className="flex items-center justify-between px-6 pt-6 pb-2 shrink-0">
           <Logo />
           <div className="flex items-center gap-1.5">
@@ -63,9 +63,9 @@ export default function SignInPage() {
           </div>
         </div>
 
-        {/* Mobile Form - Centered */}
-        <div className="flex-1 flex flex-col justify-center px-6 py-6 overflow-y-auto overflow-x-hidden">
-          <div className="w-full max-w-md mx-auto">
+        {/* Mobile Form - Scrolls internally if it exceeds screen height */}
+        <div className="flex-1 flex flex-col justify-center px-6 pt-4 pb-8 overflow-y-auto overflow-x-hidden">
+          <div className="w-full max-w-md mx-auto my-auto">
             {renderForm()}
           </div>
         </div>
@@ -111,15 +111,15 @@ export default function SignInPage() {
               }`}
           />
 
-          <div className="w-full max-w-md min-[1441px]:max-w-lg relative z-10 grid mx-auto my-auto shrink-0 origin-center transition-transform duration-300 [@media(max-height:800px)]:scale-95 [@media(max-height:700px)]:scale-[0.85] [@media(max-height:600px)]:scale-[0.75]">
-            <AnimatePresence mode="popLayout">
+          <div className="w-full max-w-md min-[1441px]:max-w-lg relative z-10 grid mx-auto my-auto shrink-0 origin-center transition-transform duration-300 min-h-[440px] [@media(max-height:800px)]:scale-95 [@media(max-height:700px)]:scale-[0.85] [@media(max-height:600px)]:scale-[0.75]">
+            <AnimatePresence mode="wait">
               <motion.div
                 key={`form-${step}`}
                 className="col-start-1 row-start-1 w-full"
-                initial={{ opacity: 0, filter: "blur(4px)", scale: 0.98, y: 10 }}
+                initial={{ opacity: 0, filter: "blur(8px)", scale: 0.98, y: 6 }}
                 animate={{ opacity: 1, filter: "blur(0px)", scale: 1, y: 0 }}
-                exit={{ opacity: 0, filter: "blur(4px)", scale: 0.98, y: -10 }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                exit={{ opacity: 0, filter: "blur(8px)", scale: 0.98, y: -6 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               >
                 {renderForm()}
               </motion.div>
