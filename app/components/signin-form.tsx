@@ -100,7 +100,7 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
                 onFocus={() => setFocusedField("email")}
                 onBlur={handleBlur}
                 placeholder="name@krifth.com"
-                className={`w-full h-11 sm:h-12 min-[1920px]:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border transition-all font-medium text-sm sm:text-base focus:outline-none placeholder:text-zinc-600 ${errors.email && (touched.email || isSubmitted)
+                  className={`w-full h-11 sm:h-12 min-[1920px]:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border transition-all font-medium text-base sm:text-base focus:outline-none placeholder:text-zinc-600 ${errors.email && (touched.email || isSubmitted)
                   ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5 focus:shadow-[0_0_12px_rgba(239,68,68,0.08)]"
                   : "border-white/5 focus:border-[#22C55E]/50 hover:bg-[#1E252D] focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
                   }`}
@@ -146,7 +146,7 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
                 onFocus={() => setFocusedField("password")}
                 onBlur={handleBlur}
                 placeholder="••••••••"
-                className={`w-full h-11 sm:h-12 min-[1920px]:h-14 pl-12 pr-12 rounded-xl bg-[#1A2026] border transition-all font-medium text-sm sm:text-base focus:outline-none placeholder:text-zinc-600 ${errors.password && (touched.password || isSubmitted)
+                className={`w-full h-11 sm:h-12 min-[1920px]:h-14 pl-12 pr-12 rounded-xl bg-[#1A2026] border transition-all font-medium text-base sm:text-base focus:outline-none placeholder:text-zinc-600 ${errors.password && (touched.password || isSubmitted)
                   ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5 focus:shadow-[0_0_12px_rgba(239,68,68,0.08)]"
                   : "border-white/5 focus:border-[#22C55E]/50 hover:bg-[#1E252D] focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
                   }`}
