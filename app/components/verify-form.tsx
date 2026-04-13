@@ -43,15 +43,12 @@ export function VerifyForm({
   return (
     <div className="w-full flex flex-col items-center">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full text-left mb-6 min-[1920px]:mb-8 relative z-10"
+        className="w-full text-center mb-6 min-[1920px]:mb-10 relative z-10"
       >
         <h2 className="text-[32px] sm:text-[40px] font-bold text-white mb-2 min-[1920px]:mb-3 tracking-tight">
           Check your email
         </h2>
-        <p className="text-[13px] sm:text-[14px] text-zinc-400 font-medium leading-relaxed max-w-sm">
+        <p className="text-[13px] sm:text-[14px] text-zinc-400 font-medium leading-relaxed max-w-sm mx-auto">
           We've sent a 6-digit verification code to <span className="text-[#22C55E]">{email}</span>.
           Please enter it below to access your core identity.
         </p>

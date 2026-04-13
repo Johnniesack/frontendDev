@@ -111,15 +111,15 @@ export default function SignInPage() {
               }`}
           />
 
-          <div className="w-full max-w-md min-[1441px]:max-w-lg relative z-10 grid mx-auto my-auto shrink-0 origin-center transition-transform duration-300 [@media(max-height:800px)]:scale-95 [@media(max-height:700px)]:scale-[0.85] [@media(max-height:600px)]:scale-[0.75]">
-            <AnimatePresence mode="popLayout">
+          <div className="w-full max-w-md min-[1441px]:max-w-lg relative z-10 grid mx-auto my-auto shrink-0 origin-center transition-transform duration-300 min-h-[440px] [@media(max-height:800px)]:scale-95 [@media(max-height:700px)]:scale-[0.85] [@media(max-height:600px)]:scale-[0.75]">
+            <AnimatePresence mode="wait">
               <motion.div
                 key={`form-${step}`}
                 className="col-start-1 row-start-1 w-full"
-                initial={{ opacity: 0, filter: "blur(4px)", scale: 0.98, y: 10 }}
+                initial={{ opacity: 0, filter: "blur(8px)", scale: 0.98, y: 6 }}
                 animate={{ opacity: 1, filter: "blur(0px)", scale: 1, y: 0 }}
-                exit={{ opacity: 0, filter: "blur(4px)", scale: 0.98, y: -10 }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                exit={{ opacity: 0, filter: "blur(8px)", scale: 0.98, y: -6 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               >
                 {renderForm()}
               </motion.div>

@@ -52,10 +52,7 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
   return (
     <div className="w-full flex flex-col items-center">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
         whileHover={{ y: -5, transition: { duration: 0.3 } }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
         className="w-full p-0 lg:p-6 xl:p-8 min-[1920px]:p-12 rounded-none lg:rounded-[32px] bg-transparent lg:bg-[#161B22] border-0 lg:border lg:border-white/10 shadow-none lg:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6),0_0_20px_rgba(34,197,94,0.05)] relative overflow-hidden group/card"
       >
         {/* Light Green Inside Effects - hidden on mobile */}
