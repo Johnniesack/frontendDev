@@ -89,7 +89,7 @@ export function MarketingSide({ mode = "signin" }: { mode?: "signin" | "signup" 
           <div className="flex flex-col gap-5 sm:gap-7 min-[1441px]:gap-6 shrink-0">
             {mode === "signin" ? (
               <h1 className="text-5xl sm:text-6xl lg:text-[3.25rem] lg:leading-[1.1] xl:text-[4.25rem] min-[1441px]:text-[4.75rem] font-bold text-white leading-[1.1] tracking-tight">
-                The Future of <br />
+                The Future 1 of <br />
                 <RotatingWords words={["Creative", "Automated", "Intelligent"]} /> <br />
                 Commerce
               </h1>
