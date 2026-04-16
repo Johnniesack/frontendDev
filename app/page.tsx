@@ -9,9 +9,10 @@ import { ForgotPasswordForm } from "./components/forgot-password-form";
 import { Logo } from "./components/logo";
 import { motion, AnimatePresence } from "framer-motion";
 import { DynamicBackground } from "./components/dynamic-background";
+import { OnboardingFlow } from "./components/onboarding-flow";
 
 export default function SignInPage() {
-  const [step, setStep] = useState<"signin" | "signup" | "verify" | "forgot-password">("signin");
+  const [step, setStep] = useState<"signin" | "signup" | "verify" | "forgot-password" | "onboarding">("signin");
   const [email, setEmail] = useState("");
 
   const handleSignInNext = (emailValue: string) => {
@@ -31,16 +32,22 @@ export default function SignInPage() {
     setStep("forgot-password");
   };
 
+  const handleSignUpSuccess = () => {
+    setStep("onboarding");
+  };
+
   const renderForm = () => {
     switch (step) {
       case "signin":
         return <SignInForm onNext={handleSignInNext} onSignUp={handleGoToSignUp} onForgotPassword={handleGoToForgotPassword} />;
       case "signup":
-        return <SignUpForm onSignIn={handleBackToSignIn} />;
+        return <SignUpForm onSignIn={handleBackToSignIn} onSignUpSuccess={handleSignUpSuccess} />;
       case "verify":
         return <VerifyForm email={email} onBack={handleBackToSignIn} />;
       case "forgot-password":
         return <ForgotPasswordForm onBack={handleBackToSignIn} />;
+      case "onboarding":
+        return <OnboardingFlow onComplete={() => console.log("Onboarding finished!")} />;
     }
   };
 
@@ -77,7 +84,7 @@ export default function SignInPage() {
       <div className="hidden lg:grid lg:grid-cols-2 lg:h-svh lg:max-h-svh lg:min-h-0 w-full relative z-10 overflow-hidden">
         {/* Logo - Desktop only */}
         <AnimatePresence>
-          {step === "signin" && (
+          {(step === "signin" || step === "signup") && (
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
@@ -91,35 +98,35 @@ export default function SignInPage() {
 
         {/* Marketing Hero - Desktop only */}
         <AnimatePresence mode="wait">
-          <motion.div
-            key={`marketing-${step}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col overflow-hidden min-h-0 lg:h-full relative origin-center transition-transform duration-300 [@media(max-height:800px)]:scale-95 [@media(max-height:700px)]:scale-[0.85] [@media(max-height:600px)]:scale-[0.75]"
-          >
-            <MarketingSide mode={step} />
-          </motion.div>
+          {step !== "onboarding" && (
+            <motion.div
+              key={`marketing-${step}`}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col overflow-hidden min-h-0 lg:h-full relative origin-center transition-transform duration-300 [@media(max-height:800px)]:scale-95 [@media(max-height:700px)]:scale-[0.85] [@media(max-height:600px)]:scale-[0.75]"
+            >
+              <MarketingSide mode={step} />
+            </motion.div>
+          )}
         </AnimatePresence>
 
         {/* Form Side - Desktop */}
-        <div className="flex flex-col min-h-0 lg:h-full lg:px-8 xl:px-12 min-[1441px]:px-16 relative lg:overflow-hidden overflow-y-auto overscroll-y-contain">
-          {/* Subtle background glow — stronger on ultra-wide */}
-          <div
-            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(100%,400px)] h-[min(100vh,440px)] max-h-[80svh] min-[1441px]:w-[min(100%,520px)] min-[1441px]:h-[min(100vh,520px)] min-[1441px]:max-h-[85svh] min-[1441px]:blur-[140px] rounded-full blur-[120px] pointer-events-none transition-colors duration-1000 ${step === "signin" ? "bg-[#22C55E]/5 min-[1441px]:bg-[#22C55E]/[0.09]" : step === "signup" ? "bg-[#3B82F6]/8 min-[1441px]:bg-[#3B82F6]/12" : "bg-[#A855F7]/8 min-[1441px]:bg-[#A855F7]/12"
-              }`}
-          />
-
-          <div className="w-full max-w-md min-[1441px]:max-w-lg relative z-10 grid mx-auto my-auto shrink-0 origin-center transition-transform duration-300 min-h-[440px] [@media(max-height:800px)]:scale-95 [@media(max-height:700px)]:scale-[0.85] [@media(max-height:600px)]:scale-[0.75]">
+        <div className={`relative flex flex-col items-center justify-center lg:h-full transition-all duration-1000 ease-[0.23,1,0.32,1] overflow-hidden ${
+          step === "onboarding" ? "lg:col-span-2 w-full px-4" : "lg:col-span-1 px-6 py-12 sm:px-12 md:px-16 lg:px-20 min-[1441px]:px-24"
+        }`}>
+          <div className={`mx-auto transition-all duration-1000 ease-[0.23,1,0.32,1] flex items-center justify-center ${
+            step === "onboarding" ? "w-full max-w-6xl h-full" : "w-full max-w-[420px] min-[1441px]:max-w-[460px] h-fit"
+          }`}>
             <AnimatePresence mode="wait">
               <motion.div
-                key={`form-${step}`}
-                className="col-start-1 row-start-1 w-full"
-                initial={{ opacity: 0, filter: "blur(8px)", scale: 0.98, y: 6 }}
-                animate={{ opacity: 1, filter: "blur(0px)", scale: 1, y: 0 }}
-                exit={{ opacity: 0, filter: "blur(8px)", scale: 0.98, y: -6 }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                key={step}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full"
               >
                 {renderForm()}
               </motion.div>
