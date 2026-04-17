@@ -43,3 +43,23 @@ export async function refreshAccessToken(refreshToken: string) {
 
     return handleResponse(response);
 }
+/**
+ * SIGNUP FUNCTION
+ * This function takes user details and sends them to the server to create a new account.
+ */
+export async function signup(email: string, fullName: string, password: string, confirmPassword: string) {
+    const response = await fetch(`${BASE_URL}/api/auth/register/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+            email, 
+            full_name: fullName, 
+            password, 
+            confirm_password: confirmPassword 
+        }),
+    });
+
+    return handleResponse(response);
+}

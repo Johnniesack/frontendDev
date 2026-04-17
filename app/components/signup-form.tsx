@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Mail, Lock, Eye, EyeOff, ArrowRight, Check } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight, Check, Loader2 } from "lucide-react";
+import { signup } from "@/lib/api/auth";
 
 export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void, onSignUpSuccess: () => void }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +14,8 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [values, setValues] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const validate = (name: string, value: string) => {
     let error = "";
@@ -25,7 +28,7 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
     } else if (name === "confirmPassword" && value !== values.password) {
       error = "Passwords do not match";
     }
-    
+
     // special check: if we change the password, we should re-check matching
     if (name === "password" && values.confirmPassword && value !== values.confirmPassword) {
       setErrors(prev => ({ ...prev, confirmPassword: "Passwords do not match" }));
@@ -59,9 +62,21 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
     const confirmPasswordError = validate("confirmPassword", values.confirmPassword);
 
     if (!nameError && !emailError && !passwordError && !confirmPasswordError && agreed) {
-      // Handle Sign Up logic here later
-      console.log("Sign up success", values);
-      onSignUpSuccess();
+      setIsLoading(true);
+      setApiError(null);
+      
+      signup(values.email, values.name, values.password, values.confirmPassword)
+        .then((response) => {
+          console.log("Sign up success", response);
+          onSignUpSuccess();
+        })
+        .catch((err) => {
+          console.error("Sign up error:", err);
+          setApiError(err.message || "Failed to create account. Please try again.");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
   };
 
@@ -241,15 +256,15 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
               </div>
             </div>
           </div>
-          
+
           {/* Main Error Message for User feedback */}
-          {(errors.name || errors.email || errors.password || errors.confirmPassword) && (isSubmitted || touched.password) && (
-            <motion.p 
-              initial={{ opacity: 0 }} 
+          {(errors.name || errors.email || errors.password || errors.confirmPassword || apiError) && (isSubmitted || touched.password || apiError) && (
+            <motion.p
+              initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center pt-2"
             >
-              {errors.name || errors.email || errors.password || errors.confirmPassword}
+              {apiError || errors.name || errors.email || errors.password || errors.confirmPassword}
             </motion.p>
           )}
 
@@ -270,12 +285,19 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
 
           <motion.button
             type="submit"
-            whileHover={{ scale: 1.01, backgroundColor: "#4ADE80" }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full h-11 sm:h-12 min-[1920px]:h-14 rounded-xl bg-[#22C55E] text-black font-bold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 group shadow-[0_4px_20px_rgba(34,197,94,0.2)]"
+            disabled={isLoading}
+            whileHover={isLoading ? {} : { scale: 1.01, backgroundColor: "#4ADE80" }}
+            whileTap={isLoading ? {} : { scale: 0.98 }}
+            className={`w-full h-11 sm:h-12 min-[1920px]:h-14 rounded-xl bg-[#22C55E] text-black font-bold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 group shadow-[0_4px_20px_rgba(34,197,94,0.2)] ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
           >
-            <span>Create Account</span>
-            <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+            {isLoading ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) : (
+              <>
+                <span>Create Account</span>
+                <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+              </>
+            )}
           </motion.button>
 
           <div className="relative py-1 flex items-center gap-4">
