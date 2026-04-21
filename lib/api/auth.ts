@@ -1,27 +1,39 @@
 // 1. This is the main address for your backend
-const BASE_URL = "https://api-test.krifth.com";
+const BASE_URL = "/api/proxy";
 
 // 2. This helper helps us handle errors in a simple way
 async function handleResponse(response: Response) {
-    const data = await response.json();
+    const contentType = response.headers.get("content-type");
+    let data;
+
+    if (contentType && contentType.includes("application/json")) {
+        try {
+            data = await response.json();
+        } catch (e) {
+            console.error("Failed to parse JSON response", e);
+            throw new Error("Server returned an invalid response format.");
+        }
+    } else {
+        const text = await response.text();
+        console.error("Non-JSON response received:", text.substring(0, 200));
+        throw new Error(`Server Error: ${response.status} ${response.statusText}`);
+    }
+
     if (!response.ok) {
-        // If something went wrong, we "throw" an error with the message from the backend
-        throw new Error(data.message || data.error || "Something went wrong");
+        throw new Error(data.error || data.message || `Request failed with status ${response.status}`);
     }
     return data;
 }
 
 /**
  * LOGIN FUNCTION
- * This function takes the user's email and password and sends them to the server.
  */
 export async function login(email: string, password: string) {
-    const response = await fetch(`${BASE_URL}/api/auth/login/`, {
+    const response = await fetch(`${BASE_URL}/auth/login/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        // We turn the email and password into a JSON string
         body: JSON.stringify({ email, password }),
     });
 
@@ -30,10 +42,9 @@ export async function login(email: string, password: string) {
 
 /**
  * REFRESH TOKEN FUNCTION
- * This function uses your "Refresh Token" (Master Key) to get a new "Access Token" (Temporary Key).
  */
 export async function refreshAccessToken(refreshToken: string) {
-    const response = await fetch(`${BASE_URL}/api/auth/refresh/`, {
+    const response = await fetch(`${BASE_URL}/auth/refresh/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -43,22 +54,37 @@ export async function refreshAccessToken(refreshToken: string) {
 
     return handleResponse(response);
 }
+
 /**
  * SIGNUP FUNCTION
- * This function takes user details and sends them to the server to create a new account.
  */
 export async function signup(email: string, fullName: string, password: string, confirmPassword: string) {
-    const response = await fetch(`${BASE_URL}/api/auth/register/`, {
+    const response = await fetch(`${BASE_URL}/auth/register/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-            email, 
-            full_name: fullName, 
-            password, 
-            confirm_password: confirmPassword 
+        body: JSON.stringify({
+            email,
+            full_name: fullName,
+            password,
+            confirm_password: confirmPassword
         }),
+    });
+
+    return handleResponse(response);
+}
+
+/**
+ * VERIFY OTP FUNCTION
+ */
+export async function verifyOtp(email: string, otp: string) {
+    const response = await fetch(`${BASE_URL}/auth/verify-otp/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, otp }),
     });
 
     return handleResponse(response);

@@ -15,8 +15,10 @@ import {
   Package,
   Target,
   Globe,
-  Plus
+  Plus,
+  Loader2
 } from "lucide-react";
+import { saveOnboardingStep, completeOnboarding } from "@/lib/api/onboarding";
 
 const InstagramIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
   <svg 
@@ -46,6 +48,8 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(0);
   const [selectedPlan, setSelectedPlan] = useState<Plan>("standard");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [values, setValues] = useState({
     brandName: "",
     productTypes: [] as string[],
@@ -55,16 +59,52 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
     instagramHandle: ""
   });
 
-  const nextStep = () => {
-    if (step < 5) {
-      setDirection(1);
-      setStep(step + 1);
-    } else {
-      onComplete();
+  const nextStep = async () => {
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      if (step === 1) {
+        await saveOnboardingStep({ 
+          step: 1, 
+          brand_name: values.brandName 
+        });
+      } else if (step === 2) {
+        await saveOnboardingStep({ 
+          step: 2, 
+          niche: values.productTypes.join(", "), 
+          custom_niche: values.otherProductType 
+        });
+      } else if (step === 3) {
+        await saveOnboardingStep({ 
+          step: 3, 
+          mission: values.goals.join(", ") 
+        });
+      } else if (step === 4) {
+        await saveOnboardingStep({ 
+          step: 4, 
+          instagram_choice: values.instagramStatus === "Yes – connect now" ? "connect_now" : values.instagramStatus === "No, but I plan to" ? "plan_to" : "no_instagram", 
+          instagram_handle: values.instagramHandle 
+        });
+      }
+
+      if (step < 5) {
+        setDirection(1);
+        setStep(step + 1);
+      } else {
+        await completeOnboarding();
+        onComplete();
+      }
+    } catch (err: any) {
+      console.error("Onboarding step error:", err);
+      setError(err.message || "Failed to save progress. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const prevStep = () => {
+    setError(null);
     if (step > 1) {
       setDirection(-1);
       setStep(step - 1);
@@ -164,13 +204,23 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                   </div>
                 </div>
 
+                {error && (
+                  <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center animate-in fade-in slide-in-from-top-1">
+                    {error}
+                  </p>
+                )}
+
                 <button
-                  disabled={!values.brandName}
+                  disabled={!values.brandName || isLoading}
                   onClick={nextStep}
                   className="w-full h-14 rounded-2xl bg-[#22C55E] text-black font-black text-base flex items-center justify-center gap-2 group disabled:opacity-40 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg mt-2"
                 >
-                  Continue
-                  <ChevronRight size={20} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />
+                  {isLoading ? <Loader2 size={20} className="animate-spin" /> : (
+                    <>
+                      Continue
+                      <ChevronRight size={20} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -211,17 +261,31 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                 </div>
               </div>
 
+              {error && (
+                <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center animate-in fade-in slide-in-from-top-1">
+                  {error}
+                </p>
+              )}
+
               <div className="flex gap-3 pt-2">
-                <button onClick={prevStep} className="h-14 px-6 rounded-2xl border border-white/10 text-zinc-400 font-bold hover:text-white transition-all flex items-center gap-2 text-xs">
+                <button 
+                  onClick={prevStep} 
+                  disabled={isLoading}
+                  className="h-14 px-6 rounded-2xl border border-white/10 text-zinc-400 font-bold hover:text-white transition-all flex items-center gap-2 text-xs disabled:opacity-40"
+                >
                    <ArrowLeft size={16} /> Back
                 </button>
                 <button
-                  disabled={values.productTypes.length === 0 && !values.otherProductType}
+                  disabled={(values.productTypes.length === 0 && !values.otherProductType) || isLoading}
                   onClick={nextStep}
                   className="flex-1 h-14 rounded-2xl bg-[#22C55E] text-black font-black text-base flex items-center justify-center gap-2 group disabled:opacity-40 transition-all"
                 >
-                  Continue
-                  <ChevronRight size={20} strokeWidth={3} />
+                  {isLoading ? <Loader2 size={20} className="animate-spin" /> : (
+                    <>
+                      Continue
+                      <ChevronRight size={20} strokeWidth={3} />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -260,15 +324,31 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                 ))}
               </div>
 
+              {error && (
+                <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center animate-in fade-in slide-in-from-top-1">
+                  {error}
+                </p>
+              )}
+
               <div className="flex gap-3 pt-2">
-                <button onClick={prevStep} className="h-14 px-6 rounded-2xl border border-white/10 text-zinc-400 font-bold text-xs">Back</button>
-                <button
-                  disabled={values.goals.length === 0}
-                  onClick={nextStep}
-                  className="flex-1 h-14 rounded-2xl bg-[#22C55E] text-black font-black text-base flex items-center justify-center gap-2 group"
+                <button 
+                  onClick={prevStep} 
+                  disabled={isLoading}
+                  className="h-14 px-6 rounded-2xl border border-white/10 text-zinc-400 font-bold text-xs disabled:opacity-40"
                 >
-                  Continue
-                  <ChevronRight size={20} strokeWidth={3} />
+                  Back
+                </button>
+                <button
+                  disabled={values.goals.length === 0 || isLoading}
+                  onClick={nextStep}
+                  className="flex-1 h-14 rounded-2xl bg-[#22C55E] text-black font-black text-base flex items-center justify-center gap-2 group disabled:opacity-40"
+                >
+                  {isLoading ? <Loader2 size={20} className="animate-spin" /> : (
+                    <>
+                      Continue
+                      <ChevronRight size={20} strokeWidth={3} />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -320,15 +400,31 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                   </div>
                 )}
 
+                {error && (
+                  <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center animate-in fade-in slide-in-from-top-1">
+                    {error}
+                  </p>
+                )}
+
                 <div className="flex gap-3 pt-2">
-                  <button onClick={prevStep} className="h-14 px-6 rounded-2xl border border-white/10 text-zinc-400 font-bold text-xs">Back</button>
-                  <button
-                    disabled={!values.instagramStatus}
-                    onClick={nextStep}
-                    className="flex-1 h-14 rounded-2xl bg-[#22C55E] text-black font-black text-base flex items-center justify-center gap-2 group"
+                  <button 
+                    onClick={prevStep} 
+                    disabled={isLoading}
+                    className="h-14 px-6 rounded-2xl border border-white/10 text-zinc-400 font-bold text-xs disabled:opacity-40"
                   >
-                    Finish Setup
-                    <ChevronRight size={20} strokeWidth={3} />
+                    Back
+                  </button>
+                  <button
+                    disabled={!values.instagramStatus || isLoading}
+                    onClick={nextStep}
+                    className="flex-1 h-14 rounded-2xl bg-[#22C55E] text-black font-black text-base flex items-center justify-center gap-2 group disabled:opacity-40"
+                  >
+                    {isLoading ? <Loader2 size={20} className="animate-spin" /> : (
+                      <>
+                        Finish Setup
+                        <ChevronRight size={20} strokeWidth={3} />
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -364,15 +460,14 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                   )}
                   <div className="mb-4">
                     <Shield size={20} className="text-zinc-500 mb-2" />
-                    <h3 className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em] mb-1">Entry</h3>
+                    <h3 className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em] mb-1">Starter</h3>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-black text-white">$0</span>
-                      <span className="text-zinc-600 text-[10px] font-bold">/mo</span>
+                      <span className="text-3xl font-black text-white">$1</span>
                     </div>
                   </div>
                   
                   <ul className="space-y-3 mb-6 flex-1">
-                    {["1 AI Agent", "Basic Traffic", "Community Support"].map((f) => (
+                    {["Custom URL", "Basic Theme", "Unlimited Inventory"].map((f) => (
                       <li key={f} className="flex items-center gap-2 text-[11px] font-bold text-zinc-500">
                         <Check size={14} className="text-[#22C55E]" strokeWidth={3} /> {f}
                       </li>
@@ -403,22 +498,22 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                        </motion.div>
                     ) : (
                       <div className="px-2 py-1 bg-[#22C55E] text-black text-[8px] font-black uppercase tracking-widest rounded-lg">
-                        Recommended
+                        Most Popular
                       </div>
                     )}
                   </div>
                   
                   <div className="mb-6">
                     <Zap size={24} className={`mb-3 transition-colors ${selectedPlan === "standard" ? "text-[#22C55E]" : "text-zinc-600"}`} />
-                    <h3 className="text-[#22C55E] font-black text-[10px] uppercase tracking-[0.2em] mb-1">Professional</h3>
+                    <h3 className="text-[#22C55E] font-black text-[10px] uppercase tracking-[0.2em] mb-1">Growth</h3>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-black text-white">$29</span>
+                      <span className="text-5xl font-black text-white">$10</span>
                       <span className="text-zinc-600 text-xs font-bold">/mo</span>
                     </div>
                   </div>
                   
                   <ul className="space-y-4 mb-8 flex-1">
-                    {["10 AI Agents", "Instagram Sync", "Inventory Alerts", "Global Sales"].map((f) => (
+                    {["Domain Name", "SSL Certificate", "Unlimited Themes", "Unlimited Inventory", "SEO Optimization"].map((f) => (
                       <li key={f} className="flex items-center gap-3 text-xs font-bold text-zinc-300">
                         <Check size={16} className="text-[#22C55E]" strokeWidth={4} /> {f}
                       </li>
@@ -453,17 +548,23 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                   )}
                   <div className="mb-4">
                     <Crown size={20} className="text-purple-500 mb-2" />
-                    <h3 className="text-purple-500 font-black text-[10px] uppercase tracking-[0.2em] mb-1">Elite</h3>
+                    <h3 className="text-purple-500 font-black text-[10px] uppercase tracking-[0.2em] mb-1">Scale</h3>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-black text-white">$99</span>
-                      <span className="text-zinc-600 text-[10px] font-bold">/mo</span>
+                      <span className="text-3xl font-black text-white">$15</span>
                     </div>
                   </div>
                   
-                  <ul className="space-y-3 mb-6 flex-1">
-                    {["Unlimited Agents", "Custom Models", "Priority VIP Support"].map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-[11px] font-bold text-zinc-500">
-                        <Check size={14} className="text-purple-500" strokeWidth={3} /> {f}
+                  <ul className="space-y-3 mb-6 flex-1 overflow-y-auto scrollbar-hide">
+                    {[
+                      "Domain Name + SSL", 
+                      "Unlimited Themes", 
+                      "Unlimited Inventory", 
+                      "Unlimited AI Agents Deployment", 
+                      "SEO Optimization", 
+                      "Priority Customer Service Support"
+                    ].map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 leading-tight">
+                        <Check size={12} className="text-purple-500 shrink-0" strokeWidth={3} /> {f}
                       </li>
                     ))}
                   </ul>
@@ -471,15 +572,22 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                   <div className={`mt-auto h-12 rounded-xl flex items-center justify-center text-xs font-black border transition-all ${
                     selectedPlan === "premium" ? "bg-purple-600 text-white border-purple-600 shadow-lg" : "bg-transparent border-white/10 text-white"
                   }`}>
-                    {selectedPlan === "premium" ? "PLAN SELECTED" : "SELECT ELITE"}
+                    {selectedPlan === "premium" ? "PLAN SELECTED" : "SELECT PREMIUM"}
                   </div>
                 </motion.div>
               </div>
 
+              {error && (
+                <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center mb-4 animate-in fade-in slide-in-from-top-1">
+                  {error}
+                </p>
+              )}
+
               <div className="mt-8 flex flex-col items-center gap-4">
                 <button
-                  onClick={onComplete}
-                  className={`w-80 h-16 rounded-[24px] font-black text-lg transition-all flex items-center justify-center gap-3 hover:scale-[1.03] transition-all duration-500 shadow-2xl ${
+                  onClick={nextStep}
+                  disabled={isLoading}
+                  className={`w-80 h-16 rounded-[24px] font-black text-lg transition-all flex items-center justify-center gap-3 hover:scale-[1.03] transition-all duration-500 shadow-2xl disabled:opacity-40 ${
                     selectedPlan === "basic" 
                       ? "bg-white text-black shadow-white/10" 
                       : selectedPlan === "standard" 
@@ -487,19 +595,27 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                         : "bg-purple-600 text-white shadow-purple-600/20"
                   }`}
                 >
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={selectedPlan}
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -5 }}
-                    >
-                      Activate {selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)} Account
-                    </motion.span>
-                  </AnimatePresence>
-                  <ChevronRight size={22} strokeWidth={3} />
+                  {isLoading ? <Loader2 size={24} className="animate-spin" /> : (
+                    <>
+                      <AnimatePresence mode="wait">
+                        <motion.span
+                          key={selectedPlan}
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -5 }}
+                        >
+                          Activate {selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)} Account
+                        </motion.span>
+                      </AnimatePresence>
+                      <ChevronRight size={22} strokeWidth={3} />
+                    </>
+                  )}
                 </button>
-                <button onClick={prevStep} className="text-[9px] font-black text-zinc-600 uppercase tracking-[0.3em] hover:text-white transition-colors">
+                <button 
+                  onClick={prevStep} 
+                  disabled={isLoading}
+                  className="text-[9px] font-black text-zinc-600 uppercase tracking-[0.3em] hover:text-white transition-colors disabled:opacity-20"
+                >
                   Adjust Settings
                 </button>
               </div>

@@ -1,18 +1,21 @@
-"use client";
-
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, RotateCcw, HelpCircle } from "lucide-react";
+import { ArrowRight, RotateCcw, HelpCircle, Loader2 } from "lucide-react";
+import { verifyOtp } from "@/lib/api/auth";
 
 export function VerifyForm({
   email = "a***n@krifth.com",
-  onBack
+  onBack,
+  onSuccess
 }: {
   email?: string;
   onBack: () => void;
+  onSuccess: () => void;
 }) {
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const [activeInput, setActiveInput] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -37,6 +40,32 @@ export function VerifyForm({
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
       setActiveInput(index - 1);
+    }
+  };
+
+  const handleVerify = async () => {
+    const otpString = otp.join("");
+    if (otpString.length !== 6) {
+      setError("Please enter the complete 6-digit code");
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await verifyOtp(email, otpString);
+      
+      // Store tokens
+      localStorage.setItem("access_token", response.access_token);
+      localStorage.setItem("refresh_token", response.refresh_token);
+      
+      onSuccess();
+    } catch (err: any) {
+      console.error("Verification error:", err);
+      setError(err.message || "Invalid verification code. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -72,6 +101,7 @@ export function VerifyForm({
                 onChange={(e) => handleChange(e.target.value, index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
                 onFocus={() => setActiveInput(index)}
+                disabled={isLoading}
                 className={`w-full aspect-[4/5] sm:h-20 rounded-lg bg-white/[0.04] border text-2xl font-bold text-white text-center transition-all focus:outline-none ${activeInput === index
                   ? "border-[#22C55E] ring-1 ring-[#22C55E]/20"
                   : "border-white/10"
@@ -86,21 +116,36 @@ export function VerifyForm({
           ))}
         </div>
 
+        {error && (
+          <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center animate-in fade-in slide-in-from-top-1">
+            {error}
+          </p>
+        )}
+
         <div className="space-y-5 min-[1920px]:space-y-6">
           <motion.button
-            whileHover={{ scale: 1.01, backgroundColor: "#4ADE80" }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full h-12 min-[1920px]:h-14 rounded-lg bg-[#22C55E] text-[#0A0A0B] font-bold text-base transition-colors flex items-center justify-center gap-2 group shadow-[0_4px_24px_rgba(34,197,94,0.2)]"
+            whileHover={isLoading ? {} : { scale: 1.01, backgroundColor: "#4ADE80" }}
+            whileTap={isLoading ? {} : { scale: 0.98 }}
+            onClick={handleVerify}
+            disabled={isLoading}
+            className="w-full h-12 min-[1920px]:h-14 rounded-lg bg-[#22C55E] text-[#0A0A0B] font-bold text-base transition-colors flex items-center justify-center gap-2 group shadow-[0_4px_24px_rgba(34,197,94,0.2)] disabled:opacity-50"
           >
-            <span>Verify</span>
-            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            {isLoading ? <Loader2 className="animate-spin" size={20} /> : (
+              <>
+                <span>Verify</span>
+                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+              </>
+            )}
           </motion.button>
 
           <div className="text-center space-y-3 min-[1920px]:space-y-4">
             <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.15em]">
               Haven't received the Code?
             </p>
-            <button className="flex items-center gap-1.5 mx-auto text-[#22C55E] hover:text-[#4ADE80] font-bold text-sm transition-colors group">
+            <button 
+              disabled={isLoading}
+              className="flex items-center gap-1.5 mx-auto text-[#22C55E] hover:text-[#4ADE80] font-bold text-sm transition-colors group disabled:opacity-30"
+            >
               <span>Resend code</span>
               <RotateCcw size={14} className="group-hover:rotate-180 transition-transform duration-700" />
             </button>
@@ -110,7 +155,8 @@ export function VerifyForm({
         <div className="pt-6 min-[1920px]:pt-8 pb-8 min-[1920px]:pb-12 flex flex-col items-center gap-5 min-[1920px]:gap-6">
           <button
             onClick={onBack}
-            className="text-[10px] font-bold text-[#22C55E] uppercase tracking-[0.15em] hover:text-[#4ADE80] transition-colors"
+            disabled={isLoading}
+            className="text-[10px] font-bold text-[#22C55E] uppercase tracking-[0.15em] hover:text-[#4ADE80] transition-colors disabled:opacity-30"
           >
             ← Back to Sign In
           </button>
