@@ -88,4 +88,13 @@
   .btn-secondary {
     @apply w-full h-11 rounded-lg bg-white/5 border border-white/10 text-white font-medium text-[14px] transition-all duration-200 outline-none flex items-center justify-center gap-2;
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
