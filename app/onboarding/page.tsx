@@ -7,7 +7,7 @@ import { DynamicBackground } from "../components/dynamic-background";
 export default function OnboardingPage() {
   const handleComplete = () => {
     // Redirect to dashboard or home after completion
-    window.location.href = "/";
+    window.location.href = "/dashboard";
   };
 
   return (

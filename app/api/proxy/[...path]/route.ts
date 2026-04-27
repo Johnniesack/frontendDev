@@ -5,7 +5,9 @@ export async function POST(
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   const path = (await params).path.join('/');
-  const targetUrl = `https://api-test.krifth.com/api/${path}/`;
+  const upstreamPath = (`/api/${path}`.replace(/\/{2,}/g, '/').replace(/\/+$/, '') + '/');
+  const upstreamUrl = new URL(upstreamPath, 'https://api-test.krifth.com');
+  upstreamUrl.search = request.nextUrl.search;
   
   let body = null;
   try {
@@ -17,8 +19,8 @@ export async function POST(
   const authHeader = request.headers.get('Authorization');
 
   try {
-    console.log(`Proxying to: ${targetUrl}`);
-    const response = await fetch(targetUrl, {
+    console.log(`Proxying to: ${upstreamUrl.toString()}`);
+    const response = await fetch(upstreamUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
