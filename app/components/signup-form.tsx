@@ -92,6 +92,14 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
           <p className="text-xs sm:text-sm text-zinc-400 font-medium">
             Join thousands of creators building with AI
           </p>
+          <div className="mt-3 sm:mt-4 flex items-center justify-center gap-2 text-[11px] sm:text-xs text-zinc-500 font-medium">
+            <span>Plans:</span>
+            <span className="text-[#22C55E] font-bold">$1/mo</span>
+            <span className="text-zinc-600">·</span>
+            <span className="text-zinc-400">$10/mo</span>
+            <span className="text-zinc-600">·</span>
+            <span className="text-zinc-400">$15/mo</span>
+          </div>
         </div>
 
         <form className="space-y-4 lg:space-y-4 min-[1920px]:space-y-6 relative z-10" onSubmit={onSubmit}>
@@ -128,7 +136,7 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
                 onChange={handleChange}
                 onFocus={() => setFocusedField("name")}
                 onBlur={handleBlur}
-                placeholder="John Doe"
+                placeholder="Peter Parker"
                 className={`w-full h-11 sm:h-12 lg:h-11 min-[1920px]:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border text-base sm:text-base transition-all font-medium focus:outline-none placeholder:text-zinc-600 ${errors.name && (touched.name || isSubmitted)
                   ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5 shadow-[0_0_12px_rgba(239,68,68,0.08)]"
                   : "border-white/5 focus:border-[#22C55E]/50 focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
@@ -170,7 +178,7 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
                 onChange={handleChange}
                 onFocus={() => setFocusedField("email")}
                 onBlur={handleBlur}
-                placeholder="john@company.com"
+                placeholder="peter@company.com"
                 className={`w-full h-11 sm:h-12 lg:h-11 min-[1920px]:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border text-base sm:text-base transition-all font-medium focus:outline-none placeholder:text-zinc-600 ${errors.email && (touched.email || isSubmitted)
                   ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5 shadow-[0_0_12px_rgba(239,68,68,0.08)]"
                   : "border-white/5 focus:border-[#22C55E]/50 focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
