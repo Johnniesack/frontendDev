@@ -355,7 +355,7 @@ export function DashboardLayout() {
       {/* ── Main ── */}
       <main className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Top bar */}
-        <header className="flex items-center justify-between px-4 sm:px-8 pt-5 pb-4 flex-shrink-0 bg-[#F5F7FA]">
+        <header className="flex items-center justify-between px-4 sm:px-8 pt-5 sm:pt-6 pb-4 sm:pb-5 flex-shrink-0 bg-[#F5F7FA]">
           <div className="flex items-center gap-3">
             {/* Hamburger — mobile only */}
             <button
@@ -382,155 +382,157 @@ export function DashboardLayout() {
           </motion.button>
         </header>
 
-        {activeNav === "Website" || activeNav === "Account" ? (
-          <AccountView />
-        ) : (
-          <div className="flex-1 overflow-y-auto px-4 sm:px-8 pb-6 space-y-4 sm:space-y-6">
-            {/* ── Stat Cards ── */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
-              {STATS.map((stat, i) => {
-                const Icon = stat.icon;
-                return (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.08, duration: 0.4 }}
-                    className="bg-white rounded-2xl p-4 sm:p-5 flex items-center gap-4 sm:gap-5 border-l-4 shadow-sm hover:shadow-md transition-shadow cursor-default"
-                    style={{ borderLeftColor: stat.border }}
-                  >
-                    <div
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ background: stat.iconBg }}
+        <div className="flex-1 overflow-y-auto">
+          {activeNav === "Website" || activeNav === "Account" ? (
+            <AccountView />
+          ) : (
+            <div className="px-4 sm:px-8 pt-4 sm:pt-0 pb-8 space-y-5 sm:space-y-6">
+              {/* ── Stat Cards ── */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+                {STATS.map((stat, i) => {
+                  const Icon = stat.icon;
+                  return (
+                    <motion.div
+                      key={stat.label}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.08, duration: 0.4 }}
+                      className="bg-white rounded-3xl p-5 sm:p-6 flex items-center gap-5 sm:gap-6 border-l-4 shadow-sm hover:shadow-md transition-shadow cursor-default"
+                      style={{ borderLeftColor: stat.border }}
                     >
-                      <Icon
-                        size={20}
-                        color={stat.iconColor}
-                        strokeWidth={2}
-                      />
-                    </div>
-                    <div>
-                      <p className="text-[10px] sm:text-[11px] text-gray-400 font-semibold uppercase tracking-widest mb-0.5">
-                        {stat.label}
-                      </p>
-                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none">
-                        {stat.value}
-                      </p>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
+                      <div
+                        className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ background: stat.iconBg }}
+                      >
+                        <Icon
+                          size={20}
+                          color={stat.iconColor}
+                          strokeWidth={2}
+                        />
+                      </div>
+                      <div>
+                        <p className="text-[10px] sm:text-[11px] text-gray-400 font-semibold uppercase tracking-widest mb-0.5">
+                          {stat.label}
+                        </p>
+                        <p className="text-2xl sm:text-3xl font-black text-gray-900 leading-none">
+                          {stat.value}
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
 
-            {/* ── Performance Chart ── */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25, duration: 0.5 }}
-              className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm"
-            >
-              {/* Chart header */}
-              <div className="flex items-start justify-between mb-4 sm:mb-6 gap-2">
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold text-gray-900 tracking-tight flex items-center gap-2">
-                    <TrendingUp size={16} className="text-[#22C55E]" />
-                    Performance Overview
-                  </h3>
-                  <p className="text-[11px] sm:text-xs text-gray-400 font-medium mt-0.5">
-                    Tracking your shop&apos;s growth and engagement
-                  </p>
+              {/* ── Performance Chart ── */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.5 }}
+                className="bg-white rounded-2xl p-3 sm:p-6 shadow-sm"
+              >
+                {/* Chart header */}
+                <div className="flex items-start justify-between mb-4 sm:mb-6 gap-2">
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-gray-900 tracking-tight flex items-center gap-2">
+                      <TrendingUp size={16} className="text-[#22C55E]" />
+                      Performance Overview
+                    </h3>
+                    <p className="text-[11px] sm:text-xs text-gray-400 font-medium mt-0.5">
+                      Tracking your shop&apos;s growth and engagement
+                    </p>
+                  </div>
+                  <button className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-gray-200 text-[11px] sm:text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap flex-shrink-0">
+                    Past 7 Days
+                    <ChevronDown size={12} />
+                  </button>
                 </div>
-                <button className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-gray-200 text-[11px] sm:text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap flex-shrink-0">
-                  Past 7 Days
-                  <ChevronDown size={12} />
-                </button>
-              </div>
 
-              {/* Recharts AreaChart */}
-              <div className="h-[200px] sm:h-[260px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart
-                    data={CHART_DATA}
-                    margin={{ top: 10, right: 4, left: -24, bottom: 0 }}
+                {/* Recharts AreaChart */}
+                <div className="h-[220px] sm:h-[260px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart
+                      data={CHART_DATA}
+                      margin={{ top: 10, right: 4, left: -24, bottom: 0 }}
+                    >
+                      <defs>
+                        <linearGradient id="performanceGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#22C55E" stopOpacity={0.18} />
+                          <stop offset="95%" stopColor="#22C55E" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="#F3F4F6"
+                        vertical={false}
+                      />
+                      <XAxis
+                        dataKey="day"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{
+                          fontSize: 11,
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontWeight: 500,
+                          fill: "#9CA3AF",
+                        }}
+                      />
+                      <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{
+                          fontSize: 11,
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontWeight: 500,
+                          fill: "#9CA3AF",
+                        }}
+                      />
+                      <Tooltip
+                        content={<ChartTooltip />}
+                        cursor={{
+                          stroke: "#22C55E",
+                          strokeWidth: 1,
+                          strokeDasharray: "4 4",
+                        }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#22C55E"
+                        strokeWidth={2.5}
+                        fill="url(#performanceGrad)"
+                        dot={{
+                          r: 4,
+                          fill: "white",
+                          stroke: "#22C55E",
+                          strokeWidth: 2,
+                        }}
+                        activeDot={{
+                          r: 6,
+                          fill: "#22C55E",
+                          stroke: "white",
+                          strokeWidth: 2,
+                        }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Detailed Analysis CTA */}
+                <div className="flex justify-center mt-4">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm w-full sm:w-auto justify-center"
+                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                   >
-                    <defs>
-                      <linearGradient id="performanceGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#22C55E" stopOpacity={0.18} />
-                        <stop offset="95%" stopColor="#22C55E" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="#F3F4F6"
-                      vertical={false}
-                    />
-                    <XAxis
-                      dataKey="day"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{
-                        fontSize: 11,
-                        fontFamily: "'Space Grotesk', sans-serif",
-                        fontWeight: 500,
-                        fill: "#9CA3AF",
-                      }}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{
-                        fontSize: 11,
-                        fontFamily: "'Space Grotesk', sans-serif",
-                        fontWeight: 500,
-                        fill: "#9CA3AF",
-                      }}
-                    />
-                    <Tooltip
-                      content={<ChartTooltip />}
-                      cursor={{
-                        stroke: "#22C55E",
-                        strokeWidth: 1,
-                        strokeDasharray: "4 4",
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#22C55E"
-                      strokeWidth={2.5}
-                      fill="url(#performanceGrad)"
-                      dot={{
-                        r: 4,
-                        fill: "white",
-                        stroke: "#22C55E",
-                        strokeWidth: 2,
-                      }}
-                      activeDot={{
-                        r: 6,
-                        fill: "#22C55E",
-                        stroke: "white",
-                        strokeWidth: 2,
-                      }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Detailed Analysis CTA */}
-              <div className="flex justify-center mt-4">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm w-full sm:w-auto justify-center"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                >
-                  Detailed Analysis
-                  <ArrowRight size={15} strokeWidth={2.5} />
-                </motion.button>
-              </div>
-            </motion.div>
-          </div>
-        )}
+                    Detailed Analysis
+                    <ArrowRight size={15} strokeWidth={2.5} />
+                  </motion.button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );

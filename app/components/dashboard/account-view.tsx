@@ -22,7 +22,7 @@ export function AccountView() {
   return (
     <div className="flex-1 px-4 sm:px-8 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
       {/* Tabs */}
-      <div className="flex items-center gap-8 border-b border-gray-200 mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
+      <div className="flex items-center gap-6 sm:gap-8 border-b border-gray-200 mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide pb-px pr-8">
         {["Profile Information", "Update Payment Method"].map((tab) => (
           <button
             key={tab}
@@ -49,11 +49,11 @@ export function AccountView() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.3 }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-6"
+            className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6"
           >
-            {/* Main Content */}
-            <div className="lg:col-span-8 space-y-6">
-              <section className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-50">
+            {/* Main Content - Moves below sidebar on mobile */}
+            <div className="lg:col-span-8 space-y-6 order-2 lg:order-1">
+              <section className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-50">
                 <div className="mb-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-1">Profile Details</h3>
                   <p className="text-sm text-gray-500 font-medium">
@@ -61,8 +61,8 @@ export function AccountView() {
                   </p>
                 </div>
 
-                <form className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <form className="space-y-5 sm:space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">
                         Username
@@ -87,7 +87,7 @@ export function AccountView() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">
                         Phone Number
@@ -112,11 +112,11 @@ export function AccountView() {
                     </div>
                   </div>
 
-                  <div className="pt-8 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="pt-8 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-6">
                     <button
                       type="button"
                       onClick={() => setIsPasswordModalOpen(true)}
-                      className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors px-2"
+                      className="flex items-center justify-center gap-2 text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors px-2 w-full sm:w-auto"
                     >
                       <Lock size={16} />
                       Update Password
@@ -124,13 +124,13 @@ export function AccountView() {
                     <div className="flex items-center gap-4 w-full sm:w-auto">
                       <button
                         type="button"
-                        className="flex-1 sm:flex-none px-8 py-3.5 border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors"
+                        className="flex-1 sm:flex-none px-6 sm:px-8 py-3.5 border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="flex-1 sm:flex-none px-8 py-3.5 bg-[#22C55E] text-white rounded-xl text-sm font-bold shadow-lg shadow-green-200 hover:bg-[#16A34A] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                        className="flex-1 sm:flex-none px-6 sm:px-8 py-3.5 bg-[#22C55E] text-white rounded-xl text-sm font-bold shadow-lg shadow-green-200 hover:bg-[#16A34A] transition-all hover:scale-[1.02] active:scale-[0.98]"
                       >
                         Save Changes
                       </button>
@@ -140,34 +140,34 @@ export function AccountView() {
               </section>
             </div>
 
-            {/* Sidebar */}
-            <aside className="lg:col-span-4 space-y-8">
+            {/* Sidebar - Appears at the top on mobile */}
+            <aside className="lg:col-span-4 space-y-6 sm:space-y-8 order-1 lg:order-2">
               {/* User Profile Card */}
-              <section className="bg-white rounded-3xl p-6 shadow-sm border border-gray-50 flex flex-col items-center text-center">
+              <section className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-gray-50 flex flex-col items-center text-center">
                 <div className="relative mb-4">
-                  <div className="w-24 h-24 rounded-2xl bg-gray-50 flex items-center justify-center shadow-inner ring-4 ring-gray-50 text-gray-300">
-                    <User size={48} />
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gray-50 flex items-center justify-center shadow-inner ring-4 ring-gray-50 text-gray-300">
+                    <User size={40} className="sm:w-12 sm:h-12" />
                   </div>
-                  <button className="absolute -right-2 -bottom-2 w-9 h-9 bg-white border border-gray-100 rounded-xl shadow-lg flex items-center justify-center text-gray-500 hover:text-[#22C55E] transition-colors">
-                    <Camera size={18} />
+                  <button className="absolute -right-2 -bottom-2 w-8 h-8 sm:w-9 sm:h-9 bg-white border border-gray-100 rounded-xl shadow-lg flex items-center justify-center text-gray-500 hover:text-[#22C55E] transition-colors">
+                    <Camera size={16} className="sm:w-[18px] sm:h-[18px]" />
                   </button>
                 </div>
 
-                <h4 className="text-lg font-bold text-gray-900 mb-1">Alex Rivera</h4>
-                <p className="text-xs text-gray-400 font-semibold mb-4">Administrator</p>
+                <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-0.5 sm:mb-1">Alex Rivera</h4>
+                <p className="text-[10px] sm:text-xs text-gray-400 font-semibold mb-4">Administrator</p>
 
-                <span className="px-4 py-1 bg-green-50 text-[#22C55E] rounded-full text-[10px] font-bold uppercase tracking-wider">
+                <span className="px-3 py-1 bg-green-50 text-[#22C55E] rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">
                   Active Account
                 </span>
               </section>
 
               {/* Security Status Card */}
-              <section className="bg-white rounded-3xl p-6 shadow-sm border border-gray-50">
+              <section className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-gray-50">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
-                    <ShieldCheck size={18} />
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
+                    <ShieldCheck size={16} className="sm:w-[18px] sm:h-[18px]" />
                   </div>
-                  <h4 className="text-base font-bold text-gray-900">Security Status</h4>
+                  <h4 className="text-sm sm:text-base font-bold text-gray-900">Security Status</h4>
                 </div>
 
                 <div className="space-y-6">
@@ -203,7 +203,7 @@ export function AccountView() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-8"
+            className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8"
           >
             {/* Left Column: Saved Cards & Current Plan */}
             <div className="lg:col-span-4 space-y-4">
@@ -246,7 +246,7 @@ export function AccountView() {
 
             {/* Right Column: Add Payment Method Form */}
             <div className="lg:col-span-8">
-              <section className="bg-white rounded-[24px] p-6 sm:p-8 border border-gray-50 shadow-sm">
+              <section className="bg-white rounded-[24px] p-5 sm:p-8 border border-gray-50 shadow-sm">
                 <div className="mb-6">
                   <h3 className="text-xl font-black text-gray-900 mb-1">Add New Payment Method</h3>
                   <p className="text-sm text-gray-500 font-medium">Securely add a new card to your account for future billing cycles.</p>
@@ -381,17 +381,17 @@ export function AccountView() {
                   />
                 </div>
 
-                <div className="pt-6 flex items-center justify-end gap-3 border-t border-gray-50 mt-8">
+                <div className="pt-6 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-gray-50 mt-8">
                   <button
                     type="button"
                     onClick={() => setIsPasswordModalOpen(false)}
-                    className="px-6 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors"
+                    className="w-full sm:w-auto px-6 py-3 sm:py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors order-2 sm:order-1"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2.5 bg-[#22C55E] text-white rounded-xl text-sm font-bold shadow-lg shadow-green-100 hover:bg-[#16A34A] transition-all"
+                    className="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-[#22C55E] text-white rounded-xl text-sm font-bold shadow-lg shadow-green-100 hover:bg-[#16A34A] transition-all order-1 sm:order-2"
                   >
                     Update Password
                   </button>
