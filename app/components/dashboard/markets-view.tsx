@@ -104,9 +104,8 @@ function CustomSelect({
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className={`w-full py-4 px-6 rounded-2xl bg-gray-50 border transition-all text-sm font-bold flex items-center justify-between group ${
-          isOpen ? "bg-white border-[#22C55E]/30 ring-8 ring-[#22C55E]/5 shadow-sm" : "border-transparent text-gray-900"
-        }`}
+        className={`w-full py-4 px-6 rounded-2xl bg-gray-50 border transition-all text-sm font-bold flex items-center justify-between group ${isOpen ? "bg-white border-[#22C55E]/30 ring-8 ring-[#22C55E]/5 shadow-sm" : "border-transparent text-gray-900"
+          }`}
       >
         <span className={!selectedOption ? "text-gray-300" : "text-gray-900"}>
           {selectedOption ? (selectedOption.name.includes("Dollar") ? `${selectedOption.code} - ${selectedOption.name}` : selectedOption.name) : placeholder}
@@ -133,11 +132,10 @@ function CustomSelect({
                   onChange(option.code);
                   setIsOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${
-                  value === option.code
-                    ? "bg-[#22C55E]/10 text-[#22C55E]"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${value === option.code
+                  ? "bg-[#22C55E]/10 text-[#22C55E]"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  }`}
               >
                 <span>{option.name.includes("Dollar") || label.includes("Currency") ? `${option.code} - ${option.name}` : option.name}</span>
                 {value === option.code && <Check size={16} strokeWidth={3} />}
@@ -255,11 +253,10 @@ export function MarketsView() {
                         e.stopPropagation();
                         setOpenDropdownId(openDropdownId === item.id ? null : item.id);
                       }}
-                      className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
-                        openDropdownId === item.id
-                          ? "bg-gray-900 text-white shadow-gray-200"
-                          : "bg-[#22C55E] text-white hover:bg-[#16A34A] shadow-green-50"
-                      }`}
+                      className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${openDropdownId === item.id
+                        ? "bg-gray-900 text-white shadow-gray-200"
+                        : "bg-[#22C55E] text-white hover:bg-[#16A34A] shadow-green-50"
+                        }`}
                     >
                       Action
                       <motion.div
@@ -347,20 +344,20 @@ export function MarketsView() {
                   {item.currency}
                 </span>
               </div>
-              
+
               <p className="text-xs font-semibold text-gray-500 leading-relaxed bg-gray-50/50 p-3 rounded-xl">
                 {item.comment}
               </p>
 
               <div className="flex items-center gap-2">
-                <button 
+                <button
                   onClick={() => console.log("Inventory", item.id)}
                   className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#22C55E]/10 text-[#22C55E] rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
                 >
                   <Package size={14} />
                   Inventory
                 </button>
-                <button 
+                <button
                   onClick={() => console.log("Delete", item.id)}
                   className="flex items-center justify-center w-11 h-11 bg-red-50 text-red-500 rounded-xl transition-all active:scale-[0.98]"
                 >
@@ -376,7 +373,7 @@ export function MarketsView() {
           <p className="text-[10px] sm:text-xs font-bold text-gray-400 order-2 sm:order-1">
             Showing <span className="text-gray-900">1-4</span> of <span className="text-gray-900">50</span> entries
           </p>
-          
+
           <div className="flex items-center gap-1.5 order-1 sm:order-2">
             <button className="p-2 text-gray-300 pointer-events-none">
               <ChevronLeft size={18} />
@@ -408,10 +405,10 @@ export function MarketsView() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 100 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative w-full max-w-xl bg-white rounded-t-[40px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl border border-gray-100 overflow-visible max-h-[90vh] overflow-y-auto"
+              className="relative w-full max-w-xl bg-white rounded-t-[40px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto overflow-x-hidden scrollbar-hide"
             >
-              {/* Decorative background element */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl hidden sm:block" />
+              {/* Decorative background element - now contained properly */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl hidden sm:block pointer-events-none" />
 
               <div className="relative mb-6 sm:mb-8 text-center sm:text-left">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-green-50 flex items-center justify-center text-[#22C55E] mb-4 sm:mb-6 mx-auto sm:mx-0">
@@ -425,14 +422,14 @@ export function MarketsView() {
 
               <form className="relative space-y-5 sm:space-y-6" onSubmit={(e) => { e.preventDefault(); setIsAddModalOpen(false); }}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-                  <CustomSelect 
+                  <CustomSelect
                     label="Region / Country"
                     options={COUNTRIES}
                     placeholder="Select a country"
                     value={selectedCountry}
                     onChange={setSelectedCountry}
                   />
-                  <CustomSelect 
+                  <CustomSelect
                     label="Default Currency"
                     options={CURRENCIES}
                     placeholder="Select currency"
