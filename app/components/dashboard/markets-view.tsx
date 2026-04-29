@@ -168,19 +168,19 @@ export function MarketsView() {
   }, []);
 
   return (
-    <div className="flex-1 px-4 sm:px-8 pb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="flex-1 px-4 sm:px-8 pb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 min-w-0">
       {/* Header Area */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-8">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-[#22C55E]">
+          <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-[#22C55E] flex-shrink-0">
             <Globe size={24} strokeWidth={2.5} />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-black uppercase tracking-[0.2em]">
+            <p className="text-[10px] sm:text-xs text-gray-400 font-black uppercase tracking-[0.2em] leading-none mb-1">
               Market Management
             </p>
-            <p className="text-sm text-gray-500 font-medium mt-0.5">
-              Configure regional pricing and market-specific settings.
+            <p className="text-xs sm:text-sm text-gray-500 font-medium leading-tight">
+              Configure regional pricing and specific settings.
             </p>
           </div>
         </div>
@@ -188,7 +188,7 @@ export function MarketsView() {
           onClick={() => setIsAddModalOpen(true)}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-[#22C55E] text-white rounded-2xl text-sm font-bold shadow-lg shadow-green-100 hover:bg-[#16A34A] transition-all"
+          className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#22C55E] text-white rounded-2xl text-sm font-bold shadow-lg shadow-green-100 hover:bg-[#16A34A] transition-all w-full sm:w-auto"
         >
           <Plus size={18} strokeWidth={3} />
           Add Pricing
@@ -198,8 +198,8 @@ export function MarketsView() {
       {/* Main Table Card */}
       <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
         {/* Filter Bar */}
-        <div className="p-6 border-b border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="relative w-full sm:w-80 group">
+        <div className="p-5 sm:p-6 border-b border-gray-50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="relative w-full lg:w-80 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#22C55E] transition-colors" size={18} />
             <input
               type="text"
@@ -210,13 +210,13 @@ export function MarketsView() {
             />
           </div>
 
-          <div className="flex items-center gap-3 self-end sm:self-auto">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Show</span>
+          <div className="flex items-center justify-between sm:justify-end gap-3">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Display</span>
             <div className="relative">
               <select
                 value={entriesPerPage}
                 onChange={(e) => setEntriesPerPage(e.target.value)}
-                className="appearance-none pl-4 pr-10 py-2.5 bg-gray-50 border border-transparent rounded-xl text-sm font-bold text-gray-700 focus:bg-white focus:border-[#22C55E]/30 transition-all outline-none cursor-pointer"
+                className="appearance-none pl-4 pr-10 py-2.5 bg-gray-50 border border-transparent rounded-xl text-xs sm:text-sm font-bold text-gray-700 focus:bg-white focus:border-[#22C55E]/30 transition-all outline-none cursor-pointer"
               >
                 <option value="10">10 entries</option>
                 <option value="25">25 entries</option>
@@ -227,8 +227,8 @@ export function MarketsView() {
           </div>
         </div>
 
-        {/* Table Content */}
-        <div className="overflow-x-auto min-h-[400px]">
+        {/* Desktop Table View (Hidden on Mobile) */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/50">
@@ -281,20 +281,14 @@ export function MarketsView() {
                         >
                           <button
                             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#22C55E] transition-all"
-                            onClick={() => {
-                              console.log("Inventory for", item.id);
-                              setOpenDropdownId(null);
-                            }}
+                            onClick={() => setOpenDropdownId(null)}
                           >
                             <Package size={16} strokeWidth={2.5} />
                             Inventory
                           </button>
                           <button
                             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-red-500 hover:bg-red-50 transition-all"
-                            onClick={() => {
-                              console.log("Delete", item.id);
-                              setOpenDropdownId(null);
-                            }}
+                            onClick={() => setOpenDropdownId(null)}
                           >
                             <Trash2 size={16} strokeWidth={2.5} />
                             Delete
@@ -331,26 +325,67 @@ export function MarketsView() {
           </table>
         </div>
 
+        {/* Mobile Card List View (Visible on Mobile Only) */}
+        <div className="block sm:hidden divide-y divide-gray-50">
+          {MOCK_DATA.map((item, idx) => (
+            <div key={item.id} className="p-5 space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-5 rounded-md overflow-hidden shadow-sm border border-gray-50 flex-shrink-0">
+                    <img
+                      src={`https://flagcdn.com/${item.countryCode}.svg`}
+                      alt={`${item.place} flag`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-gray-900">{item.place}</h4>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">ID: {item.id}</p>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-[10px] font-black tracking-wider">
+                  {item.currency}
+                </span>
+              </div>
+              
+              <p className="text-xs font-semibold text-gray-500 leading-relaxed bg-gray-50/50 p-3 rounded-xl">
+                {item.comment}
+              </p>
+
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => console.log("Inventory", item.id)}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#22C55E]/10 text-[#22C55E] rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                >
+                  <Package size={14} />
+                  Inventory
+                </button>
+                <button 
+                  onClick={() => console.log("Delete", item.id)}
+                  className="flex items-center justify-center w-11 h-11 bg-red-50 text-red-500 rounded-xl transition-all active:scale-[0.98]"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* Footer / Pagination */}
-        <div className="p-6 bg-gray-50/30 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs font-bold text-gray-400">
-            Showing <span className="text-gray-900">1</span> to <span className="text-gray-900">4</span> of <span className="text-gray-900">50</span> entries
+        <div className="p-5 sm:p-6 bg-gray-50/30 flex flex-col sm:flex-row items-center justify-between gap-5">
+          <p className="text-[10px] sm:text-xs font-bold text-gray-400 order-2 sm:order-1">
+            Showing <span className="text-gray-900">1-4</span> of <span className="text-gray-900">50</span> entries
           </p>
           
-          <div className="flex items-center gap-1.5">
-            <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-white rounded-lg transition-all disabled:opacity-50" disabled>
+          <div className="flex items-center gap-1.5 order-1 sm:order-2">
+            <button className="p-2 text-gray-300 pointer-events-none">
               <ChevronLeft size={18} />
             </button>
-            
-            <button className="w-9 h-9 flex items-center justify-center bg-[#22C55E] text-white rounded-xl text-sm font-bold shadow-sm">1</button>
-            <button className="w-9 h-9 flex items-center justify-center bg-white text-gray-600 hover:text-[#22C55E] border border-transparent hover:border-[#22C55E]/20 rounded-xl text-sm font-bold transition-all">2</button>
-            <button className="w-9 h-9 flex items-center justify-center bg-white text-gray-600 hover:text-[#22C55E] border border-transparent hover:border-[#22C55E]/20 rounded-xl text-sm font-bold transition-all">3</button>
-            
-            <span className="px-2 text-gray-300 font-bold">...</span>
-            
-            <button className="w-9 h-9 flex items-center justify-center bg-white text-gray-600 hover:text-[#22C55E] border border-transparent hover:border-[#22C55E]/20 rounded-xl text-sm font-bold transition-all">10</button>
-            
-            <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-white rounded-lg transition-all">
+            <button className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-[#22C55E] text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm">1</button>
+            <button className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white text-gray-600 rounded-xl text-xs sm:text-sm font-bold border border-gray-100">2</button>
+            <span className="px-1 text-gray-300 font-bold">...</span>
+            <button className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-white text-gray-600 rounded-xl text-xs sm:text-sm font-bold border border-gray-100">10</button>
+            <button className="p-2 text-gray-400 hover:text-gray-900 transition-colors">
               <ChevronRight size={18} />
             </button>
           </div>
@@ -360,38 +395,38 @@ export function MarketsView() {
       {/* Add Pricing Modal */}
       <AnimatePresence>
         {isAddModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center px-0 sm:px-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsAddModalOpen(false)}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative w-full max-w-xl bg-white rounded-[40px] p-6 sm:p-10 shadow-2xl border border-gray-100 overflow-visible"
+              className="relative w-full max-w-xl bg-white rounded-t-[40px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl border border-gray-100 overflow-visible max-h-[90vh] overflow-y-auto"
             >
               {/* Decorative background element */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl hidden sm:block" />
 
-              <div className="relative mb-8">
-                <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center text-[#22C55E] mb-6">
+              <div className="relative mb-6 sm:mb-8 text-center sm:text-left">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-green-50 flex items-center justify-center text-[#22C55E] mb-4 sm:mb-6 mx-auto sm:mx-0">
                   <Globe size={28} strokeWidth={2.5} />
                 </div>
-                <h3 className="text-3xl font-black text-gray-900 mb-2">Add Market Pricing</h3>
-                <p className="text-sm text-gray-500 font-medium leading-relaxed">
-                  Configure a new regional market. This will allow you to set specific currency and pricing rules for your customers in this region.
+                <h3 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2">Add Market</h3>
+                <p className="text-xs sm:text-sm text-gray-500 font-medium leading-relaxed px-4 sm:px-0">
+                  Configure regional pricing and specific currency rules for your global customers.
                 </p>
               </div>
 
-              <form className="relative space-y-6" onSubmit={(e) => { e.preventDefault(); setIsAddModalOpen(false); }}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <form className="relative space-y-5 sm:space-y-6" onSubmit={(e) => { e.preventDefault(); setIsAddModalOpen(false); }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
                   <CustomSelect 
-                    label="Market Region / Country"
+                    label="Region / Country"
                     options={COUNTRIES}
                     placeholder="Select a country"
                     value={selectedCountry}
@@ -400,7 +435,7 @@ export function MarketsView() {
                   <CustomSelect 
                     label="Default Currency"
                     options={CURRENCIES}
-                    placeholder="Select a currency"
+                    placeholder="Select currency"
                     value={selectedCurrency}
                     onChange={setSelectedCurrency}
                   />
@@ -411,25 +446,25 @@ export function MarketsView() {
                     Internal Comment
                   </label>
                   <textarea
-                    placeholder="Describe the strategic importance of this market..."
-                    rows={3}
-                    className="w-full py-4 px-6 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none"
+                    placeholder="Describe the strategic importance..."
+                    rows={2}
+                    className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none"
                   />
                 </div>
 
-                <div className="pt-6 flex flex-col sm:flex-row items-center justify-end gap-4 border-t border-gray-50 mt-8">
+                <div className="pt-6 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-gray-50 mt-4 sm:mt-8">
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto px-10 py-4 bg-[#22C55E] text-white rounded-2xl text-sm font-bold shadow-xl shadow-green-100 hover:bg-[#16A34A] transition-all order-1 sm:order-2"
+                  >
+                    Create Market
+                  </button>
                   <button
                     type="button"
                     onClick={() => setIsAddModalOpen(false)}
-                    className="w-full sm:w-auto px-8 py-4 border border-gray-200 text-gray-600 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-colors order-2 sm:order-1"
+                    className="w-full sm:w-auto px-8 py-4 text-gray-400 hover:text-gray-600 rounded-2xl text-sm font-bold transition-colors order-2 sm:order-1"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="w-full sm:w-auto px-10 py-4 bg-[#22C55E] text-white rounded-2xl text-sm font-bold shadow-xl shadow-green-100 hover:bg-[#16A34A] hover:scale-[1.02] active:scale-[0.98] transition-all order-1 sm:order-2"
-                  >
-                    Create Market
+                    Dismiss
                   </button>
                 </div>
               </form>
