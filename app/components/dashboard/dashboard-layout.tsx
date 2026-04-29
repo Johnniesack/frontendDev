@@ -41,6 +41,7 @@ import "@fontsource/space-grotesk/500.css";
 import "@fontsource/space-grotesk/600.css";
 import "@fontsource/space-grotesk/700.css";
 import { AccountView } from "./account-view";
+import { MarketsView } from "./markets-view";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 const STATS = [
@@ -369,6 +370,8 @@ export function DashboardLayout() {
                 ? "Shop Settings"
                 : activeNav === "Account"
                 ? "Account Settings"
+                : activeNav === "Markets"
+                ? "Market Pricing"
                 : "Shop Management Dashboard"}
             </h2>
           </div>
@@ -385,6 +388,8 @@ export function DashboardLayout() {
         <div className="flex-1 overflow-y-auto">
           {activeNav === "Website" || activeNav === "Account" ? (
             <AccountView />
+          ) : activeNav === "Markets" ? (
+            <MarketsView />
           ) : (
             <div className="px-4 sm:px-8 pt-4 sm:pt-0 pb-8 space-y-5 sm:space-y-6">
               {/* ── Stat Cards ── */}

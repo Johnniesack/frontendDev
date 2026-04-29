@@ -1,0 +1,442 @@
+"use client";
+
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Plus,
+  Search,
+  ChevronDown,
+  MoreVertical,
+  ChevronLeft,
+  ChevronRight,
+  Globe,
+  Package,
+  Trash2,
+  Check,
+} from "lucide-react";
+
+interface MarketPricing {
+  id: number;
+  place: string;
+  countryCode: string;
+  currency: string;
+  comment: string;
+}
+
+const MOCK_DATA: MarketPricing[] = [
+  { id: 12, place: "Canada", countryCode: "ca", currency: "USD", comment: "Primary market" },
+  { id: 13, place: "Nigeria", countryCode: "ng", currency: "NGN", comment: "High volume" },
+  { id: 14, place: "Europe", countryCode: "eu", currency: "EUR", comment: "Strategic region" },
+  { id: 15, place: "United Kingdom", countryCode: "gb", currency: "GBP", comment: "New market" },
+];
+
+const COUNTRIES = [
+  { code: "us", name: "United States" },
+  { code: "ca", name: "Canada" },
+  { code: "gb", name: "United Kingdom" },
+  { code: "ng", name: "Nigeria" },
+  { code: "gh", name: "Ghana" },
+  { code: "ke", name: "Kenya" },
+  { code: "za", name: "South Africa" },
+  { code: "de", name: "Germany" },
+  { code: "fr", name: "France" },
+  { code: "ae", name: "United Arab Emirates" },
+  { code: "eu", name: "Europe (General)" },
+  { code: "cn", name: "China" },
+  { code: "in", name: "India" },
+  { code: "br", name: "Brazil" },
+  { code: "au", name: "Australia" },
+];
+
+const CURRENCIES = [
+  { code: "USD", name: "US Dollar" },
+  { code: "EUR", name: "Euro" },
+  { code: "GBP", name: "British Pound" },
+  { code: "NGN", name: "Nigerian Naira" },
+  { code: "GHS", name: "Ghanaian Cedi" },
+  { code: "KES", name: "Kenyan Shilling" },
+  { code: "ZAR", name: "South African Rand" },
+  { code: "AED", name: "UAE Dirham" },
+  { code: "CAD", name: "Canadian Dollar" },
+  { code: "CNY", name: "Chinese Yuan" },
+  { code: "INR", name: "Indian Rupee" },
+  { code: "BRL", name: "Brazilian Real" },
+  { code: "AUD", name: "Australian Dollar" },
+];
+
+// --- Custom Select Component ---
+function CustomSelect({
+  label,
+  options,
+  placeholder,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: { code: string; name: string }[];
+  placeholder: string;
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
+  }, []);
+
+  const selectedOption = options.find((o) => o.code === value);
+
+  return (
+    <div className="space-y-2 relative" ref={containerRef}>
+      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">
+        {label}
+      </label>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
+        className={`w-full py-4 px-6 rounded-2xl bg-gray-50 border transition-all text-sm font-bold flex items-center justify-between group ${
+          isOpen ? "bg-white border-[#22C55E]/30 ring-8 ring-[#22C55E]/5 shadow-sm" : "border-transparent text-gray-900"
+        }`}
+      >
+        <span className={!selectedOption ? "text-gray-300" : "text-gray-900"}>
+          {selectedOption ? (selectedOption.name.includes("Dollar") ? `${selectedOption.code} - ${selectedOption.name}` : selectedOption.name) : placeholder}
+        </span>
+        <motion.div animate={{ rotate: isOpen ? 180 : 0 }}>
+          <ChevronDown className="text-gray-400 group-hover:text-[#22C55E] transition-colors" size={18} />
+        </motion.div>
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 5, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="absolute left-0 right-0 top-full z-[110] bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 max-h-60 overflow-y-auto scrollbar-hide"
+          >
+            {options.map((option) => (
+              <button
+                key={option.code}
+                type="button"
+                onClick={() => {
+                  onChange(option.code);
+                  setIsOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                  value === option.code
+                    ? "bg-[#22C55E]/10 text-[#22C55E]"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                }`}
+              >
+                <span>{option.name.includes("Dollar") || label.includes("Currency") ? `${option.code} - ${option.name}` : option.name}</span>
+                {value === option.code && <Check size={16} strokeWidth={3} />}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export function MarketsView() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [entriesPerPage, setEntriesPerPage] = useState("10");
+  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  // Form state
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState("");
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClick = () => setOpenDropdownId(null);
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
+  }, []);
+
+  return (
+    <div className="flex-1 px-4 sm:px-8 pb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Header Area */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-[#22C55E]">
+            <Globe size={24} strokeWidth={2.5} />
+          </div>
+          <div>
+            <p className="text-xs text-gray-400 font-black uppercase tracking-[0.2em]">
+              Market Management
+            </p>
+            <p className="text-sm text-gray-500 font-medium mt-0.5">
+              Configure regional pricing and market-specific settings.
+            </p>
+          </div>
+        </div>
+        <motion.button
+          onClick={() => setIsAddModalOpen(true)}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-[#22C55E] text-white rounded-2xl text-sm font-bold shadow-lg shadow-green-100 hover:bg-[#16A34A] transition-all"
+        >
+          <Plus size={18} strokeWidth={3} />
+          Add Pricing
+        </motion.button>
+      </div>
+
+      {/* Main Table Card */}
+      <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+        {/* Filter Bar */}
+        <div className="p-6 border-b border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="relative w-full sm:w-80 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#22C55E] transition-colors" size={18} />
+            <input
+              type="text"
+              placeholder="Search markets..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl text-sm font-semibold text-gray-700 focus:bg-white focus:border-[#22C55E]/30 focus:ring-4 focus:ring-[#22C55E]/5 transition-all outline-none placeholder:text-gray-400"
+            />
+          </div>
+
+          <div className="flex items-center gap-3 self-end sm:self-auto">
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Show</span>
+            <div className="relative">
+              <select
+                value={entriesPerPage}
+                onChange={(e) => setEntriesPerPage(e.target.value)}
+                className="appearance-none pl-4 pr-10 py-2.5 bg-gray-50 border border-transparent rounded-xl text-sm font-bold text-gray-700 focus:bg-white focus:border-[#22C55E]/30 transition-all outline-none cursor-pointer"
+              >
+                <option value="10">10 entries</option>
+                <option value="25">25 entries</option>
+                <option value="50">50 entries</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
+            </div>
+          </div>
+        </div>
+
+        {/* Table Content */}
+        <div className="overflow-x-auto min-h-[400px]">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50/50">
+                <th className="px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-50">ID</th>
+                <th className="px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-50">Action</th>
+                <th className="px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-50">Place</th>
+                <th className="px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-50">Currency</th>
+                <th className="px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-50">Comment</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {MOCK_DATA.map((item, idx) => (
+                <motion.tr
+                  key={item.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  className="group hover:bg-gray-50/50 transition-colors"
+                >
+                  <td className="px-6 py-5 text-sm font-bold text-gray-500">{item.id}</td>
+                  <td className="px-6 py-5 relative">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenDropdownId(openDropdownId === item.id ? null : item.id);
+                      }}
+                      className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${
+                        openDropdownId === item.id
+                          ? "bg-gray-900 text-white shadow-gray-200"
+                          : "bg-[#22C55E] text-white hover:bg-[#16A34A] shadow-green-50"
+                      }`}
+                    >
+                      Action
+                      <motion.div
+                        animate={{ rotate: openDropdownId === item.id ? 180 : 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <ChevronDown size={14} strokeWidth={3} />
+                      </motion.div>
+                    </button>
+
+                    <AnimatePresence>
+                      {openDropdownId === item.id && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                          animate={{ opacity: 1, scale: 1, y: 5 }}
+                          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                          className="absolute left-6 top-full z-50 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 overflow-hidden"
+                        >
+                          <button
+                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#22C55E] transition-all"
+                            onClick={() => {
+                              console.log("Inventory for", item.id);
+                              setOpenDropdownId(null);
+                            }}
+                          >
+                            <Package size={16} strokeWidth={2.5} />
+                            Inventory
+                          </button>
+                          <button
+                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-red-500 hover:bg-red-50 transition-all"
+                            onClick={() => {
+                              console.log("Delete", item.id);
+                              setOpenDropdownId(null);
+                            }}
+                          >
+                            <Trash2 size={16} strokeWidth={2.5} />
+                            Delete
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </td>
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-5 rounded-md overflow-hidden shadow-sm border border-gray-100 flex-shrink-0">
+                        <img
+                          src={`https://flagcdn.com/${item.countryCode}.svg`}
+                          alt={`${item.place} flag`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <span className="text-sm font-bold text-gray-900">{item.place}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5">
+                    <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-black tracking-wider">
+                      {item.currency}
+                    </span>
+                  </td>
+                  <td className="px-6 py-5">
+                    <p className="text-sm font-semibold text-gray-600 max-w-xs truncate">
+                      {item.comment}
+                    </p>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Footer / Pagination */}
+        <div className="p-6 bg-gray-50/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs font-bold text-gray-400">
+            Showing <span className="text-gray-900">1</span> to <span className="text-gray-900">4</span> of <span className="text-gray-900">50</span> entries
+          </p>
+          
+          <div className="flex items-center gap-1.5">
+            <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-white rounded-lg transition-all disabled:opacity-50" disabled>
+              <ChevronLeft size={18} />
+            </button>
+            
+            <button className="w-9 h-9 flex items-center justify-center bg-[#22C55E] text-white rounded-xl text-sm font-bold shadow-sm">1</button>
+            <button className="w-9 h-9 flex items-center justify-center bg-white text-gray-600 hover:text-[#22C55E] border border-transparent hover:border-[#22C55E]/20 rounded-xl text-sm font-bold transition-all">2</button>
+            <button className="w-9 h-9 flex items-center justify-center bg-white text-gray-600 hover:text-[#22C55E] border border-transparent hover:border-[#22C55E]/20 rounded-xl text-sm font-bold transition-all">3</button>
+            
+            <span className="px-2 text-gray-300 font-bold">...</span>
+            
+            <button className="w-9 h-9 flex items-center justify-center bg-white text-gray-600 hover:text-[#22C55E] border border-transparent hover:border-[#22C55E]/20 rounded-xl text-sm font-bold transition-all">10</button>
+            
+            <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-white rounded-lg transition-all">
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Add Pricing Modal */}
+      <AnimatePresence>
+        {isAddModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAddModalOpen(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="relative w-full max-w-xl bg-white rounded-[40px] p-6 sm:p-10 shadow-2xl border border-gray-100 overflow-visible"
+            >
+              {/* Decorative background element */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl" />
+
+              <div className="relative mb-8">
+                <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center text-[#22C55E] mb-6">
+                  <Globe size={28} strokeWidth={2.5} />
+                </div>
+                <h3 className="text-3xl font-black text-gray-900 mb-2">Add Market Pricing</h3>
+                <p className="text-sm text-gray-500 font-medium leading-relaxed">
+                  Configure a new regional market. This will allow you to set specific currency and pricing rules for your customers in this region.
+                </p>
+              </div>
+
+              <form className="relative space-y-6" onSubmit={(e) => { e.preventDefault(); setIsAddModalOpen(false); }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <CustomSelect 
+                    label="Market Region / Country"
+                    options={COUNTRIES}
+                    placeholder="Select a country"
+                    value={selectedCountry}
+                    onChange={setSelectedCountry}
+                  />
+                  <CustomSelect 
+                    label="Default Currency"
+                    options={CURRENCIES}
+                    placeholder="Select a currency"
+                    value={selectedCurrency}
+                    onChange={setSelectedCurrency}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">
+                    Internal Comment
+                  </label>
+                  <textarea
+                    placeholder="Describe the strategic importance of this market..."
+                    rows={3}
+                    className="w-full py-4 px-6 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none"
+                  />
+                </div>
+
+                <div className="pt-6 flex flex-col sm:flex-row items-center justify-end gap-4 border-t border-gray-50 mt-8">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddModalOpen(false)}
+                    className="w-full sm:w-auto px-8 py-4 border border-gray-200 text-gray-600 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-colors order-2 sm:order-1"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto px-10 py-4 bg-[#22C55E] text-white rounded-2xl text-sm font-bold shadow-xl shadow-green-100 hover:bg-[#16A34A] hover:scale-[1.02] active:scale-[0.98] transition-all order-1 sm:order-2"
+                  >
+                    Create Market
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
