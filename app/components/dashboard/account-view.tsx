@@ -20,7 +20,7 @@ export function AccountView() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   return (
-    <div className="flex-1 px-4 sm:px-8 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
+    <div className="flex-1 px-4 sm:px-8 pb-6 animate-in fade-in duration-500 relative">
       {/* Tabs */}
       <div className="flex items-center gap-6 sm:gap-8 border-b border-gray-200 mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide pb-px pr-8">
         {["Profile Information", "Update Payment Method"].map((tab) => (
@@ -177,7 +177,7 @@ export function AccountView() {
                     </div>
                     <div>
                       <h5 className="text-xs font-bold text-gray-900">Two-Factor Authentication</h5>
-                      <p className="text-[10px] text-gray-400 font-semibold mt-1">Enabled via Email OTP</p>
+                      <p className="text-[10px] text-gray-400 font-semibold mt-1">Enabled via Email Verification</p>
                     </div>
                   </div>
 

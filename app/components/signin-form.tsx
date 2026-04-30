@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { login } from "@/lib/api/auth";
 
-export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (email: string) => void, onSignUp: () => void, onForgotPassword?: () => void }) {
+export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (email: string, data?: any) => void, onSignUp: () => void, onForgotPassword?: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -54,16 +54,33 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
       try {
         // Here we call the login function from our auth.ts file
         const response = await login(values.email, values.password);
+        
+        const accessToken = response.access_token || response.access || 
+                            response.data?.access_token || response.data?.access;
+        const refreshToken = response.refresh_token || response.refresh || 
+                             response.data?.refresh_token || response.data?.refresh;
+        const isOnboarded = response.is_onboarded ?? response.data?.is_onboarded;
 
-        // We save the keys from the server into the browser memory
-        localStorage.setItem("access_token", response.data.access);
-        localStorage.setItem("refresh_token", response.data.refresh);
+        if (accessToken && typeof accessToken === 'string') localStorage.setItem("access_token", accessToken);
+        if (refreshToken && typeof refreshToken === 'string') localStorage.setItem("refresh_token", refreshToken);
+        if (isOnboarded !== undefined) localStorage.setItem("is_onboarded", String(isOnboarded));
 
-        // Move to the next screen
-        onNext(values.email);
+        // Move to the next screen, passing the full response so handleSignInNext can find what it needs
+        onNext(values.email, response);
       } catch (err: any) {
         // If login fails, we show the error message
-        setServerError(err.message || "Login failed. Please check your credentials.");
+        const msg = err.message || "Login failed. Please check your credentials.";
+        
+        // Try to link API error to specific fields
+        if (msg.toLowerCase().includes("email") || msg.toLowerCase().includes("user") || msg.toLowerCase().includes("account")) {
+          setErrors(prev => ({ ...prev, email: msg }));
+          setTouched(prev => ({ ...prev, email: true }));
+        } else if (msg.toLowerCase().includes("password")) {
+          setErrors(prev => ({ ...prev, password: msg }));
+          setTouched(prev => ({ ...prev, password: true }));
+        } else {
+          setServerError(msg);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -89,12 +106,12 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
           </p>
         </div>
 
-        {/* This block shows the server error if login fails */}
+        {/* General server error if it doesn't match a specific field */}
         {serverError && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold uppercase tracking-widest text-center"
+            className="mb-6 p-4 rounded-xl bg-[#FF5F5F]/10 border border-[#FF5F5F]/20 text-[#FF5F5F] text-xs font-bold uppercase tracking-widest text-center"
           >
             {serverError}
           </motion.div>
@@ -106,19 +123,10 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
               <label className="text-[10px] uppercase tracking-widest font-bold text-zinc-500">
                 Email Address
               </label>
-              {errors.email && (touched.email || isSubmitted) && (
-                <motion.span
-                  initial={{ opacity: 0, x: 5 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="text-[10px] font-bold text-red-400/80 uppercase tracking-tight pt-0.5 pr-1"
-                >
-                  {errors.email}
-                </motion.span>
-              )}
             </div>
             <div className="relative group">
               <Mail
-                className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${errors.email && (touched.email || isSubmitted) ? "text-red-400/40" : focusedField === "email" ? "text-[#22C55E]" : "text-zinc-500"}`}
+                className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${errors.email && (touched.email || isSubmitted) ? "text-[#FF5F5F]/40" : focusedField === "email" ? "text-[#22C55E]" : "text-zinc-500"}`}
                 size={18}
               />
               <input
@@ -130,9 +138,18 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
                 onBlur={handleBlur}
                 disabled={isLoading}
                 placeholder="name@krifth.com"
-                className={`w-full h-11 sm:h-12 min-[1920px]:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border transition-all font-medium text-base sm:text-base focus:outline-none placeholder:text-zinc-600 ${errors.email && (touched.email || isSubmitted) ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5 shadow-[0_0_12px_rgba(239,68,68,0.08)]" : "border-white/5 focus:border-[#22C55E]/50 hover:bg-[#1E252D] focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"}`}
+                className={`w-full h-11 sm:h-12 min-[1920px]:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border transition-all font-medium text-base sm:text-base focus:outline-none placeholder:text-zinc-600 ${errors.email && (touched.email || isSubmitted) ? "border-[#FF5F5F]/20 focus:border-[#FF5F5F]/40 bg-[#FF5F5F]/5 shadow-[0_0_12px_rgba(255,95,95,0.08)]" : "border-white/5 focus:border-[#22C55E]/50 hover:bg-[#1E252D] focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"}`}
               />
             </div>
+            {errors.email && (touched.email || isSubmitted) && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-[10px] text-[#FF5F5F] font-bold uppercase tracking-widest pl-1"
+              >
+                {errors.email}
+              </motion.p>
+            )}
           </div>
 
           <div className="space-y-1.5 sm:space-y-2">
@@ -151,7 +168,7 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
             </div>
             <div className="relative group">
               <Lock
-                className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${errors.password && (touched.password || isSubmitted) ? "text-red-400/40" : focusedField === "password" ? "text-[#22C55E]" : "text-zinc-500"}`}
+                className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${errors.password && (touched.password || isSubmitted) ? "text-[#FF5F5F]/40" : focusedField === "password" ? "text-[#22C55E]" : "text-zinc-500"}`}
                 size={18}
               />
               <input
@@ -163,7 +180,7 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
                 onBlur={handleBlur}
                 disabled={isLoading}
                 placeholder="••••••••"
-                className={`w-full h-11 sm:h-12 min-[1920px]:h-14 pl-12 pr-12 rounded-xl bg-[#1A2026] border transition-all font-medium text-base sm:text-base focus:outline-none placeholder:text-zinc-600 ${errors.password && (touched.password || isSubmitted) ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5 shadow-[0_0_12px_rgba(239,68,68,0.08)]" : "border-white/5 focus:border-[#22C55E]/50 hover:bg-[#1E252D] focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"}`}
+                className={`w-full h-11 sm:h-12 min-[1920px]:h-14 pl-12 pr-12 rounded-xl bg-[#1A2026] border transition-all font-medium text-base sm:text-base focus:outline-none placeholder:text-zinc-600 ${errors.password && (touched.password || isSubmitted) ? "border-[#FF5F5F]/20 focus:border-[#FF5F5F]/40 bg-[#FF5F5F]/5 shadow-[0_0_12px_rgba(255,95,95,0.08)]" : "border-white/5 focus:border-[#22C55E]/50 hover:bg-[#1E252D] focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"}`}
               />
               <button
                 type="button"
@@ -174,6 +191,15 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
+            {errors.password && (touched.password || isSubmitted) && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-[10px] text-[#FF5F5F] font-bold uppercase tracking-widest pl-1"
+              >
+                {errors.password}
+              </motion.p>
+            )}
           </div>
 
           <motion.button
@@ -208,7 +234,7 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.3 }}
         transition={{ delay: 1.2, duration: 1 }}
-        className="mt-6 text-[10px] uppercase tracking-[0.2em] font-medium text-zinc-500 text-center w-full"
+        className="mt-4 text-[10px] uppercase tracking-[0.2em] font-medium text-zinc-500 text-center w-full"
       >
         © 2024 KRIFTH AI. ALL RIGHTS RESERVED.
       </motion.div>

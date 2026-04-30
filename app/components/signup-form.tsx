@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight, Check, Loader2 } from "lucide-react";
 import { signup } from "@/lib/api/auth";
 
-export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void, onSignUpSuccess: (email: string) => void }) {
+export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void, onSignUpSuccess: (email: string, tempToken?: string) => void }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -67,12 +67,28 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
 
       signup(values.email, values.name, values.password, values.confirmPassword)
         .then((response) => {
-          console.log("Sign up success", response);
-          onSignUpSuccess(values.email);
+          // Try to find temp_token in multiple possible locations
+          const token = response.temp_token || response.Temp_token || response.TEMP_TOKEN || 
+                        response.data?.temp_token || response.data?.Temp_token || response.data?.TEMP_TOKEN;
+          onSignUpSuccess(values.email, token);
         })
         .catch((err) => {
           console.error("Sign up error:", err);
-          setApiError(err.message || "Failed to create account. Please try again.");
+          const msg = err.message || "Failed to create account. Please try again.";
+          
+          // Try to link API error to specific fields
+          if (msg.toLowerCase().includes("email")) {
+            setErrors(prev => ({ ...prev, email: msg }));
+            setTouched(prev => ({ ...prev, email: true }));
+          } else if (msg.toLowerCase().includes("password")) {
+            setErrors(prev => ({ ...prev, password: msg }));
+            setTouched(prev => ({ ...prev, password: true }));
+          } else if (msg.toLowerCase().includes("name")) {
+            setErrors(prev => ({ ...prev, name: msg }));
+            setTouched(prev => ({ ...prev, name: true }));
+          } else {
+            setApiError(msg);
+          }
         })
         .finally(() => {
           setIsLoading(false);
@@ -92,14 +108,6 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
           <p className="text-xs sm:text-sm text-zinc-400 font-medium">
             Join thousands of creators building with AI
           </p>
-          <div className="mt-3 sm:mt-4 flex items-center justify-center gap-2 text-[11px] sm:text-xs text-zinc-500 font-medium">
-            <span>Plans:</span>
-            <span className="text-[#22C55E] font-bold">$1/mo</span>
-            <span className="text-zinc-600">·</span>
-            <span className="text-zinc-400">$10/mo</span>
-            <span className="text-zinc-600">·</span>
-            <span className="text-zinc-400">$15/mo</span>
-          </div>
         </div>
 
         <form className="space-y-4 lg:space-y-4 min-[1920px]:space-y-6 relative z-10" onSubmit={onSubmit}>
@@ -109,20 +117,11 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
               <label className="text-[10px] uppercase tracking-widest font-bold text-zinc-500">
                 Full Name
               </label>
-              {errors.name && (touched.name || isSubmitted) && (
-                <motion.span
-                  initial={{ opacity: 0, x: 5 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="text-[10px] font-bold text-red-400/80 uppercase tracking-tight pt-0.5"
-                >
-                  {errors.name && "Required"}
-                </motion.span>
-              )}
             </div>
             <div className="relative group">
               <User
                 className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${errors.name && (touched.name || isSubmitted)
-                  ? "text-red-400/40"
+                  ? "text-[#FF5F5F]/40"
                   : focusedField === "name"
                     ? "text-[#22C55E]"
                     : "text-zinc-500"
@@ -138,11 +137,20 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
                 onBlur={handleBlur}
                 placeholder="Peter Parker"
                 className={`w-full h-11 sm:h-12 lg:h-11 min-[1920px]:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border text-base sm:text-base transition-all font-medium focus:outline-none placeholder:text-zinc-600 ${errors.name && (touched.name || isSubmitted)
-                  ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5 shadow-[0_0_12px_rgba(239,68,68,0.08)]"
+                  ? "border-[#FF5F5F]/20 focus:border-[#FF5F5F]/40 bg-[#FF5F5F]/5 shadow-[0_0_12px_rgba(255,95,95,0.08)]"
                   : "border-white/5 focus:border-[#22C55E]/50 focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
                   }`}
               />
             </div>
+            {errors.name && (touched.name || isSubmitted) && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-[10px] text-[#FF5F5F] font-bold uppercase tracking-widest pl-1"
+              >
+                {errors.name}
+              </motion.p>
+            )}
           </div>
 
           {/* Email Address */}
@@ -151,20 +159,11 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
               <label className="text-[10px] uppercase tracking-widest font-bold text-zinc-500">
                 Email Address
               </label>
-              {errors.email && (touched.email || isSubmitted) && (
-                <motion.span
-                  initial={{ opacity: 0, x: 5 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="text-[10px] font-bold text-red-400/80 uppercase tracking-tight pt-0.5"
-                >
-                  {errors.email && "Invalid"}
-                </motion.span>
-              )}
             </div>
             <div className="relative group">
               <Mail
                 className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${errors.email && (touched.email || isSubmitted)
-                  ? "text-red-400/40"
+                  ? "text-[#FF5F5F]/40"
                   : focusedField === "email"
                     ? "text-[#22C55E]"
                     : "text-zinc-500"
@@ -180,11 +179,20 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
                 onBlur={handleBlur}
                 placeholder="peter@company.com"
                 className={`w-full h-11 sm:h-12 lg:h-11 min-[1920px]:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border text-base sm:text-base transition-all font-medium focus:outline-none placeholder:text-zinc-600 ${errors.email && (touched.email || isSubmitted)
-                  ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5 shadow-[0_0_12px_rgba(239,68,68,0.08)]"
+                  ? "border-[#FF5F5F]/20 focus:border-[#FF5F5F]/40 bg-[#FF5F5F]/5 shadow-[0_0_12px_rgba(255,95,95,0.08)]"
                   : "border-white/5 focus:border-[#22C55E]/50 focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
                   }`}
               />
             </div>
+            {errors.email && (touched.email || isSubmitted) && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-[10px] text-[#FF5F5F] font-bold uppercase tracking-widest pl-1"
+              >
+                {errors.email}
+              </motion.p>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-4">
@@ -196,7 +204,7 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
               <div className="relative group">
                 <Lock
                   className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${errors.password && (touched.password || isSubmitted)
-                    ? "text-red-400/40"
+                    ? "text-[#FF5F5F]/40"
                     : focusedField === "password"
                       ? "text-[#22C55E]"
                       : "text-zinc-500"
@@ -212,7 +220,7 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
                   onBlur={handleBlur}
                   placeholder="••••••••"
                   className={`w-full h-11 sm:h-12 lg:h-11 min-[1920px]:h-14 pl-12 pr-10 rounded-xl bg-[#1A2026] border text-base sm:text-base transition-all font-medium focus:outline-none placeholder:text-zinc-600 ${errors.password && (touched.password || isSubmitted)
-                    ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5 shadow-[0_0_12px_rgba(239,68,68,0.08)]"
+                    ? "border-[#FF5F5F]/20 focus:border-[#FF5F5F]/40 bg-[#FF5F5F]/5 shadow-[0_0_12px_rgba(255,95,95,0.08)]"
                     : "border-white/5 focus:border-[#22C55E]/50 focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
                     }`}
                 />
@@ -224,6 +232,15 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              {errors.password && (touched.password || isSubmitted) && (
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-[10px] text-[#FF5F5F] font-bold uppercase tracking-widest pl-1"
+                >
+                  {errors.password}
+                </motion.p>
+              )}
             </div>
 
             {/* Confirm Password */}
@@ -234,7 +251,7 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
               <div className="relative group">
                 <Lock
                   className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${errors.confirmPassword && (touched.confirmPassword || isSubmitted)
-                    ? "text-red-400/40"
+                    ? "text-[#FF5F5F]/40"
                     : focusedField === "confirmPassword"
                       ? "text-[#22C55E]"
                       : "text-zinc-500"
@@ -250,7 +267,7 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
                   onBlur={handleBlur}
                   placeholder="••••••••"
                   className={`w-full h-11 sm:h-12 lg:h-11 min-[1920px]:h-14 pl-12 pr-10 rounded-xl bg-[#1A2026] border text-base sm:text-base transition-all font-medium focus:outline-none placeholder:text-zinc-600 ${errors.confirmPassword && (touched.confirmPassword || isSubmitted)
-                    ? "border-red-500/20 focus:border-red-500/40 bg-red-500/5 shadow-[0_0_12px_rgba(239,68,68,0.08)]"
+                    ? "border-[#FF5F5F]/20 focus:border-[#FF5F5F]/40 bg-[#FF5F5F]/5 shadow-[0_0_12px_rgba(255,95,95,0.08)]"
                     : "border-white/5 focus:border-[#22C55E]/50 focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"
                     }`}
                 />
@@ -262,17 +279,26 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
                   {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              {errors.confirmPassword && (touched.confirmPassword || isSubmitted) && (
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-[10px] text-[#FF5F5F] font-bold uppercase tracking-widest pl-1"
+                >
+                  {errors.confirmPassword}
+                </motion.p>
+              )}
             </div>
           </div>
 
-          {/* Main Error Message for User feedback */}
-          {(errors.name || errors.email || errors.password || errors.confirmPassword || apiError) && (isSubmitted || touched.password || apiError) && (
+          {/* General API Error Message (if it doesn't match a specific field) */}
+          {apiError && (
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center pt-2"
+              className="text-[10px] text-[#FF5F5F] font-bold uppercase tracking-widest text-center pt-2"
             >
-              {apiError || errors.name || errors.email || errors.password || errors.confirmPassword}
+              {apiError}
             </motion.p>
           )}
 
@@ -282,7 +308,7 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
               type="button"
               onClick={() => setAgreed(!agreed)}
               className={`w-5 h-5 rounded border transition-all flex items-center justify-center flex-shrink-0 ${agreed ? "bg-[#22C55E] border-[#22C55E]" : "bg-[#1A2026] border-white/10"
-                } ${isSubmitted && !agreed ? "border-red-500/40 bg-red-500/5" : ""}`}
+                } ${isSubmitted && !agreed ? "border-[#FF5F5F]/40 bg-[#FF5F5F]/5" : ""}`}
             >
               {agreed && <Check size={14} className="text-black" strokeWidth={4} />}
             </button>

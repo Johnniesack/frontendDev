@@ -18,16 +18,52 @@ async function handleResponse(response: Response) {
     }
 
     if (!response.ok) {
-        throw new Error(data.error || data.message || `Request failed with status ${response.status}`);
+        let errorMessage = `Request failed with status ${response.status}`;
+        if (data) {
+            if (typeof data.error === 'string') errorMessage = data.error;
+            else if (typeof data.message === 'string') errorMessage = data.message;
+            else if (typeof data === 'object') {
+                const firstKey = Object.keys(data)[0];
+                if (firstKey && Array.isArray(data[firstKey])) {
+                    errorMessage = `${firstKey}: ${data[firstKey][0]}`;
+                } else if (firstKey && typeof data[firstKey] === 'string') {
+                    errorMessage = data[firstKey];
+                }
+            }
+        }
+        throw new Error(errorMessage);
     }
     return data;
 }
 
-function getAuthHeaders() {
-    const token = localStorage.getItem("access_token");
+function getAuthHeaders(): HeadersInit {
+    // SSR Check: Prevent crashing during Next.js build
+    if (typeof window === "undefined") {
+        return { "Content-Type": "application/json" };
+    }
+
+    let token = localStorage.getItem("access_token");
+    
+    // Defensive check: if it's null or literally the string "undefined"/"null"
+    if (!token || token === "undefined" || token === "null") {
+        return { "Content-Type": "application/json" };
+    }
+
+    // Clean token: remove any surrounding quotes and whitespace
+    // We do this repeatedly to handle double-quoting or mixed padding
+    token = token.trim();
+    while (token.startsWith('"') && token.endsWith('"')) {
+        token = token.slice(1, -1).trim();
+    }
+
+    // Ensure we don't double-prefix if Bearer was accidentally saved
+    if (token.toLowerCase().startsWith("bearer ")) {
+        token = token.slice(7).trim();
+    }
+
     return {
         "Content-Type": "application/json",
-        ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+        "Authorization": `Bearer ${token}`,
     };
 }
 
@@ -35,7 +71,7 @@ function getAuthHeaders() {
  * SAVE ONBOARDING STEP
  */
 export async function saveOnboardingStep(stepData: any) {
-    const response = await fetch(`${BASE_URL}/onboarding/step/`, {
+    const response = await fetch(`${BASE_URL}/auth/onboarding/step/`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify(stepData),
@@ -47,11 +83,12 @@ export async function saveOnboardingStep(stepData: any) {
 /**
  * COMPLETE ONBOARDING
  */
-export async function completeOnboarding() {
-    const response = await fetch(`${BASE_URL}/onboarding/complete/`, {
+export async function completeOnboarding(plan: string) {
+    const response = await fetch(`${BASE_URL}/auth/onboarding/complete/`, {
         method: "POST",
         headers: getAuthHeaders(),
+        body: JSON.stringify({ plan }),
     });
-
+ 
     return handleResponse(response);
 }
