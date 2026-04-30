@@ -19,18 +19,24 @@ export async function POST(
   const authHeader = request.headers.get('Authorization');
 
   try {
-    console.log(`Proxying to: ${upstreamUrl.toString()}`);
+    console.log(`Proxying ${request.method} to: ${upstreamUrl.toString()}`);
+    console.log('Proxy Headers:', JSON.stringify(Object.fromEntries(request.headers.entries())));
+    
     const response = await fetch(upstreamUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         ...(authHeader ? { 'Authorization': authHeader } : {}),
         'Host': 'api-test.krifth.com',
       },
       ...(body ? { body: JSON.stringify(body) } : {}),
     });
 
+    console.log(`Upstream Response Status: ${response.status}`);
     const responseText = await response.text();
+    console.log(`Upstream Response Body: ${responseText.substring(0, 500)}`);
+
     let data;
     try {
         data = JSON.parse(responseText);
@@ -42,7 +48,7 @@ export async function POST(
   } catch (error: any) {
     console.error('Proxy Fetch Error:', error);
     return NextResponse.json(
-      { error: 'Failed to proxy request', message: error.message, stack: error.stack },
+      { error: 'Failed to proxy request', message: error.message },
       { status: 500 }
     );
   }

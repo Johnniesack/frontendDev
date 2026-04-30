@@ -1,18 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, RotateCcw, HelpCircle, Loader2 } from "lucide-react";
-import { verifyOtp } from "@/lib/api/auth";
+import { verifyOtp, resendOtp } from "@/lib/api/auth";
 
 export function VerifyForm({
   email = "a***n@krifth.com",
+  tempToken,
   onBack,
   onSuccess
 }: {
   email?: string;
+  tempToken?: string;
   onBack: () => void;
-  onSuccess: () => void;
+  onSuccess: (isOnboarded: boolean) => void;
 }) {
-  const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
+  const [code, setCode] = useState<string[]>(new Array(6).fill(""));
   const [activeInput, setActiveInput] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,9 +27,9 @@ export function VerifyForm({
   }, []);
 
   const handleChange = (value: string, index: number) => {
-    const newOtp = [...otp];
-    newOtp[index] = value.substring(value.length - 1);
-    setOtp(newOtp);
+    const newCode = [...code];
+    newCode[index] = value.substring(value.length - 1);
+    setCode(newCode);
 
     // Move to next input
     if (value && index < 5) {
@@ -37,15 +39,15 @@ export function VerifyForm({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
+    if (e.key === "Backspace" && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
       setActiveInput(index - 1);
     }
   };
 
   const handleVerify = async () => {
-    const otpString = otp.join("");
-    if (otpString.length !== 6) {
+    const codeString = code.join("");
+    if (codeString.length !== 6) {
       setError("Please enter the complete 6-digit code");
       return;
     }
@@ -54,16 +56,48 @@ export function VerifyForm({
     setError(null);
 
     try {
-      const response = await verifyOtp(email, otpString);
+      const response = await verifyOtp(email, codeString, tempToken);
       
-      // Store tokens
-      localStorage.setItem("access_token", response.access_token);
-      localStorage.setItem("refresh_token", response.refresh_token);
+      // Store tokens (Handle nested data wrapper and varied key names)
+      const accessToken = response.access_token || response.access || 
+                          response.data?.access_token || response.data?.access;
+      const refreshToken = response.refresh_token || response.refresh || 
+                           response.data?.refresh_token || response.data?.refresh;
       
-      onSuccess();
+      if (accessToken && typeof accessToken === 'string') localStorage.setItem("access_token", accessToken);
+      if (refreshToken && typeof refreshToken === 'string') localStorage.setItem("refresh_token", refreshToken);
+      
+      const isOnboarded = response.is_onboarded ?? response.data?.is_onboarded;
+      if (isOnboarded !== undefined) localStorage.setItem("is_onboarded", String(isOnboarded));
+      
+      onSuccess(isOnboarded);
     } catch (err: any) {
       console.error("Verification error:", err);
-      setError(err.message || "Invalid verification code. Please try again.");
+      // Sanitize backend message to replace 'OTP' with 'code'
+      const msg = (err.message || "Invalid verification code. Please try again.")
+        .replace(/OTP/g, "code")
+        .replace(/otp/g, "code");
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    console.log("Resend requested. tempToken:", tempToken, "email:", email);
+    if (!tempToken && !email) return;
+    
+    setIsLoading(true);
+    setError(null);
+    try {
+      await resendOtp(email, tempToken);
+      alert("Verification code resent successfully!");
+    } catch (err: any) {
+      console.error("Resend error:", err);
+      const msg = (err.message || "Failed to resend code. Please try again.")
+        .replace(/OTP/g, "code")
+        .replace(/otp/g, "code");
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +119,7 @@ export function VerifyForm({
 
       <div className="w-full space-y-6 min-[1920px]:space-y-8 relative z-10">
         <div className="flex justify-between gap-3 sm:gap-4">
-          {otp.map((digit, index) => (
+          {code.map((digit, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -144,6 +178,7 @@ export function VerifyForm({
             </p>
             <button 
               disabled={isLoading}
+              onClick={handleResend}
               className="flex items-center gap-1.5 mx-auto text-[#22C55E] hover:text-[#4ADE80] font-bold text-sm transition-colors group disabled:opacity-30"
             >
               <span>Resend code</span>

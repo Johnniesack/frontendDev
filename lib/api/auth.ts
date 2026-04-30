@@ -9,6 +9,7 @@ async function handleResponse(response: Response) {
     if (contentType && contentType.includes("application/json")) {
         try {
             data = await response.json();
+            console.log(`API Response [${response.url}]:`, data);
         } catch (e) {
             console.error("Failed to parse JSON response", e);
             throw new Error("Server returned an invalid response format.");
@@ -20,7 +21,21 @@ async function handleResponse(response: Response) {
     }
 
     if (!response.ok) {
-        throw new Error(data.error || data.message || `Request failed with status ${response.status}`);
+        let errorMessage = `Request failed with status ${response.status}`;
+        if (data) {
+            if (typeof data.error === 'string') errorMessage = data.error;
+            else if (typeof data.message === 'string') errorMessage = data.message;
+            else if (typeof data === 'object') {
+                // Handle cases like { "email": ["Already exists"] }
+                const firstKey = Object.keys(data)[0];
+                if (firstKey && Array.isArray(data[firstKey])) {
+                    errorMessage = `${firstKey}: ${data[firstKey][0]}`;
+                } else if (firstKey && typeof data[firstKey] === 'string') {
+                    errorMessage = data[firstKey];
+                }
+            }
+        }
+        throw new Error(errorMessage);
     }
     return data;
 }
@@ -59,17 +74,21 @@ export async function refreshAccessToken(refreshToken: string) {
  * SIGNUP FUNCTION
  */
 export async function signup(email: string, fullName: string, password: string, confirmPassword: string) {
+    const body = {
+        email,
+        full_name: fullName,
+        password,
+        confirm_password: confirmPassword
+    };
+    console.log("Signup Request Body:", JSON.stringify(body));
+    
     const response = await fetch(`${BASE_URL}/auth/register/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "Accept": "application/json",
         },
-        body: JSON.stringify({
-            email,
-            full_name: fullName,
-            password,
-            confirm_password: confirmPassword
-        }),
+        body: JSON.stringify(body),
     });
 
     return handleResponse(response);
@@ -78,14 +97,42 @@ export async function signup(email: string, fullName: string, password: string, 
 /**
  * VERIFY OTP FUNCTION
  */
-export async function verifyOtp(email: string, otp: string) {
+export async function verifyOtp(email: string, otp: string, tempToken?: string) {
     const response = await fetch(`${BASE_URL}/auth/verify-otp/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "Accept": "application/json",
         },
-        body: JSON.stringify({ email, otp }),
+        body: JSON.stringify({ 
+            email, 
+            otp,
+            ...(tempToken ? { 
+                TEMP_TOKEN: tempToken,
+                temp_token: tempToken 
+            } : {})
+        }),
     });
 
+    return handleResponse(response);
+}
+/**
+ * RESEND OTP FUNCTION
+ */
+export async function resendOtp(email: string, tempToken?: string) {
+    const response = await fetch(`${BASE_URL}/auth/resend-otp/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        body: JSON.stringify({ 
+            email,
+            ...(tempToken ? { 
+                TEMP_TOKEN: tempToken,
+                temp_token: tempToken 
+            } : {})
+        }),
+    });
     return handleResponse(response);
 }

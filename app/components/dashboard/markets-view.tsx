@@ -166,10 +166,13 @@ export function MarketsView() {
   }, []);
 
   return (
-    <div className="flex-1 px-4 sm:px-8 pb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 min-w-0">
+    <div className="flex-1 px-3 sm:px-8 pb-8 min-w-0 overflow-x-hidden">
       {/* Header Area */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-8">
-        <div className="flex items-center gap-4">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-5 mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-[#22C55E] flex-shrink-0">
             <Globe size={24} strokeWidth={2.5} />
           </div>
@@ -186,17 +189,21 @@ export function MarketsView() {
           onClick={() => setIsAddModalOpen(true)}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#22C55E] text-white rounded-2xl text-sm font-bold shadow-lg shadow-green-100 hover:bg-[#16A34A] transition-all w-full sm:w-auto"
+          className="flex items-center justify-center gap-2 px-5 py-3 bg-[#22C55E] text-white rounded-2xl text-sm font-bold shadow-lg shadow-green-100 hover:bg-[#16A34A] transition-all w-full sm:w-auto"
         >
           <Plus size={18} strokeWidth={3} />
           Add Pricing
         </motion.button>
-      </div>
+      </motion.div>
 
       {/* Main Table Card */}
-      <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        className="bg-white rounded-[24px] sm:rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
         {/* Filter Bar */}
-        <div className="p-5 sm:p-6 border-b border-gray-50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="p-4 sm:p-6 border-b border-gray-50 flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
           <div className="relative w-full lg:w-80 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#22C55E] transition-colors" size={18} />
             <input
@@ -208,9 +215,9 @@ export function MarketsView() {
             />
           </div>
 
-          <div className="flex items-center justify-between sm:justify-end gap-3">
+          <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Display</span>
-            <div className="relative">
+            <div className="relative shrink-0">
               <select
                 value={entriesPerPage}
                 onChange={(e) => setEntriesPerPage(e.target.value)}
@@ -241,8 +248,8 @@ export function MarketsView() {
               {MOCK_DATA.map((item, idx) => (
                 <motion.tr
                   key={item.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   transition={{ delay: idx * 0.05 }}
                   className="group hover:bg-gray-50/50 transition-colors"
                 >
@@ -270,9 +277,9 @@ export function MarketsView() {
                     <AnimatePresence>
                       {openDropdownId === item.id && (
                         <motion.div
-                          initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                          animate={{ opacity: 1, scale: 1, y: 5 }}
-                          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
                           transition={{ duration: 0.2, ease: "easeOut" }}
                           className="absolute left-6 top-full z-50 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 overflow-hidden"
                         >
@@ -325,7 +332,7 @@ export function MarketsView() {
         {/* Mobile Card List View (Visible on Mobile Only) */}
         <div className="block sm:hidden divide-y divide-gray-50">
           {MOCK_DATA.map((item, idx) => (
-            <div key={item.id} className="p-5 space-y-4">
+            <div key={item.id} className="p-4 space-y-3.5">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-5 rounded-md overflow-hidden shadow-sm border border-gray-50 flex-shrink-0">
@@ -359,7 +366,7 @@ export function MarketsView() {
                 </button>
                 <button
                   onClick={() => console.log("Delete", item.id)}
-                  className="flex items-center justify-center w-11 h-11 bg-red-50 text-red-500 rounded-xl transition-all active:scale-[0.98]"
+                  className="flex items-center justify-center w-10 h-10 bg-red-50 text-red-500 rounded-xl transition-all active:scale-[0.98]"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -369,7 +376,7 @@ export function MarketsView() {
         </div>
 
         {/* Footer / Pagination */}
-        <div className="p-5 sm:p-6 bg-gray-50/30 flex flex-col sm:flex-row items-center justify-between gap-5">
+        <div className="p-4 sm:p-6 bg-gray-50/30 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-5">
           <p className="text-[10px] sm:text-xs font-bold text-gray-400 order-2 sm:order-1">
             Showing <span className="text-gray-900">1-4</span> of <span className="text-gray-900">50</span> entries
           </p>
@@ -387,7 +394,7 @@ export function MarketsView() {
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Add Pricing Modal */}
       <AnimatePresence>
@@ -401,9 +408,9 @@ export function MarketsView() {
               className="absolute inset-0 bg-black/60 backdrop-blur-md"
             />
             <motion.div
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 100 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="relative w-full max-w-xl bg-white rounded-t-[40px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto overflow-x-hidden scrollbar-hide"
             >

@@ -2,13 +2,13 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Rocket, 
-  Sparkles, 
-  ChevronRight, 
-  Check, 
-  Shield, 
-  Zap, 
+import {
+  Rocket,
+  Sparkles,
+  ChevronRight,
+  Check,
+  Shield,
+  Zap,
   Crown,
   ArrowLeft,
   Store,
@@ -25,15 +25,15 @@ import {
 import { saveOnboardingStep, completeOnboarding } from "@/lib/api/onboarding";
 
 const InstagramIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
-  <svg 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     className={className}
   >
     <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
@@ -71,9 +71,9 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
   const [paymentErrors, setPaymentErrors] = useState<Record<string, string>>({});
 
   const planDetails = {
-    basic:    { label: "Starter",  price: "$1",  color: "#ffffff", shadow: "rgba(255,255,255,0.08)" },
-    standard: { label: "Growth",   price: "$10", color: "#22C55E", shadow: "rgba(34,197,94,0.15)" },
-    premium:  { label: "Scale",    price: "$15", color: "#a855f7", shadow: "rgba(168,85,247,0.15)" },
+    basic: { label: "Starter", price: "$1", color: "#ffffff", shadow: "rgba(255,255,255,0.08)" },
+    standard: { label: "Growth", price: "$10", color: "#22C55E", shadow: "rgba(34,197,94,0.15)" },
+    premium: { label: "Scale", price: "$15", color: "#a855f7", shadow: "rgba(168,85,247,0.15)" },
   };
 
   const formatCardNumber = (raw: string) => {
@@ -90,18 +90,18 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
   const handlePaymentChange = (field: string, raw: string) => {
     let value = raw;
     if (field === "cardNumber") value = formatCardNumber(raw);
-    if (field === "expiry")     value = formatExpiry(raw);
-    if (field === "cvv")        value = raw.replace(/\D/g, "").slice(0, 4);
+    if (field === "expiry") value = formatExpiry(raw);
+    if (field === "cvv") value = raw.replace(/\D/g, "").slice(0, 4);
     setPayment(prev => ({ ...prev, [field]: value }));
     setPaymentErrors(prev => ({ ...prev, [field]: "" }));
   };
 
   const validatePayment = () => {
     const errs: Record<string, string> = {};
-    if (!payment.cardName.trim())                   errs.cardName   = "Required";
+    if (!payment.cardName.trim()) errs.cardName = "Required";
     if (payment.cardNumber.replace(/\s/g, "").length < 16) errs.cardNumber = "Invalid card number";
-    if (payment.expiry.length < 5)                  errs.expiry     = "Invalid expiry";
-    if (payment.cvv.length < 3)                     errs.cvv        = "Invalid CVV";
+    if (payment.expiry.length < 5) errs.expiry = "Invalid expiry";
+    if (payment.cvv.length < 3) errs.cvv = "Invalid CVV";
     setPaymentErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -112,26 +112,26 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
 
     try {
       if (step === 1) {
-        await saveOnboardingStep({ 
-          step: 1, 
-          brand_name: values.brandName 
+        await saveOnboardingStep({
+          step: 1,
+          brand_name: values.brandName
         });
       } else if (step === 2) {
-        await saveOnboardingStep({ 
-          step: 2, 
-          niche: values.productTypes.join(", "), 
-          custom_niche: values.otherProductType 
+        await saveOnboardingStep({
+          step: 2,
+          niche: values.productTypes.join(", "),
+          custom_niche: values.otherProductType || "None"
         });
       } else if (step === 3) {
-        await saveOnboardingStep({ 
-          step: 3, 
-          mission: values.goals.join(", ") 
+        await saveOnboardingStep({
+          step: 3,
+          mission: values.goals.join(", ")
         });
       } else if (step === 4) {
-        await saveOnboardingStep({ 
-          step: 4, 
-          instagram_choice: values.instagramStatus === "Yes – connect now" ? "connect_now" : values.instagramStatus === "No, but I plan to" ? "plan_to" : "no_instagram", 
-          instagram_handle: values.instagramHandle 
+        await saveOnboardingStep({
+          step: 4,
+          instagram_choice: values.instagramStatus === "Yes – connect now" ? "connect_now" : values.instagramStatus === "No, but I plan to" ? "plan_to" : "no_instagram",
+          instagram_handle: values.instagramHandle || "None"
         });
       }
 
@@ -139,7 +139,7 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
         setDirection(1);
         setStep(step + 1);
       } else {
-        await completeOnboarding();
+        await completeOnboarding(selectedPlan);
         onComplete();
       }
     } catch (err: any) {
@@ -157,7 +157,7 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
     try {
       // Backend handles actual payment processing.
       // Here we just complete onboarding after UI validation passes.
-      await completeOnboarding();
+      await completeOnboarding(selectedPlan);
       onComplete();
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
@@ -177,7 +177,7 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
   const toggleSelection = (field: 'productTypes' | 'goals', item: string) => {
     setValues(prev => {
       const current = prev[field];
-      const next = current.includes(item) 
+      const next = current.includes(item)
         ? current.filter(i => i !== item)
         : [...current, item];
       return { ...prev, [field]: next };
@@ -202,16 +202,15 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
   };
 
   return (
-    <div className="w-full h-[100dvh] flex flex-col items-center justify-start lg:justify-center overflow-x-hidden overflow-y-auto lg:overflow-hidden bg-black selection:bg-[#22C55E]/30 relative">
+    <div className="w-full min-h-[100dvh] flex flex-col items-center justify-start overflow-x-hidden overflow-y-auto bg-black selection:bg-[#22C55E]/30 relative">
       {/* Step Indicator - Sticky on mobile with better spacing */}
       <div className="flex flex-col items-center gap-3 pt-8 pb-6 sticky top-0 z-[60] bg-black/90 backdrop-blur-xl w-full border-b border-white/5">
         <div className="flex gap-2">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div 
-              key={i} 
-              className={`h-1 rounded-full transition-all duration-700 ease-out ${
-                i <= step ? "w-8 bg-[#22C55E]" : "w-2 bg-white/10"
-              }`} 
+            <div
+              key={i}
+              className={`h-1 rounded-full transition-all duration-700 ease-out ${i <= step ? "w-8 bg-[#22C55E]" : "w-2 bg-white/10"
+                }`}
             />
           ))}
         </div>
@@ -232,7 +231,9 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
             x: { type: "spring", stiffness: 300, damping: 30 },
             opacity: { duration: 0.2 }
           }}
-          className="w-full max-w-5xl flex-1 flex flex-col items-center justify-start lg:justify-center px-4 pt-10 pb-20 sm:pb-32"
+          className={`w-full max-w-5xl xl:max-w-6xl flex-1 flex flex-col items-center ${step === 5 ? "justify-center" : "justify-start"} px-4 sm:px-6 md:px-8 ${step === 6 ? "pb-8 sm:pb-12" : step === 5 ? "pb-10 sm:pb-12" : "pb-20 sm:pb-24"
+            } ${step === 5 ? "pt-4 sm:pt-6" : step === 6 ? "pt-2" : step === 3 ? "pt-12" : "pt-16"
+            }`}
         >
           {step === 1 && (
             <div className="space-y-6 max-w-lg w-full text-center">
@@ -303,11 +304,10 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                   <button
                     key={tag}
                     onClick={() => toggleSelection('productTypes', tag)}
-                    className={`h-14 rounded-xl border transition-all font-black text-xs ${
-                      values.productTypes.includes(tag) 
-                        ? "bg-[#22C55E]/10 border-[#22C55E] text-[#22C55E]" 
+                    className={`h-14 rounded-xl border transition-all font-black text-xs ${values.productTypes.includes(tag)
+                        ? "bg-[#22C55E]/10 border-[#22C55E] text-[#22C55E]"
                         : "bg-white/[0.01] border-white/5 text-zinc-500 hover:border-white/20"
-                    }`}
+                      }`}
                   >
                     {tag}
                   </button>
@@ -331,12 +331,12 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
               )}
 
               <div className="flex gap-3 pt-2">
-                <button 
-                  onClick={prevStep} 
+                <button
+                  onClick={prevStep}
                   disabled={isLoading}
                   className="h-14 px-6 rounded-2xl border border-white/10 text-zinc-400 font-bold hover:text-white transition-all flex items-center gap-2 text-xs disabled:opacity-40"
                 >
-                   <ArrowLeft size={16} /> Back
+                  <ArrowLeft size={16} /> Back
                 </button>
                 <button
                   disabled={(values.productTypes.length === 0 && !values.otherProductType) || isLoading}
@@ -355,7 +355,7 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
           )}
 
           {step === 3 && (
-            <div className="space-y-6 max-w-xl w-full text-center">
+            <div className="space-y-5 max-w-xl w-full text-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-black text-white mb-2 tracking-tight">Main Mission</h2>
                 <p className="text-zinc-500 text-sm font-medium">What should your AI agents prioritize first?</p>
@@ -372,14 +372,13 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                   <button
                     key={item.id}
                     onClick={() => toggleSelection('goals', item.id)}
-                    className={`w-full p-4 rounded-xl border transition-all flex items-center gap-4 group ${
-                      values.goals.includes(item.id)
+                    className={`w-full p-3.5 rounded-xl border transition-all flex items-center gap-3 group ${values.goals.includes(item.id)
                         ? "bg-[#22C55E]/10 border-[#22C55E]"
                         : "bg-white/[0.01] border-white/5 hover:border-white/10"
-                    }`}
+                      }`}
                   >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${values.goals.includes(item.id) ? "bg-[#22C55E] text-black" : "bg-white/5 text-zinc-600"}`}>
-                      <item.icon size={18} strokeWidth={2.5} />
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${values.goals.includes(item.id) ? "bg-[#22C55E] text-black" : "bg-white/5 text-zinc-600"}`}>
+                      <item.icon size={16} strokeWidth={2.5} />
                     </div>
                     <span className={`text-sm font-black ${values.goals.includes(item.id) ? "text-white" : "text-zinc-400"}`}>{item.label}</span>
                     {values.goals.includes(item.id) && <Check size={16} className="ml-auto text-[#22C55E]" strokeWidth={4} />}
@@ -393,18 +392,18 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                 </p>
               )}
 
-              <div className="flex gap-3 pt-2">
-                <button 
-                  onClick={prevStep} 
+              <div className="flex gap-3 pt-1">
+                <button
+                  onClick={prevStep}
                   disabled={isLoading}
-                  className="h-14 px-6 rounded-2xl border border-white/10 text-zinc-400 font-bold text-xs disabled:opacity-40"
+                  className="h-13 px-6 rounded-2xl border border-white/10 text-zinc-400 font-bold text-xs disabled:opacity-40"
                 >
                   Back
                 </button>
                 <button
                   disabled={values.goals.length === 0 || isLoading}
                   onClick={nextStep}
-                  className="flex-1 h-14 rounded-2xl bg-[#22C55E] text-black font-black text-base flex items-center justify-center gap-2 group disabled:opacity-40"
+                  className="flex-1 h-13 rounded-2xl bg-[#22C55E] text-black font-black text-base flex items-center justify-center gap-2 group disabled:opacity-40"
                 >
                   {isLoading ? <Loader2 size={20} className="animate-spin" /> : (
                     <>
@@ -435,11 +434,10 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                     <button
                       key={option}
                       onClick={() => setValues({ ...values, instagramStatus: option })}
-                      className={`p-4 rounded-xl border text-left font-black text-xs transition-all ${
-                        values.instagramStatus === option 
-                          ? "bg-white/10 border-white/30 text-white" 
+                      className={`p-4 rounded-xl border text-left font-black text-xs transition-all ${values.instagramStatus === option
+                          ? "bg-white/10 border-white/30 text-white"
                           : "bg-white/[0.01] border-white/5 text-zinc-500 hover:border-white/10"
-                      }`}
+                        }`}
                     >
                       {option}
                     </button>
@@ -470,8 +468,8 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                 )}
 
                 <div className="flex gap-3 pt-2">
-                  <button 
-                    onClick={prevStep} 
+                  <button
+                    onClick={prevStep}
                     disabled={isLoading}
                     className="h-14 px-6 rounded-2xl border border-white/10 text-zinc-400 font-bold text-xs disabled:opacity-40"
                   >
@@ -495,146 +493,140 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
           )}
 
           {step === 5 && (
-            <div className="w-full max-w-6xl mx-auto flex flex-col items-center justify-start lg:justify-center lg:h-full py-4 px-2">
-              <div className="text-center mb-6 lg:mb-8">
-                <h2 className="text-3xl sm:text-5xl font-black text-white mb-2 tracking-tighter">Choose Your Plan</h2>
-                <p className="text-zinc-600 text-xs sm:text-sm font-medium">Professional power, scaled for growth.</p>
+            <div className="w-full max-w-6xl mx-auto flex flex-col items-center justify-start py-1 lg:py-0 px-2">
+              <div className="text-center mb-4 sm:mb-5 lg:mb-4">
+                <h2 className="text-[28px] sm:text-5xl font-black text-white mb-1.5 sm:mb-2 tracking-tighter">Choose Your Plan</h2>
+                <p className="text-zinc-600 text-[11px] sm:text-sm font-medium">Professional power, scaled for growth.</p>
               </div>
 
-              <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 lg:gap-4 w-full items-stretch lg:h-[420px]">
+              <div className="flex flex-col xl:grid xl:grid-cols-3 gap-4 xl:gap-3 w-full items-stretch xl:h-[360px] 2xl:h-[420px]">
                 {/* Basic Plan */}
-                <motion.div 
+                <motion.div
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedPlan("basic")}
-                  className={`flex flex-col p-6 rounded-[32px] border transition-all cursor-pointer relative overflow-hidden ${
-                    selectedPlan === "basic" 
-                      ? "bg-[#0A0A0A] border-white/40 ring-2 ring-white/10 shadow-[0_0_40px_rgba(255,255,255,0.05)]" 
+                  className={`flex flex-col p-5 xl:p-6 rounded-[32px] border transition-all cursor-pointer relative overflow-hidden ${selectedPlan === "basic"
+                      ? "bg-[#0A0A0A] border-white/40 ring-2 ring-white/10 shadow-[0_0_40px_rgba(255,255,255,0.05)]"
                       : "bg-white/[0.01] border-white/5 opacity-30 hover:opacity-60"
-                  }`}
+                    }`}
                 >
                   {selectedPlan === "basic" && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, scale: 0.5 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="absolute top-4 right-4 w-6 h-6 bg-white rounded-full flex items-center justify-center z-20"
+                      className="absolute top-4 right-4 w-5 h-5 sm:w-6 sm:h-6 bg-white rounded-full flex items-center justify-center z-20"
                     >
-                      <Check size={14} className="text-black" strokeWidth={5} />
+                      <Check size={12} className="text-black" strokeWidth={5} />
                     </motion.div>
                   )}
-                  <div className="mb-4">
-                    <Shield size={20} className="text-zinc-500 mb-2" />
-                    <h3 className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em] mb-1">Starter</h3>
+                  <div className="mb-3 sm:mb-4">
+                    <Shield size={18} className="text-zinc-500 mb-1.5 sm:mb-2" />
+                    <h3 className="text-zinc-500 font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] mb-0.5 sm:mb-1">Starter</h3>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-black text-white">$1</span>
+                      <span className="text-2xl sm:text-3xl font-black text-white">$1</span>
                     </div>
                   </div>
-                  
-                  <ul className="space-y-3 mb-6 flex-1">
+
+                  <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 flex-1">
                     {["Custom URL", "Basic Theme", "Unlimited Inventory"].map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-[11px] font-bold text-zinc-500">
-                        <Check size={14} className="text-[#22C55E]" strokeWidth={3} /> {f}
+                      <li key={f} className="flex items-center gap-2 text-[10px] sm:text-[11px] font-bold text-zinc-500">
+                        <Check size={12} className="text-[#22C55E]" strokeWidth={3} /> {f}
                       </li>
                     ))}
                   </ul>
 
-                  <div className={`mt-auto h-12 rounded-xl flex items-center justify-center text-xs font-black border transition-all ${
-                    selectedPlan === "basic" ? "bg-white text-black border-white" : "bg-transparent border-white/10 text-white"
-                  }`}>
+                  <div className={`mt-auto h-11 sm:h-12 rounded-xl flex items-center justify-center text-[10px] sm:text-xs font-black border transition-all ${selectedPlan === "basic" ? "bg-white text-black border-white" : "bg-transparent border-white/10 text-white"
+                    }`}>
                     {selectedPlan === "basic" ? "PLAN SELECTED" : "SELECT BASIC"}
                   </div>
                 </motion.div>
 
                 {/* Standard Plan */}
-                <motion.div 
+                <motion.div
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedPlan("standard")}
-                  className={`flex flex-col p-8 rounded-[36px] border-2 transition-all cursor-pointer relative z-10 ${
-                    selectedPlan === "standard" 
-                      ? "bg-[#111] border-[#22C55E] scale-105 shadow-[0_20px_60px_rgba(34,197,94,0.15)] ring-4 ring-[#22C55E]/5" 
-                      : "bg-white/[0.01] border-[#22C55E]/10 opacity-40 hover:opacity-80 translate-y-2 scale-95"
-                  }`}
+                  className={`flex flex-col p-5 sm:p-6 xl:p-8 rounded-[28px] sm:rounded-[36px] border-2 transition-all cursor-pointer relative z-10 ${selectedPlan === "standard"
+                      ? "bg-[#111] border-[#22C55E] xl:scale-100 2xl:scale-105 shadow-[0_20px_60px_rgba(34,197,94,0.15)] ring-4 ring-[#22C55E]/5"
+                      : "bg-white/[0.01] border-[#22C55E]/10 opacity-40 hover:opacity-80 xl:translate-y-0 2xl:translate-y-2 xl:scale-100 2xl:scale-95"
+                    }`}
                 >
-                  <div className="absolute top-6 right-6 flex items-center gap-2">
+                  <div className="absolute top-5 right-5 sm:top-6 sm:right-6 flex items-center gap-2">
                     {selectedPlan === "standard" ? (
-                       <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-8 h-8 bg-[#22C55E] rounded-full flex items-center justify-center shadow-lg">
-                         <Check size={18} className="text-black" strokeWidth={5} />
-                       </motion.div>
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-7 h-7 sm:w-8 sm:h-8 bg-[#22C55E] rounded-full flex items-center justify-center shadow-lg">
+                        <Check size={16} className="text-black" strokeWidth={5} />
+                      </motion.div>
                     ) : (
-                      <div className="px-2 py-1 bg-[#22C55E] text-black text-[8px] font-black uppercase tracking-widest rounded-lg">
+                      <div className="px-2 py-0.5 sm:py-1 bg-[#22C55E] text-black text-[7px] sm:text-[8px] font-black uppercase tracking-widest rounded-lg">
                         Most Popular
                       </div>
                     )}
                   </div>
-                  
-                  <div className="mb-6">
-                    <Zap size={24} className={`mb-3 transition-colors ${selectedPlan === "standard" ? "text-[#22C55E]" : "text-zinc-600"}`} />
-                    <h3 className="text-[#22C55E] font-black text-[10px] uppercase tracking-[0.2em] mb-1">Growth</h3>
+
+                  <div className="mb-4 sm:mb-6">
+                    <Zap size={22} className={`mb-2 sm:mb-3 transition-colors ${selectedPlan === "standard" ? "text-[#22C55E]" : "text-zinc-600"}`} />
+                    <h3 className="text-[#22C55E] font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] mb-0.5 sm:mb-1">Growth</h3>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-black text-white">$10</span>
+                      <span className="text-4xl sm:text-5xl font-black text-white">$10</span>
                       <span className="text-zinc-600 text-xs font-bold">/mo</span>
                     </div>
                   </div>
-                  
-                  <ul className="space-y-4 mb-8 flex-1">
+
+                  <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 flex-1">
                     {["Domain Name", "SSL Certificate", "Unlimited Themes", "Unlimited Inventory", "SEO Optimization"].map((f) => (
-                      <li key={f} className="flex items-center gap-3 text-xs font-bold text-zinc-300">
-                        <Check size={16} className="text-[#22C55E]" strokeWidth={4} /> {f}
+                      <li key={f} className="flex items-center gap-3 text-[11px] sm:text-xs font-bold text-zinc-300">
+                        <Check size={14} className="text-[#22C55E]" strokeWidth={4} /> {f}
                       </li>
                     ))}
                   </ul>
 
-                  <div className={`mt-auto h-14 rounded-2xl flex items-center justify-center text-sm font-black transition-all ${
-                    selectedPlan === "standard" ? "bg-[#22C55E] text-black shadow-xl" : "bg-transparent border-2 border-[#22C55E]/20 text-[#22C55E]"
-                  }`}>
+                  <div className={`mt-auto h-12 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-[12px] sm:text-sm font-black transition-all ${selectedPlan === "standard" ? "bg-[#22C55E] text-black shadow-xl" : "bg-transparent border-2 border-[#22C55E]/20 text-[#22C55E]"
+                    }`}>
                     {selectedPlan === "standard" ? "PLAN SELECTED" : "SELECT STANDARD"}
                   </div>
                 </motion.div>
 
                 {/* Premium Plan */}
-                <motion.div 
+                <motion.div
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedPlan("premium")}
-                  className={`flex flex-col p-6 rounded-[32px] border transition-all cursor-pointer relative overflow-hidden ${
-                    selectedPlan === "premium" 
-                      ? "bg-[#0A0A0A] border-purple-500 ring-2 ring-purple-500/10 shadow-[0_0_40px_rgba(168,85,247,0.1)]" 
+                  className={`flex flex-col p-5 sm:p-5 xl:p-6 rounded-[24px] sm:rounded-[32px] border transition-all cursor-pointer relative overflow-hidden ${selectedPlan === "premium"
+                      ? "bg-[#0A0A0A] border-purple-500 ring-2 ring-purple-500/10 shadow-[0_0_40px_rgba(168,85,247,0.1)]"
                       : "bg-white/[0.01] border-white/5 opacity-30 hover:opacity-60"
-                  }`}
+                    }`}
                 >
                   {selectedPlan === "premium" && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, scale: 0.5 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="absolute top-4 right-4 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center z-20"
+                      className="absolute top-4 right-4 w-5 h-5 sm:w-6 sm:h-6 bg-purple-500 rounded-full flex items-center justify-center z-20"
                     >
-                      <Check size={14} className="text-white" strokeWidth={5} />
+                      <Check size={12} className="text-white" strokeWidth={5} />
                     </motion.div>
                   )}
-                  <div className="mb-4">
-                    <Crown size={20} className="text-purple-500 mb-2" />
-                    <h3 className="text-purple-500 font-black text-[10px] uppercase tracking-[0.2em] mb-1">Scale</h3>
+                  <div className="mb-3 sm:mb-4">
+                    <Crown size={18} className="text-purple-500 mb-1.5 sm:mb-2" />
+                    <h3 className="text-purple-500 font-black text-[9px] sm:text-[10px] uppercase tracking-[0.2em] mb-0.5 sm:mb-1">Scale</h3>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-black text-white">$15</span>
+                      <span className="text-2xl sm:text-3xl font-black text-white">$15</span>
                     </div>
                   </div>
-                  
-                  <ul className="space-y-3 mb-6 flex-1 overflow-y-auto scrollbar-hide">
+
+                  <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 flex-1 overflow-y-auto scrollbar-hide">
                     {[
-                      "Domain Name + SSL", 
-                      "Unlimited Themes", 
-                      "Unlimited Inventory", 
-                      "Unlimited AI Agents Deployment", 
-                      "SEO Optimization", 
-                      "Priority Customer Service Support"
+                      "Domain Name + SSL",
+                      "Unlimited Themes",
+                      "Unlimited Inventory",
+                      "Unlimited AI Agents",
+                      "SEO Optimization",
+                      "Priority Support"
                     ].map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 leading-tight">
-                        <Check size={12} className="text-purple-500 shrink-0" strokeWidth={3} /> {f}
+                      <li key={f} className="flex items-center gap-2 text-[9px] sm:text-[10px] font-bold text-zinc-500 leading-tight">
+                        <Check size={10} className="text-purple-500 shrink-0" strokeWidth={3} /> {f}
                       </li>
                     ))}
                   </ul>
 
-                  <div className={`mt-auto h-12 rounded-xl flex items-center justify-center text-xs font-black border transition-all ${
-                    selectedPlan === "premium" ? "bg-purple-600 text-white border-purple-600 shadow-lg" : "bg-transparent border-white/10 text-white"
-                  }`}>
+                  <div className={`mt-auto h-11 sm:h-12 rounded-xl flex items-center justify-center text-[10px] sm:text-xs font-black border transition-all ${selectedPlan === "premium" ? "bg-purple-600 text-white border-purple-600 shadow-lg" : "bg-transparent border-white/10 text-white"
+                    }`}>
                     {selectedPlan === "premium" ? "PLAN SELECTED" : "SELECT PREMIUM"}
                   </div>
                 </motion.div>
@@ -646,17 +638,24 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                 </p>
               )}
 
-              <div className="mt-8 flex flex-col items-center gap-4">
+              <div className="mt-6 w-full max-w-[460px] flex items-center gap-3">
+                <button
+                  onClick={prevStep}
+                  disabled={isLoading}
+                  className="h-14 w-14 shrink-0 rounded-2xl border border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 transition-all flex items-center justify-center disabled:opacity-20"
+                  aria-label="Go back"
+                >
+                  <ArrowLeft size={20} />
+                </button>
                 <button
                   onClick={nextStep}
                   disabled={isLoading}
-                  className={`w-80 h-16 rounded-[24px] font-black text-lg transition-all flex items-center justify-center gap-3 hover:scale-[1.03] duration-300 shadow-2xl disabled:opacity-40 ${
-                    selectedPlan === "basic" 
-                      ? "bg-white text-black shadow-white/10" 
-                      : selectedPlan === "standard" 
-                        ? "bg-[#22C55E] text-black shadow-[#22C55E]/20" 
+                  className={`flex-1 h-14 xl:h-16 rounded-[24px] font-black text-base xl:text-lg transition-all flex items-center justify-center gap-3 hover:scale-[1.03] duration-300 shadow-2xl disabled:opacity-40 ${selectedPlan === "basic"
+                      ? "bg-white text-black shadow-white/10"
+                      : selectedPlan === "standard"
+                        ? "bg-[#22C55E] text-black shadow-[#22C55E]/20"
                         : "bg-purple-600 text-white shadow-purple-600/20"
-                  }`}
+                    }`}
                 >
                   {isLoading ? <Loader2 size={24} className="animate-spin" /> : (
                     <>
@@ -667,19 +666,12 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -5 }}
                         >
-                          Continue to Payment
+                          {selectedPlan === "basic" ? "Continue to Payment" : "Start 7-Day Free Trial"}
                         </motion.span>
                       </AnimatePresence>
                       <ChevronRight size={22} strokeWidth={3} />
                     </>
                   )}
-                </button>
-                <button 
-                  onClick={prevStep} 
-                  disabled={isLoading}
-                  className="text-[9px] font-black text-zinc-600 uppercase tracking-[0.3em] hover:text-white transition-colors disabled:opacity-20"
-                >
-                  Adjust Settings
                 </button>
               </div>
             </div>
@@ -688,171 +680,173 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
           {step === 6 && (() => {
             const plan = planDetails[selectedPlan];
             const accentColor = plan.color;
+
+            // If BASIC plan, show payment form
+            if (selectedPlan === "basic") {
+              return (
+                <div className="w-full max-w-lg mx-auto flex flex-col gap-4 sm:gap-6 py-4 sm:py-6 px-4 mt-2 sm:mt-3">
+                  <div className="text-center">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 border shadow-2xl" style={{ background: `${accentColor}20`, borderColor: `${accentColor}40` }}>
+                      <CreditCard size={26} style={{ color: accentColor }} strokeWidth={2.5} />
+                    </div>
+                    <h2 className="text-2xl sm:text-4xl font-black text-white mb-1 tracking-tight">Payment Details</h2>
+                    <p className="text-zinc-400 text-xs sm:text-sm font-medium">Starter Plan ($1) — Secure checkout</p>
+                  </div>
+
+                  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl border flex items-center justify-between shadow-xl" style={{ background: `${accentColor}15`, borderColor: `${accentColor}30` }}>
+                    <div>
+                      <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400 mb-0.5">Selected Plan</p>
+                      <p className="text-white font-black text-sm sm:text-base">{plan.label}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400 mb-0.5">Billed Monthly</p>
+                      <p className="font-black text-xl sm:text-2xl" style={{ color: accentColor }}>$1</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <label className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400 pl-1">Card Details</label>
+                      <div className="relative">
+                        <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
+                        <input
+                          type="text"
+                          value={payment.cardNumber}
+                          onChange={e => handlePaymentChange("cardNumber", e.target.value)}
+                          placeholder="0000 0000 0000 0000"
+                          className="w-full h-12 sm:h-13 py-3 pl-10 pr-4 rounded-xl bg-white/[0.06] border border-white/10 text-sm font-bold text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-zinc-600"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                      <input
+                        type="text"
+                        value={payment.expiry}
+                        onChange={e => handlePaymentChange("expiry", e.target.value)}
+                        placeholder="MM/YY"
+                        className="w-full h-12 sm:h-13 py-3 px-4 rounded-xl bg-white/[0.06] border border-white/10 text-sm font-bold text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-zinc-600"
+                      />
+                      <input
+                        type="text"
+                        value={payment.cvv}
+                        onChange={e => handlePaymentChange("cvv", e.target.value)}
+                        placeholder="CVV"
+                        className="w-full h-12 sm:h-13 py-3 px-4 rounded-xl bg-white/[0.06] border border-white/10 text-sm font-bold text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-zinc-600"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 sm:gap-4 pt-2">
+                    <button onClick={prevStep} className="h-14 sm:h-16 px-6 sm:px-8 rounded-xl sm:rounded-2xl border border-white/10 text-zinc-400 font-bold text-sm hover:text-white hover:bg-white/5 transition-all flex items-center gap-2">
+                      <ArrowLeft size={18} />
+                    </button>
+                    <button
+                      onClick={submitPayment}
+                      disabled={isLoading}
+                      className="flex-1 h-14 sm:h-16 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg bg-white text-black shadow-white/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40"
+                    >
+                      {isLoading ? <Loader2 size={24} className="animate-spin mx-auto" /> : "Pay $1 & Activate"}
+                    </button>
+                  </div>
+                </div>
+              );
+            }
+
+            // Standard/Premium Trial Activation UI
             return (
-              <div className="w-full max-w-lg mx-auto flex flex-col gap-6 py-6 px-4">
-                {/* Header */}
-                <div className="text-center">
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 border shadow-2xl"
-                    style={{ background: `${accentColor}20`, borderColor: `${accentColor}40` }}
-                  >
-                    <CreditCard size={28} style={{ color: accentColor }} strokeWidth={2.5} />
+              <div className="w-full max-w-xl mx-auto flex flex-col gap-5 sm:gap-6 py-4 sm:py-5 px-4 items-center text-center mt-2 sm:mt-4">
+                {/* Header Section */}
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="relative">
+                    <motion.div
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-[24px] sm:rounded-[28px] flex items-center justify-center mx-auto border shadow-2xl relative z-10"
+                      style={{ background: `${accentColor}10`, borderColor: `${accentColor}30` }}
+                    >
+                      <Rocket size={32} style={{ color: accentColor }} strokeWidth={2.5} className="animate-pulse" />
+                    </motion.div>
                   </div>
-                  <h2 className="text-3xl sm:text-4xl font-black text-white mb-1.5 tracking-tight">Payment Details</h2>
-                  <p className="text-zinc-400 text-sm font-medium">Secure checkout — cancel anytime</p>
-                </div>
 
-                {/* Order Summary */}
-                <div
-                  className="p-4 rounded-2xl border flex items-center justify-between shadow-xl"
-                  style={{ background: `${accentColor}15`, borderColor: `${accentColor}30` }}
-                >
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400 mb-0.5">Selected Plan</p>
-                    <p className="text-white font-black text-base">{plan.label}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400 mb-0.5">Billed Monthly</p>
-                    <p className="font-black text-2xl" style={{ color: accentColor }}>{plan.price}<span className="text-xs text-zinc-500 font-bold">/mo</span></p>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tighter">
+                      Activate Your <span style={{ color: accentColor }}>7-Day Trial</span>
+                    </h2>
+                    <p className="text-zinc-500 text-[13px] sm:text-base font-medium max-w-md mx-auto">
+                      Get full access to all <span className="text-white font-bold">{plan.label}</span> features. No credit card required.
+                    </p>
                   </div>
                 </div>
 
-                {/* Card Form */}
-                <div className="space-y-5">
-                  {/* Cardholder Name */}
-                  <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400 pl-1">Cardholder Name</label>
-                    <div className="relative">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-                      <input
-                        type="text"
-                        value={payment.cardName}
-                        onChange={e => handlePaymentChange("cardName", e.target.value)}
-                        placeholder="Peter Parker"
-                        className={`w-full h-13 py-3.5 pl-11 pr-4 rounded-xl bg-white/[0.06] border text-sm font-bold text-white focus:outline-none transition-all placeholder:text-zinc-600 ${
-                          paymentErrors.cardName
-                            ? "border-red-500/40 focus:border-red-500/60"
-                            : "border-white/10 focus:border-white/20"
-                        }`}
-                      />
-                      {paymentErrors.cardName && <p className="text-[10px] text-red-400 font-bold mt-1 pl-1">{paymentErrors.cardName}</p>}
-                    </div>
-                  </div>
-
-                  {/* Card Number */}
-                  <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400 pl-1">Card Number</label>
-                    <div className="relative">
-                      <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={payment.cardNumber}
-                        onChange={e => handlePaymentChange("cardNumber", e.target.value)}
-                        placeholder="0000 0000 0000 0000"
-                        className={`w-full h-13 py-3.5 pl-11 pr-4 rounded-xl bg-white/[0.06] border text-sm font-bold text-white focus:outline-none transition-all placeholder:text-zinc-600 tracking-widest ${
-                          paymentErrors.cardNumber
-                            ? "border-red-500/40 focus:border-red-500/60"
-                            : "border-white/10 focus:border-white/20"
-                        }`}
-                      />
-                      {paymentErrors.cardNumber && <p className="text-[10px] text-red-400 font-bold mt-1 pl-1">{paymentErrors.cardNumber}</p>}
-                    </div>
-                  </div>
-
-                  {/* Expiry + CVV */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400 pl-1">Expiry</label>
-                      <div className="relative">
-                        <CalendarDays className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          value={payment.expiry}
-                          onChange={e => handlePaymentChange("expiry", e.target.value)}
-                          placeholder="MM/YY"
-                          className={`w-full h-13 py-3.5 pl-11 pr-4 rounded-xl bg-white/[0.06] border text-sm font-bold text-white focus:outline-none transition-all placeholder:text-zinc-600 ${
-                            paymentErrors.expiry
-                              ? "border-red-500/40 focus:border-red-500/60"
-                              : "border-white/10 focus:border-white/20"
-                          }`}
-                        />
-                        {paymentErrors.expiry && <p className="text-[10px] text-red-400 font-bold mt-1 pl-1">{paymentErrors.expiry}</p>}
+                {/* Trial Benefits Card */}
+                <div className="w-full bg-white/[0.02] border border-white/5 rounded-[28px] sm:rounded-[32px] p-4 sm:p-6 space-y-4 sm:space-y-5 relative overflow-hidden group">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 relative z-10">
+                    {[
+                      { icon: Zap, text: "Instant Shop Launch" },
+                      { icon: Globe, text: "Global Market Access" },
+                      { icon: Shield, text: "AI Agent Security" },
+                      { icon: Target, text: "Full Growth Analytics" }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 bg-white/[0.03] p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-white/5">
+                        <item.icon size={18} style={{ color: accentColor }} />
+                        <span className="text-[10px] sm:text-xs font-bold text-zinc-300 uppercase tracking-wider">{item.text}</span>
                       </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400 pl-1">CVV</label>
-                      <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          value={payment.cvv}
-                          onChange={e => handlePaymentChange("cvv", e.target.value)}
-                          placeholder="•••"
-                          className={`w-full h-13 py-3.5 pl-11 pr-4 rounded-xl bg-white/[0.06] border text-sm font-bold text-white focus:outline-none transition-all placeholder:text-zinc-600 ${
-                            paymentErrors.cvv
-                              ? "border-red-500/40 focus:border-red-500/60"
-                              : "border-white/10 focus:border-white/20"
-                          }`}
-                        />
-                        {paymentErrors.cvv && <p className="text-[10px] text-red-400 font-bold mt-1 pl-1">{paymentErrors.cvv}</p>}
-                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-3 sm:pt-4 border-t border-white/5 flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/[0.05] border border-white/10">
+                      <CalendarDays size={14} style={{ color: accentColor }} />
+                      <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Trial Period: 7 Days</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Trust signals */}
-                <div className="flex items-center justify-center gap-5 py-1">
-                  <div className="flex items-center gap-1.5 text-[10px] font-black text-zinc-600 uppercase tracking-widest">
-                    <Lock size={11} />
-                    <span>SSL Secured</span>
+                {/* CTA Section */}
+                <div className="w-full space-y-3 pt-1">
+                  <div className="flex gap-3 sm:gap-4">
+                    <button
+                      onClick={prevStep}
+                      disabled={isLoading}
+                      className="h-13 sm:h-14 px-6 sm:px-7 rounded-xl sm:rounded-2xl border border-white/10 text-zinc-400 font-bold text-sm hover:text-white hover:bg-white/5 transition-all flex items-center gap-2"
+                    >
+                      <ArrowLeft size={18} />
+                    </button>
+                    <button
+                      onClick={async () => {
+                        setIsLoading(true);
+                        setError(null);
+                        try {
+                          await completeOnboarding(selectedPlan);
+                          onComplete();
+                        } catch (err: any) {
+                          setError(err.message || "Something went wrong. Please try again.");
+                        } finally {
+                          setIsLoading(false);
+                        }
+                      }}
+                      disabled={isLoading}
+                      className="flex-1 h-13 sm:h-14 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2 sm:gap-3 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl disabled:opacity-40"
+                      style={{
+                        background: accentColor,
+                        color: selectedPlan === "premium" ? "#fff" : "#000",
+                        boxShadow: `0 12px 48px ${plan.shadow}`
+                      }}
+                    >
+                      {isLoading ? <Loader2 size={24} className="animate-spin" /> : (
+                        <>
+                          <span>Start My Free Trial</span>
+                          <ChevronRight size={20} strokeWidth={3} />
+                        </>
+                      )}
+                    </button>
                   </div>
-                  <div className="w-px h-3 bg-white/10" />
-                  <div className="flex items-center gap-1.5 text-[10px] font-black text-zinc-600 uppercase tracking-widest">
-                    <Check size={11} />
-                    <span>Cancel Anytime</span>
-                  </div>
-                  <div className="w-px h-3 bg-white/10" />
-                  <div className="flex items-center gap-1.5 text-[10px] font-black text-zinc-600 uppercase tracking-widest">
-                    <Shield size={11} />
-                    <span>256-bit Encrypted</span>
-                  </div>
-                </div>
 
-                {error && (
-                  <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center animate-in fade-in">
-                    {error}
-                  </p>
-                )}
-
-                {/* CTA */}
-                <div className="flex gap-4">
-                  <button
-                    onClick={prevStep}
-                    disabled={isLoading}
-                    className="h-14 px-6 rounded-2xl border border-white/20 text-zinc-300 font-bold text-sm hover:text-white hover:bg-white/5 transition-all disabled:opacity-40 flex items-center gap-2"
-                  >
-                    <ArrowLeft size={18} /> Back
-                  </button>
-                  <button
-                    onClick={submitPayment}
-                    disabled={isLoading}
-                    className="flex-1 h-14 rounded-2xl font-black text-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl disabled:opacity-40"
-                    style={{
-                      background: accentColor,
-                      color: selectedPlan === "premium" ? "#fff" : "#000",
-                      boxShadow: `0 12px 48px ${plan.shadow}`
-                    }}
-                  >
-                    {isLoading ? <Loader2 size={20} className="animate-spin" /> : (
-                      <>
-                        <Lock size={16} />
-                        Pay {plan.price}/mo & Activate
-                      </>
-                    )}
-                  </button>
+                  {error && (
+                    <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center animate-in fade-in pt-2">
+                      {error}
+                    </p>
+                  )}
                 </div>
               </div>
             );
