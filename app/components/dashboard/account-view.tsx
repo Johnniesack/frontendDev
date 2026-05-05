@@ -20,9 +20,9 @@ export function AccountView() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   return (
-    <div className="flex-1 px-4 sm:px-8 pb-6 animate-in fade-in duration-500 relative">
+    <div className="flex-1 px-4 sm:px-8 pt-4 sm:pt-6 pb-6 animate-in fade-in duration-500 relative">
       {/* Tabs */}
-      <div className="flex items-center gap-6 sm:gap-8 border-b border-gray-200 mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide pb-px pr-8">
+      <div className="flex items-center gap-5 sm:gap-8 border-b border-gray-200 mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide pb-px -mx-4 px-4 sm:mx-0 sm:px-0 pr-4">
         {["Profile Information", "Update Payment Method"].map((tab) => (
           <button
             key={tab}

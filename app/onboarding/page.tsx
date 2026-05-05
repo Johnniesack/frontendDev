@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { OnboardingFlow } from "../components/onboarding-flow";
-import { DynamicBackground } from "../components/dynamic-background";
+import { OnboardingFlow } from "../components/onboarding/onboarding-flow";
+import { DynamicBackground } from "../components/marketing/dynamic-background";
 
 export default function OnboardingPage() {
   const handleComplete = () => {

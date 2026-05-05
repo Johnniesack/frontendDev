@@ -3,7 +3,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Rocket, Fingerprint, Share2, Shield } from "lucide-react";
-import { Logo } from "./logo";
+import { Logo } from "../ui/logo";
 
 const features = [
   {

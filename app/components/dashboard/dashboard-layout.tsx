@@ -48,6 +48,8 @@ import "@fontsource/space-grotesk/700.css";
 import { AccountView } from "./account-view";
 import { MarketsView } from "./markets-view";
 import ShippingView from "./shipping-view";
+import { WebsiteView } from "./website-view";
+import { PagesView } from "./pages-view";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 const STATS = [
@@ -115,6 +117,25 @@ const NAV_ITEMS = [
     type: "section",
     children: [{ label: "Account", icon: User }],
   },
+];
+
+// Bottom-nav primary tabs (mobile)
+const BOTTOM_TABS = [
+  { label: "Dashboard", icon: Home },
+  { label: "Website", icon: Monitor },
+  { label: "Shipping", icon: Truck },
+  { label: "Account", icon: User },
+];
+
+// All items for the "More" bottom sheet
+const MORE_ITEMS = [
+  { label: "Coupons", icon: Ticket },
+  { label: "Pages", icon: FileText },
+  { label: "Personnel", icon: Users },
+  { label: "Markets", icon: Globe },
+  { label: "Tutorials", icon: PlayCircle },
+  { label: "Goals", icon: Target },
+  { label: "Agents", icon: UserCog },
 ];
 
 // ─── Custom Tooltip ───────────────────────────────────────────────────────────
@@ -256,7 +277,167 @@ function NavItem({
   );
 }
 
-// ─── Sidebar content (shared between drawer and desktop) ──────────────────────
+// ─── Mobile Bottom Nav ────────────────────────────────────────────────────────
+function MobileBottomNav({
+  activeNav,
+  setActiveNav,
+}: {
+  activeNav: string;
+  setActiveNav: (v: string) => void;
+}) {
+  const [showMore, setShowMore] = useState(false);
+
+  const handleMoreItem = (label: string) => {
+    setActiveNav(label);
+    setShowMore(false);
+  };
+
+  return (
+    <>
+      {/* Bottom bar */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-t border-gray-100 flex items-stretch shadow-2xl shadow-black/10">
+        {BOTTOM_TABS.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeNav === tab.label;
+          return (
+            <button
+              key={tab.label}
+              onClick={() => setActiveNav(tab.label)}
+              className="flex-1 flex flex-col items-center justify-center gap-1 py-3 min-h-[60px] relative transition-colors"
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="bottom-tab-indicator"
+                  className="absolute top-0 inset-x-3 h-0.5 rounded-full"
+                  style={{ backgroundColor: "#22C55E" }}
+                />
+              )}
+              <Icon size={22} strokeWidth={isActive ? 2.5 : 1.8} color={isActive ? "#22C55E" : "#9CA3AF"} />
+              <span className={`text-[10px] font-bold tracking-wide ${isActive ? "text-[#22C55E]" : "text-gray-400"}`}>
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
+        {/* More tab */}
+        <button
+          onClick={() => setShowMore(true)}
+          className="flex-1 flex flex-col items-center justify-center gap-1 py-3 min-h-[60px] relative"
+        >
+          <Menu size={22} strokeWidth={1.8} color="#9CA3AF" />
+          <span className="text-[10px] font-bold tracking-wide text-gray-400">More</span>
+        </button>
+      </nav>
+
+      {/* More bottom sheet */}
+      <AnimatePresence>
+        {showMore && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowMore(false)}
+              className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]"
+            />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 320 }}
+              className="md:hidden fixed bottom-0 inset-x-0 z-[70] bg-white rounded-t-[32px] shadow-2xl pb-safe"
+            >
+              {/* Handle */}
+              <div className="flex justify-center pt-3 pb-2">
+                <div className="w-10 h-1 bg-gray-200 rounded-full" />
+              </div>
+              <div className="px-6 pb-2">
+                <h3 className="text-sm font-black text-gray-900 mb-1">More</h3>
+                <p className="text-xs text-gray-400 font-medium">All dashboard sections</p>
+              </div>
+              <div className="grid grid-cols-4 gap-2 px-4 pb-8">
+                {MORE_ITEMS.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeNav === item.label;
+                  return (
+                    <motion.button
+                      key={item.label}
+                      whileTap={{ scale: 0.92 }}
+                      onClick={() => handleMoreItem(item.label)}
+                      className="flex flex-col items-center justify-center gap-2 py-4 rounded-2xl transition-all"
+                      style={{ backgroundColor: isActive ? "#F0FDF4" : "#F9FAFB" }}
+                    >
+                      <Icon size={22} strokeWidth={1.8} color={isActive ? "#22C55E" : "#6B7280"} />
+                      <span className={`text-[10px] font-bold text-center leading-tight ${isActive ? "text-[#22C55E]" : "text-gray-500"}`}>
+                        {item.label}
+                      </span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+// ─── Tablet Icon Sidebar ───────────────────────────────────────────────────────
+const ALL_FLAT_ITEMS = [
+  { label: "Dashboard", icon: Home },
+  { label: "Website", icon: Monitor },
+  { label: "Shipping", icon: Truck },
+  { label: "Pages", icon: FileText },
+  { label: "Markets", icon: Globe },
+  { label: "Coupons", icon: Ticket },
+  { label: "Personnel", icon: Users },
+  { label: "Goals", icon: Target },
+  { label: "Agents", icon: UserCog },
+  { label: "Account", icon: User },
+];
+
+function TabletSidebar({
+  activeNav,
+  setActiveNav,
+}: {
+  activeNav: string;
+  setActiveNav: (v: string) => void;
+}) {
+  return (
+    <aside className="hidden md:flex lg:hidden w-[68px] flex-shrink-0 bg-white border-r border-gray-100 flex-col items-center py-4 gap-1 shadow-sm">
+      {/* Logo mark */}
+      <div className="w-9 h-9 rounded-xl bg-gray-900 flex items-center justify-center text-white text-[11px] font-black mb-3">
+        K
+      </div>
+      <div className="w-8 h-px bg-gray-100 mb-2" />
+      <div className="flex-1 flex flex-col gap-1 w-full px-2 overflow-y-auto">
+        {ALL_FLAT_ITEMS.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeNav === item.label;
+          return (
+            <button
+              key={item.label}
+              onClick={() => setActiveNav(item.label)}
+              title={item.label}
+              className={`w-full flex items-center justify-center p-3 rounded-xl transition-all ${
+                isActive ? "bg-[#22C55E] text-white shadow-sm" : "text-gray-400 hover:bg-gray-50 hover:text-gray-700"
+              }`}
+            >
+              <Icon size={19} strokeWidth={isActive ? 2.5 : 1.8} />
+            </button>
+          );
+        })}
+      </div>
+      {/* Logout */}
+      <div className="w-8 h-px bg-gray-100 mt-2 mb-2" />
+      <button title="Logout" className="p-3 rounded-xl text-gray-300 hover:text-red-400 hover:bg-red-50 transition-all">
+        <LogOut size={19} strokeWidth={1.8} />
+      </button>
+    </aside>
+  );
+}
+
 function SidebarContent({
   activeNav,
   setActiveNav,
@@ -497,111 +678,73 @@ export function DashboardLayout() {
         <SidebarContent activeNav={activeNav} setActiveNav={setActiveNav} />
       </aside>
 
-      {/* ── Mobile Drawer Overlay ── */}
-      <AnimatePresence>
-        {drawerOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              key="backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/40 z-40 lg:hidden"
-              onClick={() => setDrawerOpen(false)}
-            />
-            {/* Drawer */}
-            <motion.aside
-              key="drawer"
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed top-0 left-0 h-full w-[230px] bg-white z-50 shadow-2xl lg:hidden flex flex-col"
-            >
-              {/* Close button */}
-              <button
-                onClick={() => setDrawerOpen(false)}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                <X size={18} />
-              </button>
-              <SidebarContent
-                activeNav={activeNav}
-                setActiveNav={setActiveNav}
-                onNavClick={() => setDrawerOpen(false)}
-              />
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+      {/* ── Tablet Icon Sidebar ── */}
+      <TabletSidebar activeNav={activeNav} setActiveNav={setActiveNav} />
+
+      {/* ── Mobile Bottom Nav ── */}
+      <MobileBottomNav activeNav={activeNav} setActiveNav={setActiveNav} />
 
       {/* ── Main ── */}
       <main className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Top bar */}
-        <header className="flex items-center justify-between gap-2 px-3 sm:px-8 pt-3 pb-2 flex-shrink-0 bg-[#F5F7FA]">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            {/* Hamburger — mobile only */}
-            <button
-              onClick={() => setDrawerOpen(true)}
-              className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-white border border-gray-100 shadow-sm text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <Menu size={18} />
-            </button>
-            <h2 className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-900 tracking-tight leading-tight truncate">
-              {activeNav === "Website"
-                ? "Shop Settings"
-                : activeNav === "Account"
-                  ? "Account Settings"
-                  : activeNav === "Markets"
-                    ? "Market Pricing"
-                    : activeNav === "Shipping"
-                      ? "Shipping Address"
-                      : "Shop Management Dashboard"}
+        <header className="flex items-center justify-between gap-3 px-4 md:px-6 lg:px-8 pt-4 pb-3 flex-shrink-0 bg-[#F5F7FA]">
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Mobile: brand mark instead of hamburger */}
+            <div className="md:hidden w-8 h-8 rounded-xl bg-gray-900 flex items-center justify-center text-white text-[11px] font-black flex-shrink-0">
+              K
+            </div>
+            <h2 className="text-base sm:text-xl lg:text-2xl font-black text-gray-900 tracking-tight leading-tight truncate">
+              {activeNav === "Website" ? "Shop Settings"
+                : activeNav === "Account" ? "Account Settings"
+                : activeNav === "Markets" ? "Market Pricing"
+                : activeNav === "Shipping" ? "Shipping"
+                : activeNav === "Pages" ? "Pages"
+                : activeNav === "Dashboard" ? "Dashboard"
+                : activeNav}
             </h2>
           </div>
 
-          {/* Right side: Bell + Action button */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          {/* Right: Bell + context action */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             <NotificationBell />
             {activeNav === "Shipping" ? (
               <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => window.dispatchEvent(new Event("open-add-shipping"))}
-                className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 bg-[#22C55E] text-white rounded-xl text-[11px] sm:text-sm font-semibold shadow-sm hover:bg-[#16A34A] transition-colors"
+                className="flex items-center gap-1.5 px-3 sm:px-5 py-2.5 bg-[#22C55E] text-white rounded-xl text-xs sm:text-sm font-black shadow-sm hover:bg-[#16A34A] transition-colors"
               >
-                <Plus size={14} strokeWidth={2.5} />
+                <Plus size={15} strokeWidth={2.5} />
                 <span className="hidden sm:inline">Add Shipping</span>
                 <span className="sm:hidden">Add</span>
               </motion.button>
             ) : (
               <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setShowLogoutConfirm(true)}
-                className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 bg-[#22C55E] text-white rounded-xl text-[11px] sm:text-sm font-semibold shadow-sm hover:bg-[#16A34A] transition-colors"
+                className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-[#22C55E] text-white rounded-xl text-sm font-black shadow-sm hover:bg-[#16A34A] transition-colors"
               >
                 <LogOut size={14} strokeWidth={2.5} />
-                <span className="hidden sm:inline">Logout</span>
-                <span className="sm:hidden">Out</span>
+                Logout
               </motion.button>
             )}
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarGutter: "stable" }}>
-          {activeNav === "Website" || activeNav === "Account" ? (
+        <div className="flex-1 overflow-y-auto pb-24 md:pb-4" style={{ scrollbarGutter: "stable" }}>
+          {activeNav === "Website" ? (
+            <WebsiteView />
+          ) : activeNav === "Account" ? (
             <AccountView />
           ) : activeNav === "Markets" ? (
             <MarketsView />
           ) : activeNav === "Shipping" ? (
             <ShippingView />
+          ) : activeNav === "Pages" ? (
+            <PagesView />
           ) : (
-            <div className="px-4 sm:px-8 pt-4 sm:pt-0 pb-8 space-y-5 sm:space-y-6">
+            <div className="px-4 sm:px-8 pt-4 sm:pt-6 pb-8 space-y-4 sm:space-y-6">
               {/* ── Stat Cards ── */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
                 {STATS.map((stat, i) => {
                   const Icon = stat.icon;
                   return (

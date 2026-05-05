@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { MarketingSide } from "./components/marketing-side";
-import { SignInForm } from "./components/signin-form";
-import { SignUpForm } from "./components/signup-form";
-import { VerifyForm } from "./components/verify-form";
-import { ForgotPasswordForm } from "./components/forgot-password-form";
-import { Logo } from "./components/logo";
+import { MarketingSide } from "./components/marketing/marketing-side";
+import { SignInForm } from "./components/auth/signin-form";
+import { SignUpForm } from "./components/auth/signup-form";
+import { VerifyForm } from "./components/auth/verify-form";
+import { ForgotPasswordForm } from "./components/auth/forgot-password-form";
+import { Logo } from "./components/ui/logo";
 import { motion, AnimatePresence } from "framer-motion";
-import { DynamicBackground } from "./components/dynamic-background";
+import { DynamicBackground } from "./components/marketing/dynamic-background";
 import { useRouter } from "next/navigation";
-import { OnboardingFlow } from "./components/onboarding-flow";
+import { OnboardingFlow } from "./components/onboarding/onboarding-flow";
 
 export default function SignInPage() {
   const router = useRouter();

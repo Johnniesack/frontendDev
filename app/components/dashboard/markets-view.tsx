@@ -166,7 +166,7 @@ export function MarketsView() {
   }, []);
 
   return (
-    <div className="flex-1 px-3 sm:px-8 pb-8 min-w-0 overflow-x-hidden">
+    <div className="flex-1 px-3 sm:px-8 pt-4 sm:pt-6 pb-8 min-w-0 overflow-x-hidden">
       {/* Header Area */}
       <motion.div 
         initial={{ opacity: 0 }}

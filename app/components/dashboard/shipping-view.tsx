@@ -112,7 +112,7 @@ export default function ShippingView() {
   ];
 
   return (
-    <div className="px-3 sm:px-6 pb-10 sm:pb-12 flex flex-col gap-4 sm:gap-5 min-w-0">
+    <div className="px-3 sm:px-6 pt-4 sm:pt-6 pb-10 sm:pb-12 flex flex-col gap-4 sm:gap-5 min-w-0">
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 flex-shrink-0">
