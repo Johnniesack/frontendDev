@@ -281,9 +281,11 @@ function NavItem({
 function MobileBottomNav({
   activeNav,
   setActiveNav,
+  onLogout,
 }: {
   activeNav: string;
   setActiveNav: (v: string) => void;
+  onLogout: () => void;
 }) {
   const [showMore, setShowMore] = useState(false);
 
@@ -374,6 +376,19 @@ function MobileBottomNav({
                     </motion.button>
                   );
                 })}
+                <motion.button
+                  whileTap={{ scale: 0.92 }}
+                  onClick={() => {
+                    setShowMore(false);
+                    onLogout();
+                  }}
+                  className="flex flex-col items-center justify-center gap-2 py-4 rounded-2xl transition-all bg-red-50"
+                >
+                  <LogOut size={22} strokeWidth={1.8} className="text-red-500" />
+                  <span className="text-[10px] font-bold text-center leading-tight text-red-600">
+                    Log out
+                  </span>
+                </motion.button>
               </div>
             </motion.div>
           </>
@@ -682,7 +697,7 @@ export function DashboardLayout() {
       <TabletSidebar activeNav={activeNav} setActiveNav={setActiveNav} />
 
       {/* ── Mobile Bottom Nav ── */}
-      <MobileBottomNav activeNav={activeNav} setActiveNav={setActiveNav} />
+      <MobileBottomNav activeNav={activeNav} setActiveNav={setActiveNav} onLogout={() => setShowLogoutConfirm(true)} />
 
       {/* ── Main ── */}
       <main className="flex-1 flex flex-col overflow-hidden min-w-0">
