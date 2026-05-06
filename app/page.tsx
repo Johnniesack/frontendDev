@@ -22,15 +22,11 @@ export default function SignInPage() {
 
   React.useEffect(() => {
     const accessToken = localStorage.getItem("access_token");
-    const isOnboardedRaw = localStorage.getItem("is_onboarded");
     
     if (accessToken) {
-      // Only go to dashboard if explicitly onboarded, otherwise default to onboarding
-      if (isOnboardedRaw === "true") {
-        router.push("/dashboard");
-      } else {
-        router.push("/onboarding");
-      }
+      // If signed in before, go straight to dashboard. 
+      // The dashboard can redirect back to onboarding if the profile is truly empty.
+      router.push("/dashboard");
     } else {
       setIsCheckingAuth(false);
     }

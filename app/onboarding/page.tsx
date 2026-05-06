@@ -5,8 +5,20 @@ import { OnboardingFlow } from "../components/onboarding/onboarding-flow";
 import { DynamicBackground } from "../components/marketing/dynamic-background";
 
 export default function OnboardingPage() {
+  const router = React.useMemo(() => typeof window !== "undefined" ? require("next/navigation").useRouter() : null, []);
+
+  React.useEffect(() => {
+    const accessToken = localStorage.getItem("access_token");
+    const isOnboarded = localStorage.getItem("is_onboarded") === "true";
+    
+    // If they are already signed in AND marked as onboarded, bounce to dashboard
+    if (accessToken && isOnboarded) {
+      window.location.href = "/dashboard";
+    }
+  }, []);
+
   const handleComplete = () => {
-    // Redirect to dashboard or home after completion
+    localStorage.setItem("is_onboarded", "true");
     window.location.href = "/dashboard";
   };
 
