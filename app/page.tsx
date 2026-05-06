@@ -25,10 +25,11 @@ export default function SignInPage() {
     const isOnboardedRaw = localStorage.getItem("is_onboarded");
     
     if (accessToken) {
-      if (isOnboardedRaw === "false") {
-        router.push("/onboarding");
-      } else {
+      // Only go to dashboard if explicitly onboarded, otherwise default to onboarding
+      if (isOnboardedRaw === "true") {
         router.push("/dashboard");
+      } else {
+        router.push("/onboarding");
       }
     } else {
       setIsCheckingAuth(false);
@@ -52,10 +53,10 @@ export default function SignInPage() {
     const isOnboarded = data?.is_onboarded ?? data?.data?.is_onboarded;
     
     if (accessToken || isOnboarded !== undefined) {
-      if (isOnboarded === false) {
-        router.push("/onboarding");
-      } else {
+      if (isOnboarded === true) {
         router.push("/dashboard");
+      } else {
+        router.push("/onboarding");
       }
     } else {
       const token = data?.temp_token || data?.Temp_token || data?.TEMP_TOKEN || data?.tempToken ||
@@ -114,7 +115,7 @@ export default function SignInPage() {
   };
 
   return (
-    <main className="min-h-[100dvh] lg:h-[100dvh] w-full relative overflow-x-hidden overflow-y-auto lg:overflow-hidden bg-[#050505] text-white">
+    <main className="min-h-[100dvh] w-full relative overflow-x-hidden overflow-y-auto bg-transparent text-white">
       <DynamicBackground />
 
       {/* ═══════════════════════════════════════════════════════════ */}
@@ -143,7 +144,7 @@ export default function SignInPage() {
       {/* ═══════════════════════════════════════════════════════════ */}
       {/* DESKTOP LAYOUT — Two-panel: Marketing + Form              */}
       {/* ═══════════════════════════════════════════════════════════ */}
-      <div className="hidden xl:grid xl:grid-cols-2 xl:h-svh xl:max-h-svh xl:min-h-0 w-full relative z-10 overflow-hidden">
+      <div className="hidden xl:grid xl:grid-cols-2 xl:min-h-screen w-full relative z-10">
         {/* Marketing Hero - Desktop only */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -152,14 +153,14 @@ export default function SignInPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col overflow-hidden min-h-0 xl:h-full max-h-[100dvh] xl:max-h-full relative origin-center transition-transform duration-300 [@media(max-height:800px)]:scale-95 [@media(max-height:700px)]:scale-[0.85] [@media(max-height:600px)]:scale-[0.75]"
+              className="flex flex-col min-h-0 xl:min-h-full relative origin-center transition-transform duration-300 [@media(max-height:800px)]:scale-95 [@media(max-height:700px)]:scale-[0.85] [@media(max-height:600px)]:scale-[0.75]"
             >
               <MarketingSide mode={step} />
             </motion.div>
           </AnimatePresence>
 
         {/* Form Side - Desktop */}
-        <div className={`relative flex flex-col items-center justify-center xl:h-full max-h-[100dvh] xl:max-h-full transition-all duration-1000 ease-[0.23,1,0.32,1] overflow-hidden ${step === "signup" ? "xl:col-span-1 px-6 py-8 sm:px-12 md:px-16 xl:px-20 min-[1441px]:px-24" : "xl:col-span-1 px-6 py-12 sm:px-12 md:px-16 xl:px-20 min-[1441px]:px-24"
+        <div className={`relative flex flex-col items-center justify-center min-h-screen transition-all duration-1000 ease-[0.23,1,0.32,1] ${step === "signup" ? "xl:col-span-1 px-6 py-12 sm:px-12 md:px-16 xl:px-20 min-[1441px]:px-24" : "xl:col-span-1 px-6 py-12 sm:px-12 md:px-16 xl:px-20 min-[1441px]:px-24"
           }`}>
           <div className={`mx-auto transition-all duration-1000 ease-[0.23,1,0.32,1] flex items-center justify-center ${step === "signup" ? "w-full max-w-[460px] min-[1441px]:max-w-[500px] h-fit" : "w-full max-w-[420px] min-[1441px]:max-w-[460px] h-fit"
             }`}>

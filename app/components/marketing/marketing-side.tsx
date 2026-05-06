@@ -62,7 +62,7 @@ const RotatingWords = ({ words, colorClass = "text-[#22C55E]" }: { words: string
 export function MarketingSide({ mode = "signin" }: { mode?: "signin" | "signup" | "verify" | "forgot-password" }) {
   return (
     <div
-      className="relative flex flex-col justify-center flex-1 px-6 sm:px-10 lg:px-12 lg:py-12 xl:px-14 pt-20 pb-14 lg:pt-16 lg:pb-10 min-[1441px]:px-12 min-[1441px]:py-16 overflow-hidden min-h-0 lg:h-full"
+      className="relative flex flex-col justify-center flex-1 px-6 sm:px-10 lg:px-12 lg:py-12 xl:px-14 pt-20 pb-14 lg:pt-16 lg:pb-10 min-[1441px]:px-12 min-[1441px]:py-16 min-h-0"
     >
       {/* Ultra-wide: soft focal glow so the left panel feels full, not empty */}
       <div

@@ -67,8 +67,8 @@ export function VerifyForm({
       if (accessToken && typeof accessToken === 'string') localStorage.setItem("access_token", accessToken);
       if (refreshToken && typeof refreshToken === 'string') localStorage.setItem("refresh_token", refreshToken);
       
-      const isOnboarded = response.is_onboarded ?? response.data?.is_onboarded;
-      if (isOnboarded !== undefined) localStorage.setItem("is_onboarded", String(isOnboarded));
+      const isOnboarded = response.is_onboarded ?? response.data?.is_onboarded ?? false;
+      localStorage.setItem("is_onboarded", String(isOnboarded));
       
       onSuccess(isOnboarded);
     } catch (err: any) {

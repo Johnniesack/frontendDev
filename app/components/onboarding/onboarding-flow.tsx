@@ -20,7 +20,8 @@ import {
   CreditCard,
   Lock,
   CalendarDays,
-  User
+  User,
+  Phone
 } from "lucide-react";
 import { saveOnboardingStep, completeOnboarding } from "@/lib/api/onboarding";
 
@@ -62,11 +63,10 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
     instagramStatus: "",
     instagramHandle: ""
   });
-  const [payment, setPayment] = useState({
-    cardName: "",
-    cardNumber: "",
-    expiry: "",
-    cvv: ""
+  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "momo">("stripe");
+  const [momoDetails, setMomoDetails] = useState({
+    number: "",
+    network: "MTN"
   });
   const [paymentErrors, setPaymentErrors] = useState<Record<string, string>>({});
 
@@ -76,32 +76,13 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
     premium: { label: "Scale", price: "$15", color: "#a855f7", shadow: "rgba(168,85,247,0.15)" },
   };
 
-  const formatCardNumber = (raw: string) => {
-    const digits = raw.replace(/\D/g, "").slice(0, 16);
-    return digits.replace(/(\d{4})(?=\d)/g, "$1 ");
-  };
-
-  const formatExpiry = (raw: string) => {
-    const digits = raw.replace(/\D/g, "").slice(0, 4);
-    if (digits.length >= 3) return digits.slice(0, 2) + "/" + digits.slice(2);
-    return digits;
-  };
-
-  const handlePaymentChange = (field: string, raw: string) => {
-    let value = raw;
-    if (field === "cardNumber") value = formatCardNumber(raw);
-    if (field === "expiry") value = formatExpiry(raw);
-    if (field === "cvv") value = raw.replace(/\D/g, "").slice(0, 4);
-    setPayment(prev => ({ ...prev, [field]: value }));
-    setPaymentErrors(prev => ({ ...prev, [field]: "" }));
-  };
 
   const validatePayment = () => {
     const errs: Record<string, string> = {};
-    if (!payment.cardName.trim()) errs.cardName = "Required";
-    if (payment.cardNumber.replace(/\s/g, "").length < 16) errs.cardNumber = "Invalid card number";
-    if (payment.expiry.length < 5) errs.expiry = "Invalid expiry";
-    if (payment.cvv.length < 3) errs.cvv = "Invalid CVV";
+    if (paymentMethod === "momo") {
+      if (!momoDetails.number.trim()) errs.number = "Required";
+      if (momoDetails.number.length < 10) errs.number = "Invalid number";
+    }
     setPaymentErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -202,7 +183,7 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
   };
 
   return (
-    <div className="w-full min-h-[100dvh] flex flex-col items-center justify-start overflow-x-hidden overflow-y-auto bg-black selection:bg-[#22C55E]/30 relative">
+    <div className="w-full min-h-[100dvh] flex flex-col items-center justify-start bg-transparent selection:bg-[#22C55E]/30 relative">
       {/* Step Indicator - Sticky on mobile with better spacing */}
       <div className="flex flex-col items-center gap-3 pt-8 pb-6 sticky top-0 z-[60] bg-black/90 backdrop-blur-xl w-full border-b border-white/5">
         <div className="flex gap-2">
@@ -215,7 +196,7 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
           ))}
         </div>
         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#22C55E]">
-          Krifth OS — Step {step} of 6
+          Step {step} of 6
         </span>
       </div>
 
@@ -231,7 +212,7 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
             x: { type: "spring", stiffness: 300, damping: 30 },
             opacity: { duration: 0.2 }
           }}
-          className={`w-full max-w-5xl xl:max-w-6xl flex-1 flex flex-col items-center ${step === 5 ? "justify-center" : "justify-start"} px-4 sm:px-6 md:px-8 ${step === 6 ? "pb-8 sm:pb-12" : step === 5 ? "pb-10 sm:pb-12" : "pb-20 sm:pb-24"
+          className={`w-full max-w-5xl xl:max-w-6xl min-h-0 flex flex-col items-center ${step === 5 ? "justify-center" : "justify-start"} px-4 sm:px-6 md:px-8 ${step === 6 ? "pb-8 sm:pb-12" : step === 5 ? "pb-10 sm:pb-12" : "pb-20 sm:pb-24"
             } ${step === 5 ? "pt-4 sm:pt-6" : step === 6 ? "pt-2" : step === 3 ? "pt-12" : "pt-16"
             }`}
         >
@@ -305,8 +286,8 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                     key={tag}
                     onClick={() => toggleSelection('productTypes', tag)}
                     className={`h-14 rounded-xl border transition-all font-black text-xs ${values.productTypes.includes(tag)
-                        ? "bg-[#22C55E]/10 border-[#22C55E] text-[#22C55E]"
-                        : "bg-white/[0.01] border-white/5 text-zinc-500 hover:border-white/20"
+                      ? "bg-[#22C55E]/10 border-[#22C55E] text-[#22C55E]"
+                      : "bg-white/[0.01] border-white/5 text-zinc-500 hover:border-white/20"
                       }`}
                   >
                     {tag}
@@ -373,8 +354,8 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                     key={item.id}
                     onClick={() => toggleSelection('goals', item.id)}
                     className={`w-full p-3.5 rounded-xl border transition-all flex items-center gap-3 group ${values.goals.includes(item.id)
-                        ? "bg-[#22C55E]/10 border-[#22C55E]"
-                        : "bg-white/[0.01] border-white/5 hover:border-white/10"
+                      ? "bg-[#22C55E]/10 border-[#22C55E]"
+                      : "bg-white/[0.01] border-white/5 hover:border-white/10"
                       }`}
                   >
                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${values.goals.includes(item.id) ? "bg-[#22C55E] text-black" : "bg-white/5 text-zinc-600"}`}>
@@ -435,8 +416,8 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                       key={option}
                       onClick={() => setValues({ ...values, instagramStatus: option })}
                       className={`p-4 rounded-xl border text-left font-black text-xs transition-all ${values.instagramStatus === option
-                          ? "bg-white/10 border-white/30 text-white"
-                          : "bg-white/[0.01] border-white/5 text-zinc-500 hover:border-white/10"
+                        ? "bg-white/10 border-white/30 text-white"
+                        : "bg-white/[0.01] border-white/5 text-zinc-500 hover:border-white/10"
                         }`}
                     >
                       {option}
@@ -499,14 +480,14 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                 <p className="text-zinc-600 text-[11px] sm:text-sm font-medium">Professional power, scaled for growth.</p>
               </div>
 
-              <div className="flex flex-col xl:grid xl:grid-cols-3 gap-4 xl:gap-3 w-full items-stretch xl:h-[360px] 2xl:h-[420px]">
+              <div className="flex flex-col xl:grid xl:grid-cols-3 gap-4 xl:gap-3 w-full items-stretch xl:min-h-[360px] 2xl:min-h-[420px]">
                 {/* Basic Plan */}
                 <motion.div
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedPlan("basic")}
                   className={`flex flex-col p-5 xl:p-6 rounded-[32px] border transition-all cursor-pointer relative overflow-hidden ${selectedPlan === "basic"
-                      ? "bg-[#0A0A0A] border-white/40 ring-2 ring-white/10 shadow-[0_0_40px_rgba(255,255,255,0.05)]"
-                      : "bg-white/[0.01] border-white/5 opacity-30 hover:opacity-60"
+                    ? "bg-[#0A0A0A] border-white/40 ring-2 ring-white/10 shadow-[0_0_40px_rgba(255,255,255,0.05)]"
+                    : "bg-white/[0.01] border-white/5 opacity-30 hover:opacity-60"
                     }`}
                 >
                   {selectedPlan === "basic" && (
@@ -545,8 +526,8 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedPlan("standard")}
                   className={`flex flex-col p-5 sm:p-6 xl:p-8 rounded-[28px] sm:rounded-[36px] border-2 transition-all cursor-pointer relative z-10 ${selectedPlan === "standard"
-                      ? "bg-[#111] border-[#22C55E] xl:scale-100 2xl:scale-105 shadow-[0_20px_60px_rgba(34,197,94,0.15)] ring-4 ring-[#22C55E]/5"
-                      : "bg-white/[0.01] border-[#22C55E]/10 opacity-40 hover:opacity-80 xl:translate-y-0 2xl:translate-y-2 xl:scale-100 2xl:scale-95"
+                    ? "bg-[#111] border-[#22C55E] xl:scale-100 2xl:scale-105 shadow-[0_20px_60px_rgba(34,197,94,0.15)] ring-4 ring-[#22C55E]/5"
+                    : "bg-white/[0.01] border-[#22C55E]/10 opacity-40 hover:opacity-80 xl:translate-y-0 2xl:translate-y-2 xl:scale-100 2xl:scale-95"
                     }`}
                 >
                   <div className="absolute top-5 right-5 sm:top-6 sm:right-6 flex items-center gap-2">
@@ -589,8 +570,8 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedPlan("premium")}
                   className={`flex flex-col p-5 sm:p-5 xl:p-6 rounded-[24px] sm:rounded-[32px] border transition-all cursor-pointer relative overflow-hidden ${selectedPlan === "premium"
-                      ? "bg-[#0A0A0A] border-purple-500 ring-2 ring-purple-500/10 shadow-[0_0_40px_rgba(168,85,247,0.1)]"
-                      : "bg-white/[0.01] border-white/5 opacity-30 hover:opacity-60"
+                    ? "bg-[#0A0A0A] border-purple-500 ring-2 ring-purple-500/10 shadow-[0_0_40px_rgba(168,85,247,0.1)]"
+                    : "bg-white/[0.01] border-white/5 opacity-30 hover:opacity-60"
                     }`}
                 >
                   {selectedPlan === "premium" && (
@@ -651,10 +632,10 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                   onClick={nextStep}
                   disabled={isLoading}
                   className={`flex-1 h-14 xl:h-16 rounded-[24px] font-black text-base xl:text-lg transition-all flex items-center justify-center gap-3 hover:scale-[1.03] duration-300 shadow-2xl disabled:opacity-40 ${selectedPlan === "basic"
-                      ? "bg-white text-black shadow-white/10"
-                      : selectedPlan === "standard"
-                        ? "bg-[#22C55E] text-black shadow-[#22C55E]/20"
-                        : "bg-purple-600 text-white shadow-purple-600/20"
+                    ? "bg-white text-black shadow-white/10"
+                    : selectedPlan === "standard"
+                      ? "bg-[#22C55E] text-black shadow-[#22C55E]/20"
+                      : "bg-purple-600 text-white shadow-purple-600/20"
                     }`}
                 >
                   {isLoading ? <Loader2 size={24} className="animate-spin" /> : (
@@ -666,7 +647,7 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -5 }}
                         >
-                          {selectedPlan === "basic" ? "Continue to Payment" : "Start 7-Day Free Trial"}
+                          Continue to Payment
                         </motion.span>
                       </AnimatePresence>
                       <ChevronRight size={22} strokeWidth={3} />
@@ -679,174 +660,114 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
 
           {step === 6 && (() => {
             const plan = planDetails[selectedPlan];
+            const planPrice = plan.price.includes(".") ? plan.price : `${plan.price}.00`;
             const accentColor = plan.color;
 
-            // If BASIC plan, show payment form
-            if (selectedPlan === "basic") {
-              return (
-                <div className="w-full max-w-lg mx-auto flex flex-col gap-4 sm:gap-6 py-4 sm:py-6 px-4 mt-2 sm:mt-3">
-                  <div className="text-center">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 border shadow-2xl" style={{ background: `${accentColor}20`, borderColor: `${accentColor}40` }}>
-                      <CreditCard size={26} style={{ color: accentColor }} strokeWidth={2.5} />
-                    </div>
-                    <h2 className="text-2xl sm:text-4xl font-black text-white mb-1 tracking-tight">Payment Details</h2>
-                    <p className="text-zinc-400 text-xs sm:text-sm font-medium">Starter Plan ($1) — Secure checkout</p>
-                  </div>
-
-                  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl border flex items-center justify-between shadow-xl" style={{ background: `${accentColor}15`, borderColor: `${accentColor}30` }}>
-                    <div>
-                      <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400 mb-0.5">Selected Plan</p>
-                      <p className="text-white font-black text-sm sm:text-base">{plan.label}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400 mb-0.5">Billed Monthly</p>
-                      <p className="font-black text-xl sm:text-2xl" style={{ color: accentColor }}>$1</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 sm:space-y-4">
-                    <div className="space-y-1.5 sm:space-y-2">
-                      <label className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-black text-zinc-400 pl-1">Card Details</label>
-                      <div className="relative">
-                        <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
-                        <input
-                          type="text"
-                          value={payment.cardNumber}
-                          onChange={e => handlePaymentChange("cardNumber", e.target.value)}
-                          placeholder="0000 0000 0000 0000"
-                          className="w-full h-12 sm:h-13 py-3 pl-10 pr-4 rounded-xl bg-white/[0.06] border border-white/10 text-sm font-bold text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-zinc-600"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                      <input
-                        type="text"
-                        value={payment.expiry}
-                        onChange={e => handlePaymentChange("expiry", e.target.value)}
-                        placeholder="MM/YY"
-                        className="w-full h-12 sm:h-13 py-3 px-4 rounded-xl bg-white/[0.06] border border-white/10 text-sm font-bold text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-zinc-600"
-                      />
-                      <input
-                        type="text"
-                        value={payment.cvv}
-                        onChange={e => handlePaymentChange("cvv", e.target.value)}
-                        placeholder="CVV"
-                        className="w-full h-12 sm:h-13 py-3 px-4 rounded-xl bg-white/[0.06] border border-white/10 text-sm font-bold text-white focus:outline-none focus:border-white/20 transition-all placeholder:text-zinc-600"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 sm:gap-4 pt-2">
-                    <button onClick={prevStep} className="h-14 sm:h-16 px-6 sm:px-8 rounded-xl sm:rounded-2xl border border-white/10 text-zinc-400 font-bold text-sm hover:text-white hover:bg-white/5 transition-all flex items-center gap-2">
-                      <ArrowLeft size={18} />
-                    </button>
-                    <button
-                      onClick={submitPayment}
-                      disabled={isLoading}
-                      className="flex-1 h-14 sm:h-16 rounded-xl sm:rounded-2xl font-black text-base sm:text-lg bg-white text-black shadow-white/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40"
-                    >
-                      {isLoading ? <Loader2 size={24} className="animate-spin mx-auto" /> : "Pay $1 & Activate"}
-                    </button>
-                  </div>
-                </div>
-              );
-            }
-
-            // Standard/Premium Trial Activation UI
             return (
-              <div className="w-full max-w-xl mx-auto flex flex-col gap-5 sm:gap-6 py-4 sm:py-5 px-4 items-center text-center mt-2 sm:mt-4">
-                {/* Header Section */}
-                <div className="space-y-3 sm:space-y-4">
-                  <div className="relative">
-                    <motion.div
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-[24px] sm:rounded-[28px] flex items-center justify-center mx-auto border shadow-2xl relative z-10"
-                      style={{ background: `${accentColor}10`, borderColor: `${accentColor}30` }}
-                    >
-                      <Rocket size={32} style={{ color: accentColor }} strokeWidth={2.5} className="animate-pulse" />
-                    </motion.div>
+              <div className="w-full max-w-lg mx-auto flex flex-col gap-4 sm:gap-6 py-4 sm:py-6 px-4 mt-2 sm:mt-3">
+                <div className="text-center">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 border shadow-2xl bg-white/5 border-white/10">
+                    <CreditCard size={26} className="text-white" strokeWidth={2.5} />
                   </div>
+                  <h2 className="text-2xl sm:text-4xl font-black text-white mb-1 tracking-tight">Activate {plan.label}</h2>
+                  <p className="text-zinc-400 text-xs sm:text-sm font-medium">{plan.label} Plan ({planPrice}) — Choose payment method</p>
+                </div>
 
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tighter">
-                      Activate Your <span style={{ color: accentColor }}>7-Day Trial</span>
-                    </h2>
-                    <p className="text-zinc-500 text-[13px] sm:text-base font-medium max-w-md mx-auto">
-                      Get full access to all <span className="text-white font-bold">{plan.label}</span> features. No credit card required.
-                    </p>
+                {/* Payment Method Selector */}
+                <div className="grid grid-cols-2 gap-3 mb-2">
+                  <button
+                    onClick={() => setPaymentMethod("stripe")}
+                    className={`p-4 rounded-2xl border flex flex-col items-center gap-2 transition-all ${paymentMethod === "stripe"
+                      ? "bg-white/10 border-white/40 ring-2 ring-white/10"
+                      : "bg-white/[0.02] border-white/5 text-zinc-500 hover:border-white/10"}`}
+                  >
+                    <CreditCard size={20} className={paymentMethod === "stripe" ? "text-white" : "text-zinc-600"} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Pay with Card</span>
+                  </button>
+                  <button
+                    onClick={() => setPaymentMethod("momo")}
+                    className={`p-4 rounded-2xl border flex flex-col items-center gap-2 transition-all ${paymentMethod === "momo"
+                      ? "bg-[#22C55E]/10 border-[#22C55E]/40 ring-2 ring-[#22C55E]/10"
+                      : "bg-white/[0.02] border-white/5 text-zinc-500 hover:border-white/10"}`}
+                  >
+                    <Phone size={20} className={paymentMethod === "momo" ? "text-[#22C55E]" : "text-zinc-600"} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Mobile Money</span>
+                  </button>
+                </div>
+
+                <div className="p-4 rounded-2xl border flex items-center justify-between shadow-xl bg-white/[0.02] border-white/10">
+                  <div>
+                    <p className="text-[9px] uppercase tracking-[0.2em] font-black text-zinc-500 mb-0.5">Total Due</p>
+                    <p className="text-white font-black text-lg">{planPrice}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[9px] uppercase tracking-[0.2em] font-black text-zinc-500 mb-0.5">Frequency</p>
+                    <p className="text-zinc-300 font-bold text-sm">Monthly</p>
                   </div>
                 </div>
 
-                {/* Trial Benefits Card */}
-                <div className="w-full bg-white/[0.02] border border-white/5 rounded-[28px] sm:rounded-[32px] p-4 sm:p-6 space-y-4 sm:space-y-5 relative overflow-hidden group">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 relative z-10">
-                    {[
-                      { icon: Zap, text: "Instant Shop Launch" },
-                      { icon: Globe, text: "Global Market Access" },
-                      { icon: Shield, text: "AI Agent Security" },
-                      { icon: Target, text: "Full Growth Analytics" }
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 bg-white/[0.03] p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-white/5">
-                        <item.icon size={18} style={{ color: accentColor }} />
-                        <span className="text-[10px] sm:text-xs font-bold text-zinc-300 uppercase tracking-wider">{item.text}</span>
+                <div className="space-y-4">
+                  {paymentMethod === "stripe" ? (
+                    <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 text-center space-y-3">
+                      <div className="w-10 h-10 bg-[#635BFF]/10 rounded-full flex items-center justify-center mx-auto">
+                        <Globe size={18} className="text-[#635BFF]" />
                       </div>
-                    ))}
-                  </div>
-
-                  <div className="pt-3 sm:pt-4 border-t border-white/5 flex flex-col items-center gap-2">
-                    <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/[0.05] border border-white/10">
-                      <CalendarDays size={14} style={{ color: accentColor }} />
-                      <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Trial Period: 7 Days</span>
+                      <p className="text-xs text-zinc-400 font-medium leading-relaxed">
+                        Secure redirect to <span className="text-white font-bold">Stripe Checkout</span>. You can pay with any major credit or debit card.
+                      </p>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="space-y-2">
+                        <label className="text-[9px] uppercase tracking-[0.2em] font-black text-zinc-500 pl-1">Select Network</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {["MTN", "Telecel", "AirtelTigo"].map((net) => (
+                            <button
+                              key={net}
+                              onClick={() => setMomoDetails({ ...momoDetails, network: net })}
+                              className={`py-2 rounded-lg border text-[9px] font-black transition-all ${momoDetails.network === net
+                                ? "bg-[#22C55E]/20 border-[#22C55E] text-white"
+                                : "bg-white/[0.02] border-white/5 text-zinc-600 hover:border-white/10"}`}
+                            >
+                              {net}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[9px] uppercase tracking-[0.2em] font-black text-zinc-500 pl-1">Phone Number</label>
+                        <div className="relative">
+                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" size={16} />
+                          <input
+                            type="tel"
+                            value={momoDetails.number}
+                            onChange={e => setMomoDetails({ ...momoDetails, number: e.target.value.replace(/\D/g, "") })}
+                            placeholder="024 000 0000"
+                            className="w-full h-13 pl-10 pr-4 rounded-xl bg-white/[0.06] border border-white/10 text-sm font-bold text-white focus:outline-none focus:border-[#22C55E]/50 transition-all"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* CTA Section */}
-                <div className="w-full space-y-3 pt-1">
-                  <div className="flex gap-3 sm:gap-4">
-                    <button
-                      onClick={prevStep}
-                      disabled={isLoading}
-                      className="h-13 sm:h-14 px-6 sm:px-7 rounded-xl sm:rounded-2xl border border-white/10 text-zinc-400 font-bold text-sm hover:text-white hover:bg-white/5 transition-all flex items-center gap-2"
-                    >
-                      <ArrowLeft size={18} />
-                    </button>
-                    <button
-                      onClick={async () => {
-                        setIsLoading(true);
-                        setError(null);
-                        try {
-                          await completeOnboarding(selectedPlan);
-                          onComplete();
-                        } catch (err: any) {
-                          setError(err.message || "Something went wrong. Please try again.");
-                        } finally {
-                          setIsLoading(false);
-                        }
-                      }}
-                      disabled={isLoading}
-                      className="flex-1 h-13 sm:h-14 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2 sm:gap-3 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl disabled:opacity-40"
-                      style={{
-                        background: accentColor,
-                        color: selectedPlan === "premium" ? "#fff" : "#000",
-                        boxShadow: `0 12px 48px ${plan.shadow}`
-                      }}
-                    >
-                      {isLoading ? <Loader2 size={24} className="animate-spin" /> : (
-                        <>
-                          <span>Start My Free Trial</span>
-                          <ChevronRight size={20} strokeWidth={3} />
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  {error && (
-                    <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest text-center animate-in fade-in pt-2">
-                      {error}
-                    </p>
-                  )}
+                <div className="flex gap-3 pt-2">
+                  <button onClick={prevStep} className="h-14 px-6 rounded-2xl border border-white/10 text-zinc-400 font-bold text-sm hover:text-white transition-all">
+                    <ArrowLeft size={18} />
+                  </button>
+                  <button
+                    onClick={submitPayment}
+                    disabled={isLoading}
+                    className={`flex-1 h-14 rounded-2xl font-black text-base transition-all flex items-center justify-center gap-2 ${paymentMethod === "momo" ? "bg-[#22C55E] text-black" : "bg-[#635BFF] text-white shadow-[#635BFF]/20"
+                      } shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40`}
+                  >
+                    {isLoading ? <Loader2 size={24} className="animate-spin" /> : (
+                      <>
+                        {paymentMethod === "stripe" ? "Continue to Checkout" : "Pay with MoMo"}
+                        <ChevronRight size={18} strokeWidth={3} />
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             );

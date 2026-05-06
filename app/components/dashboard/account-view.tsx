@@ -10,20 +10,50 @@ import {
   Camera,
   CheckCircle2,
   CreditCard,
-  Trash2,
-  Plus,
-  ShieldAlert
+  Shield,
+  Zap,
+  Crown,
+  Phone,
+  ArrowRight,
+  ShieldAlert,
+  Loader2,
+  Check
 } from "lucide-react";
+
+type Plan = "basic" | "standard" | "premium";
+type PayMethod = "card" | "momo";
+
+const PLANS: { id: Plan; label: string; price: string; monthly: string; color: string; icon: any; features: string[] }[] = [
+  { id: "basic", label: "Starter", price: "$1", monthly: "1.00", color: "#6b7280", icon: Shield, features: ["Custom URL", "Basic Theme", "Unlimited Inventory"] },
+  { id: "standard", label: "Growth", price: "$10", monthly: "10.00", color: "#22C55E", icon: Zap, features: ["Domain + SSL", "Unlimited Themes", "Unlimited Inventory", "SEO Optimization"] },
+  { id: "premium", label: "Scale", price: "$15", monthly: "15.00", color: "#a855f7", icon: Crown, features: ["Domain + SSL", "Unlimited Themes", "Unlimited AI Agents", "Priority Support"] },
+];
 
 export function AccountView() {
   const [activeTab, setActiveTab] = useState("Profile Information");
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
+  // Payment upgrade state
+  const currentPlan: Plan = "basic"; // replace with real value from context/API
+  const [selectedPlan, setSelectedPlan] = useState<Plan>("standard");
+  const [payMethod, setPayMethod] = useState<PayMethod>("card");
+  const [momoNetwork, setMomoNetwork] = useState("MTN");
+  const [momoNumber, setMomoNumber] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isDone, setIsDone] = useState(false);
+
+  const handlePay = async () => {
+    setIsProcessing(true);
+    await new Promise(r => setTimeout(r, 2000));
+    setIsProcessing(false);
+    setIsDone(true);
+  };
+
   return (
     <div className="flex-1 px-4 sm:px-8 pt-4 sm:pt-6 pb-6 animate-in fade-in duration-500 relative">
       {/* Tabs */}
       <div className="flex items-center gap-5 sm:gap-8 border-b border-gray-200 mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide pb-px -mx-4 px-4 sm:mx-0 sm:px-0 pr-4">
-        {["Profile Information", "Update Payment Method"].map((tab) => (
+        {["Profile Information", "Billing and Subscriptions"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -203,129 +233,223 @@ export function AccountView() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8"
+            className="space-y-6"
           >
-            {/* Left Column: Saved Cards & Current Plan */}
-            <div className="lg:col-span-4 space-y-4">
-              <div className="space-y-3">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Saved Cards</h4>
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm relative group overflow-hidden">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-10 h-7 bg-gray-50 rounded-md border border-gray-100 flex items-center justify-center">
-                      <CreditCard size={16} className="text-gray-400" />
+            {/* Current Plan Banner */}
+            {(() => {
+              const cp = PLANS.find(p => p.id === currentPlan)!;
+              const CpIcon = cp.icon;
+              return (
+                <div className="p-5 bg-white rounded-3xl border border-gray-100 shadow-sm space-y-4 overflow-hidden relative">
+                  <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: cp.color }} />
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm" style={{ backgroundColor: `${cp.color}10` }}>
+                      <CpIcon size={22} style={{ color: cp.color }} />
                     </div>
-                    <span className="px-2 py-1 bg-green-50 text-[#22C55E] text-[9px] font-black uppercase tracking-wider rounded-md">Primary</span>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400">Your Subscription</p>
+                        <span className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-green-50 text-green-600 border border-green-100">Active</span>
+                      </div>
+                      <p className="text-base font-black text-gray-900">{cp.label} Plan <span className="text-gray-300 font-medium">/</span> ${cp.monthly}<span className="text-xs text-gray-400 font-bold">.00</span></p>
+                    </div>
                   </div>
-                  <p className="text-base font-bold text-gray-900 tracking-[0.15em] mb-1">•••• •••• •••• 1234</p>
-                  <p className="text-xs text-gray-400 font-semibold mb-4">Expires 12/26</p>
-
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-50">
-                    <span className="text-sm font-bold text-gray-700">Alex Rivera</span>
-                    <button className="text-xs font-bold text-red-500 hover:text-red-600 flex items-center gap-1.5 transition-colors">
-                      <Trash2 size={14} />
-                      Remove
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                    <p className="text-[11px] font-bold text-gray-400">
+                      Next billing date: <span className="text-gray-900 font-black">June 6, 2026</span>
+                    </p>
+                    <button className="text-[11px] font-black text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1.5 px-3 py-1.5 hover:bg-red-50 rounded-lg">
+                      Cancel Plan
                     </button>
                   </div>
                 </div>
-              </div>
+              );
+            })()}
 
-              {/* Current Plan Card */}
-              <div className="bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-2xl p-5 text-white shadow-lg shadow-green-100 relative overflow-hidden group">
-                <div className="relative z-10">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80 mb-2">Current Plan</p>
-                  <h3 className="text-xl font-black mb-1">Growth Plan</h3>
-                  <p className="text-xs font-bold text-white/90">$10.00 / billed monthly</p>
-                </div>
+            {/* Plan Cards */}
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4 ml-1">Upgrade your experience</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {PLANS.map(plan => {
+                  const PIcon = plan.icon;
+                  const isCurrent = plan.id === currentPlan;
+                  const isSelected = plan.id === selectedPlan;
+                  const isRecommended = plan.id === "standard";
 
-                {/* Decorative Pattern */}
-                <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-700">
-                  <CheckCircle2 size={120} strokeWidth={1} />
-                </div>
+                  return (
+                    <button
+                      key={plan.id}
+                      onClick={() => !isCurrent && setSelectedPlan(plan.id)}
+                      disabled={isCurrent}
+                      className={`relative flex flex-col p-6 rounded-[28px] border-2 text-left transition-all duration-300 group ${isSelected && !isCurrent
+                        ? "shadow-xl scale-[1.02] z-10"
+                        : isCurrent
+                          ? "border-gray-100 bg-gray-50/50 cursor-default"
+                          : "border-gray-100 hover:border-gray-200 bg-white hover:shadow-md"
+                        }`}
+                      style={isSelected && !isCurrent ? { borderColor: plan.color, backgroundColor: "white" } : {}}
+                    >
+                      {/* Status Badges */}
+                      <div className="absolute top-4 right-4">
+                        {isCurrent ? (
+                          <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-gray-200 text-gray-500">Current</span>
+                        ) : isRecommended ? (
+                          <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#22C55E] text-white shadow-lg shadow-green-100">Recommended</span>
+                        ) : null}
+                      </div>
+
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 transition-transform duration-500 group-hover:rotate-6 ${isSelected ? "" : "bg-gray-50"}`}
+                        style={isSelected ? { backgroundColor: `${plan.color}15` } : {}}>
+                        <PIcon size={24} style={{ color: plan.color }} />
+                      </div>
+
+                      <p className="text-[11px] font-black uppercase tracking-wider mb-1" style={{ color: plan.color }}>{plan.label}</p>
+                      <div className="flex items-baseline gap-1 mb-4">
+                        <span className="text-3xl font-black text-gray-900 tracking-tight">{plan.price}</span>
+                        <span className="text-xs font-bold text-gray-400">/mo</span>
+                      </div>
+
+                      <div className="space-y-3 mt-auto">
+                        <div className="h-px bg-gray-100 w-full" />
+                        <ul className="space-y-2">
+                          {plan.features.map(f => (
+                            <li key={f} className="flex items-center gap-2 text-[11px] font-bold text-gray-600">
+                              <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${plan.color}10` }}>
+                                <Check size={10} strokeWidth={4} style={{ color: plan.color }} />
+                              </div>
+                              {f}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {isSelected && !isCurrent && (
+                        <motion.div
+                          layoutId="planHighlight"
+                          className="absolute inset-0 rounded-[28px] border-4 pointer-events-none"
+                          style={{ borderColor: `${plan.color}20` }}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Right Column: Add Payment Method Form */}
-            <div className="lg:col-span-8">
-              <section className="bg-white rounded-[24px] p-5 sm:p-8 border border-gray-50 shadow-sm">
-                <div className="mb-6">
-                  <h3 className="text-xl font-black text-gray-900 mb-1">Add New Payment Method</h3>
-                  <p className="text-sm text-gray-500 font-medium">Securely add a new card to your account for future billing cycles.</p>
-                </div>
-
-                <form className="space-y-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Cardholder Name</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Alex Rivera"
-                      className="w-full py-3 px-5 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-4 focus:ring-[#22C55E]/5 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
-                    />
+            {/* Payment Method Section */}
+            <AnimatePresence mode="wait">
+              {isDone ? (
+                <motion.div key="done" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center justify-center py-16 gap-6 bg-white rounded-[32px] border border-gray-100 shadow-xl">
+                  <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center shadow-xl shadow-green-100">
+                    <Check size={40} className="text-white" strokeWidth={4} />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="text-2xl font-black text-gray-900">Success!</h3>
+                    <p className="text-gray-500 font-medium mt-2">Your account is now on the <span className="text-gray-900 font-black">{PLANS.find(p => p.id === selectedPlan)?.label}</span> plan.</p>
+                  </div>
+                  <button onClick={() => setIsDone(false)} className="px-8 py-3 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-gray-800 transition-all shadow-lg">
+                    Return to Settings
+                  </button>
+                </motion.div>
+              ) : (
+                <motion.div key="form" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-[32px] border border-gray-100 shadow-xl overflow-hidden">
+                  {/* Modern Tab Switcher */}
+                  <div className="p-2 bg-gray-50/50 flex gap-1">
+                    {([["card", CreditCard, "Card Payment"], ["momo", Phone, "Mobile Money"]] as const).map(([id, Icon, label]) => (
+                      <button
+                        key={id}
+                        onClick={() => setPayMethod(id as PayMethod)}
+                        className={`flex-1 relative py-3.5 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 ${payMethod === id ? "text-white" : "text-gray-400 hover:text-gray-600"
+                          }`}
+                      >
+                        {payMethod === id && (
+                          <motion.div
+                            layoutId="payTab"
+                            className="absolute inset-0 bg-gray-900 rounded-2xl shadow-lg"
+                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                          />
+                        )}
+                        <Icon size={16} className="relative z-10" />
+                        <span className="relative z-10">{label}</span>
+                      </button>
+                    ))}
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Card Number</label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="0000 0000 0000 0000"
-                        className="w-full py-3 px-5 pr-12 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-4 focus:ring-[#22C55E]/5 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300 tracking-widest"
-                      />
-                      <CreditCard className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                  <div className="p-6 space-y-4">
+                    {/* Order Summary */}
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Upgrading to</p>
+                        <p className="text-sm font-black text-gray-900">{PLANS.find(p => p.id === selectedPlan)?.label} Plan</p>
+                      </div>
+                      <p className="text-xl font-black text-gray-900">{PLANS.find(p => p.id === selectedPlan)?.price}<span className="text-xs font-bold text-gray-400">/mo</span></p>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Expiration Date</label>
-                      <input
-                        type="text"
-                        placeholder="MM/YY"
-                        className="w-full py-3 px-5 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-4 focus:ring-[#22C55E]/5 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">CVC</label>
-                      <input
-                        type="text"
-                        placeholder="•••"
-                        className="w-full py-3 px-5 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-4 focus:ring-[#22C55E]/5 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
-                      />
-                    </div>
-                  </div>
+                    <AnimatePresence mode="wait">
+                      {payMethod === "card" ? (
+                        <motion.div key="stripe-card" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
+                          {/* Saved card from Stripe — replace these values with real data from your API */}
+                          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Saved Card</p>
+                          <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border-2 border-[#635BFF]/30">
+                            <div className="w-10 h-10 bg-[#635BFF]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                              <CreditCard size={18} className="text-[#635BFF]" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-black text-gray-900 tracking-widest">Visa •••• •••• •••• 4242</p>
+                              <p className="text-[10px] font-bold text-gray-400 mt-0.5">Expires 12 / 27</p>
+                            </div>
+                            <CheckCircle2 size={18} className="text-[#635BFF] flex-shrink-0" />
+                          </div>
+                          <button
+                            onClick={() => {/* redirect to Stripe Checkout for new card */ }}
+                            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-gray-200 text-[11px] font-black text-gray-500 hover:border-[#635BFF]/40 hover:text-[#635BFF] transition-all"
+                          >
+                            <CreditCard size={13} />
+                            Use a different card
+                          </button>
+                          <p className="text-[10px] text-gray-400 font-bold flex items-center gap-1.5">
+                            <ShieldAlert size={11} className="text-[#635BFF]" />
+                            Secured by <span className="text-[#635BFF]">Stripe</span> — PCI DSS compliant
+                          </p>
+                        </motion.div>
+                      ) : (
+                        <motion.div key="momo-form" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Network</label>
+                            <div className="grid grid-cols-3 gap-2">
+                              {["MTN", "Telecel", "AirtelTigo"].map(net => (
+                                <button key={net} onClick={() => setMomoNetwork(net)}
+                                  className={`py-2.5 rounded-xl text-[10px] font-black border transition-all ${momoNetwork === net ? "bg-[#22C55E]/10 border-[#22C55E] text-[#22C55E]" : "bg-gray-50 border-transparent text-gray-500 hover:bg-gray-100"}`}>
+                                  {net}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Phone Number</label>
+                            <div className="relative">
+                              <Phone size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                              <input type="tel" value={momoNumber} onChange={e => setMomoNumber(e.target.value.replace(/\D/g, ""))} placeholder="024 000 0000"
+                                className="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-xl text-sm font-bold text-gray-900 outline-none border border-transparent focus:bg-white focus:border-[#22C55E]/30 transition-all placeholder:text-gray-300" />
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
-                  <label className="flex items-center gap-3 cursor-pointer group py-2">
-                    <div className="relative flex items-center justify-center">
-                      <input type="checkbox" className="peer sr-only" />
-                      <div className="w-5 h-5 border-2 border-gray-200 rounded-md peer-checked:bg-[#22C55E] peer-checked:border-[#22C55E] transition-all"></div>
-                      <CheckCircle2 size={12} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={4} />
-                    </div>
-                    <span className="text-sm font-bold text-gray-500 group-hover:text-gray-700 transition-colors">Set as primary payment method</span>
-                  </label>
-
-                  <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-50">
-                    <button
-                      type="button"
-                      className="px-6 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors"
-                    >
-                      Cancel
+                    <button onClick={handlePay} disabled={isProcessing || selectedPlan === currentPlan}
+                      className={`w-full py-4 rounded-2xl text-sm font-black flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 shadow-lg ${payMethod === "card" ? "bg-[#635BFF] text-white shadow-indigo-100" : "bg-[#22C55E] text-white shadow-green-100"
+                        }`}>
+                      {isProcessing ? <Loader2 size={18} className="animate-spin" /> : <ArrowRight size={18} />}
+                      {isProcessing ? "Processing..." : payMethod === "card" ? `Upgrade with Saved Card` : `Pay with ${momoNetwork} MoMo`}
                     </button>
-                    <button
-                      type="submit"
-                      className="px-6 py-2.5 bg-[#22C55E] text-white rounded-xl text-sm font-bold shadow-lg shadow-green-100 hover:bg-[#16A34A] transition-all"
-                    >
-                      Save Payment Method
-                    </button>
                   </div>
-                </form>
-              </section>
-
-              <div className="mt-4 flex items-center justify-center gap-2 text-gray-400">
-                <ShieldAlert size={16} className="text-[#22C55E]" />
-                <p className="text-[10px] font-bold leading-relaxed max-w-md">
-                  Your payment information is encrypted and securely processed. KRIFTH never stores your full card number on our servers.
-                </p>
-              </div>
-            </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>

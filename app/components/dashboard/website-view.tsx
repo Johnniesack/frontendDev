@@ -196,8 +196,8 @@ export function WebsiteView() {
                     <p className="text-white/90 font-mono font-bold text-lg tracking-[0.2em] mb-4">
                       {cardNumber
                         ? cardNumber.padEnd(19, " ").replace(/(.{4})/g, "$1 ").trim().split("").map((c, i) =>
-                            i < cardNumber.length ? c : (c === " " ? " " : "•")
-                          ).join("")
+                          i < cardNumber.length ? c : (c === " " ? " " : "•")
+                        ).join("")
                         : "•••• •••• •••• ••••"}
                     </p>
                     <div className="flex items-end justify-between">
@@ -334,9 +334,8 @@ export function WebsiteView() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 pb-4 text-sm font-bold transition-all relative ${
-              activeTab === tab.id ? "" : "text-gray-400 hover:text-gray-600"
-            }`}
+            className={`flex items-center gap-2 pb-4 text-sm font-bold transition-all relative ${activeTab === tab.id ? "" : "text-gray-400 hover:text-gray-600"
+              }`}
             style={{ color: activeTab === tab.id ? brandColor : undefined }}
           >
             <tab.icon size={16} strokeWidth={activeTab === tab.id ? 2.5 : 2} />
@@ -365,7 +364,7 @@ export function WebsiteView() {
             <div className="lg:col-span-7 space-y-6">
               <section className="bg-white rounded-[32px] p-6 sm:p-8 shadow-sm border border-gray-100 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl -mr-16 -mt-16 opacity-40 group-hover:opacity-60 transition-opacity" style={{ backgroundColor: `${brandColor}15` }} />
-                
+
                 <div className="relative z-10 mb-8">
                   <h3 className="text-xl font-black text-gray-900 mb-1 flex items-center gap-2">
                     <Sparkles size={20} style={{ color: brandColor }} />
@@ -409,7 +408,7 @@ export function WebsiteView() {
                         <p className="text-xs text-gray-400 font-medium leading-relaxed max-w-[240px]">
                           We recommend a high-resolution PNG or SVG with a transparent background.
                         </p>
-                        <button 
+                        <button
                           className="text-xs font-black transition-colors flex items-center gap-1.5 mx-auto sm:mx-0 pt-2 relative"
                           style={{ color: brandColor }}
                         >
@@ -454,8 +453,8 @@ export function WebsiteView() {
                       </label>
                       <div className="flex items-center gap-3">
                         <div className="relative group/picker">
-                          <input 
-                            type="color" 
+                          <input
+                            type="color"
                             value={brandColor}
                             onChange={(e) => setBrandColor(e.target.value)}
                             className="w-12 h-12 rounded-xl cursor-pointer border-none bg-transparent overflow-hidden"
@@ -498,12 +497,12 @@ export function WebsiteView() {
                       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">
                         Announcement Bar
                       </label>
-                      <button 
+                      <button
                         onClick={() => setShowAnnouncement(!showAnnouncement)}
                         className={`w-12 h-6 rounded-full p-1 transition-colors ${showAnnouncement ? '' : 'bg-gray-200'}`}
                         style={{ backgroundColor: showAnnouncement ? brandColor : undefined }}
                       >
-                        <motion.div 
+                        <motion.div
                           animate={{ x: showAnnouncement ? 24 : 0 }}
                           className="w-4 h-4 bg-white rounded-full shadow-sm"
                         />
@@ -569,7 +568,7 @@ export function WebsiteView() {
             <div className="lg:col-span-5 space-y-6">
               <section className="bg-gray-900 rounded-[32px] p-8 text-white relative overflow-hidden shadow-2xl">
                 <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -mr-32 -mt-32" style={{ backgroundColor: `${brandColor}30` }} />
-                
+
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-8">
                     <h4 className="text-sm font-black uppercase tracking-widest" style={{ color: brandColor }}>Live Preview</h4>
@@ -601,7 +600,7 @@ export function WebsiteView() {
                     </div>
                     <div className="aspect-video bg-white p-6 flex flex-col items-center justify-center text-center" style={{ fontFamily: brandFont }}>
                       <div className="w-16 h-16 bg-gray-50 rounded-2xl mb-4 flex items-center justify-center text-gray-300">
-                         {logo ? <img src={logo} alt="Logo" className="w-full h-full object-contain p-2" /> : <Sparkles size={24} style={{ color: brandColor }} />}
+                        {logo ? <img src={logo} alt="Logo" className="w-full h-full object-contain p-2" /> : <Sparkles size={24} style={{ color: brandColor }} />}
                       </div>
                       <h5 className="text-lg font-black text-gray-900 mb-2 truncate max-w-full px-4" style={{ fontFamily: brandFont }}>{brandName || "My Shop"}</h5>
                       <div className="w-24 h-2 rounded-full" style={{ backgroundColor: `${brandColor}20` }} />
@@ -662,13 +661,13 @@ export function WebsiteView() {
                   <p className="text-sm text-gray-500 font-medium">Manage the hero section of your storefront website.</p>
                 </div>
                 <div className="relative">
-                  <button 
+                  <button
                     className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200"
                   >
                     <Plus size={18} />
                     Add New Slide
-                    <input 
-                      type="file" 
+                    <input
+                      type="file"
                       className="absolute inset-0 opacity-0 cursor-pointer"
                       accept="image/*"
                       onChange={(e) => {
@@ -683,12 +682,12 @@ export function WebsiteView() {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <AnimatePresence mode="popLayout">
                   {sliders.map((slider) => (
-                    <motion.div 
+                    <motion.div
                       layout
                       initial={{ opacity: 0, scale: 0.9, y: 20 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                      key={slider.id} 
+                      key={slider.id}
                       className="group relative aspect-video rounded-3xl bg-gray-50 border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                     >
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
@@ -700,7 +699,7 @@ export function WebsiteView() {
                         )}
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 p-5 w-full z-20">
-                        <input 
+                        <input
                           type="text"
                           value={slider.title}
                           onChange={(e) => updateSlideTitle(slider.id, e.target.value)}
@@ -712,7 +711,7 @@ export function WebsiteView() {
                         <button className="w-8 h-8 rounded-xl bg-white/90 backdrop-blur shadow-lg flex items-center justify-center text-gray-700 hover:text-[#22C55E] transition-colors">
                           <Layout size={14} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => deleteSlide(slider.id)}
                           className="w-8 h-8 rounded-xl bg-white/90 backdrop-blur shadow-lg flex items-center justify-center text-gray-700 hover:text-red-500 transition-colors"
                         >
@@ -767,15 +766,15 @@ export function WebsiteView() {
                   </div>
                   <p className="text-sm font-bold text-gray-700 flex-1 truncate">
                     {isPro
-                      ? <span className="font-black text-gray-900">{customDomain || "www.yourshop.com"}</span>
-                      : <><span className="font-black text-gray-900">{subdomain || "yourshop"}</span>.krifth.com</>
+                      ? <span className="font-black text-gray-900">{customDomain || "example.com"}</span>
+                      : <>krifth.com/<span className="font-black text-gray-900">{subdomain || "yourshop"}</span></>
                     }
                   </p>
                   <span className="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded-full flex-shrink-0" style={{ backgroundColor: `${brandColor}10`, color: brandColor }}>
                     {dnsStatus === "connected" ? "Connected" : "Live"}
                   </span>
                   <a
-                    href={`https://${isPro ? (customDomain || 'yourshop.com') : `${subdomain || 'yourshop'}.krifth.com`}`}
+                    href={`https://${isPro ? (customDomain || 'example.com') : `krifth.com/${subdomain || 'yourshop'}`}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-8 h-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-700 shadow-sm transition-all flex-shrink-0"
@@ -789,17 +788,17 @@ export function WebsiteView() {
                     /* FREE — Subdomain editor */
                     <motion.div key="free-input" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
                       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1 block">
-                        Subdomain
+                        URL
                       </label>
                       <div className="flex items-center bg-gray-50 rounded-2xl border border-transparent focus-within:bg-white focus-within:border-gray-200 focus-within:shadow-sm transition-all overflow-hidden">
+                        <span className="pl-6 text-sm font-bold text-gray-400 whitespace-nowrap">krifth.com/</span>
                         <input
                           type="text"
                           value={subdomain}
                           onChange={(e) => setSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                          className="flex-1 px-6 py-4 bg-transparent text-sm font-bold text-gray-900 outline-none placeholder:text-gray-300"
-                          placeholder="e.g. krith-test-shop"
+                          className="flex-1 px-3 py-4 bg-transparent text-sm font-bold text-gray-900 outline-none placeholder:text-gray-300"
+                          placeholder="yourshop"
                         />
-                        <span className="pr-6 text-sm font-bold text-gray-400 whitespace-nowrap">.krifth.com</span>
                       </div>
                       <AnimatePresence>
                         {subdomainStatus === "available" && (
@@ -843,7 +842,7 @@ export function WebsiteView() {
                     /* PRO — Custom domain manager */
                     <motion.div key="pro-input" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
                       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1 block">
-                        Custom Domain
+                        Domain
                       </label>
                       <div className="flex items-center bg-gray-50 rounded-2xl border border-transparent focus-within:bg-white focus-within:border-gray-200 focus-within:shadow-sm transition-all overflow-hidden">
                         <input
@@ -851,7 +850,7 @@ export function WebsiteView() {
                           value={customDomain}
                           onChange={(e) => { setCustomDomain(e.target.value.toLowerCase()); setDnsStatus("idle"); }}
                           className="flex-1 px-6 py-4 bg-transparent text-sm font-bold text-gray-900 outline-none placeholder:text-gray-300"
-                          placeholder="e.g. www.myshop.com"
+                          placeholder="example.com"
                         />
                       </div>
 
