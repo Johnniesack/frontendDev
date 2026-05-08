@@ -166,16 +166,13 @@ export function PagesView() {
             <h1 className="text-2xl font-black text-gray-900 tracking-tight">Pages</h1>
             <p className="text-sm text-gray-500 font-medium mt-1">Manage your storefront's static and custom pages</p>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button
             onClick={() => setShowModal(true)}
-            className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-black text-white shadow-lg transition-all"
-            style={{ backgroundColor: brandColor, boxShadow: `0 8px 24px ${brandColor}30` }}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-black transition-all w-full sm:w-auto"
           >
-            <Plus size={18} strokeWidth={3} />
+            <Plus size={14} strokeWidth={3} />
             Add Page
-          </motion.button>
+          </button>
         </div>
 
         {/* ── Filters & Search ── */}
@@ -338,101 +335,94 @@ export function PagesView() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => { setShowModal(false); resetForm(); }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+              className="absolute inset-0 bg-gray-900/10 backdrop-blur-sm"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 24 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: 24 }}
-              transition={{ type: "spring", damping: 26, stiffness: 320 }}
-              className="relative w-full max-w-md bg-white rounded-[32px] overflow-hidden shadow-2xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="relative w-full max-w-lg bg-white rounded-xl shadow-[0_20px_70px_rgba(0,0,0,0.1)] overflow-hidden border border-gray-100"
             >
-              {/* Modal header */}
-              <div className="flex items-center justify-between px-8 py-6 border-b border-gray-50">
-                <h3 className="text-xl font-black text-gray-900">Add Page</h3>
-                <button
-                  onClick={() => { setShowModal(false); resetForm(); }}
-                  className="w-9 h-9 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-700 transition-all"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <div className="px-8 py-6 space-y-5">
-                {/* Page Name */}
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1 block">
-                    Page Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="eg. About us"
-                    value={pageName}
-                    onChange={(e) => setPageName(e.target.value)}
-                    className="w-full px-5 py-4 bg-gray-50 rounded-2xl text-sm font-bold text-gray-900 outline-none border border-transparent focus:bg-white focus:border-gray-200 focus:shadow-sm transition-all placeholder:text-gray-300"
-                  />
+              <div className="p-8 space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-bold text-gray-900 tracking-tight">Create Page</h2>
+                  <button onClick={() => { setShowModal(false); resetForm(); }} className="text-gray-400 hover:text-gray-900 transition-colors">
+                    <X size={20} />
+                  </button>
                 </div>
 
-                {/* Type */}
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1 block">
-                    Type
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={pageType}
-                      onChange={(e) => setPageType(e.target.value as PageType)}
-                      className="w-full appearance-none pl-5 pr-12 py-4 bg-gray-50 rounded-2xl text-sm font-bold text-gray-900 outline-none border border-transparent focus:bg-white focus:border-gray-200 focus:shadow-sm transition-all cursor-pointer"
-                    >
-                      <option value="blank_canvas">Blank Canvas</option>
-                      <option value="link">Link</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-gray-400">
-                      <ChevronDown size={16} />
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider pl-1">Page Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. About Us"
+                      value={pageName}
+                      onChange={(e) => setPageName(e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-semibold text-gray-900 outline-none focus:border-gray-300 transition-all placeholder:text-gray-300"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider pl-1">Type</label>
+                      <div className="relative group">
+                        <select
+                          value={pageType}
+                          onChange={(e) => setPageType(e.target.value as PageType)}
+                          className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-semibold text-gray-900 outline-none focus:border-gray-300 appearance-none transition-all cursor-pointer"
+                        >
+                          <option value="blank_canvas">Blank Canvas</option>
+                          <option value="link">Link</option>
+                        </select>
+                        <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-gray-900 transition-colors" />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider pl-1">Visibility</label>
+                      <div className="relative group">
+                        <select
+                          className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-semibold text-gray-900 outline-none focus:border-gray-300 appearance-none transition-all cursor-pointer"
+                        >
+                          <option>Visible</option>
+                          <option>Draft</option>
+                        </select>
+                        <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-gray-900 transition-colors" />
+                      </div>
                     </div>
                   </div>
+
+                  <AnimatePresence>
+                    {pageType === "link" && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-1.5 overflow-hidden"
+                      >
+                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider pl-1">External URL</label>
+                        <input
+                          type="url"
+                          placeholder="https://instagram.com/..."
+                          value={pageUrl}
+                          onChange={(e) => setPageUrl(e.target.value)}
+                          className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-semibold text-gray-900 outline-none focus:border-gray-300 transition-all placeholder:text-gray-300"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                {/* URL — only for Link type */}
-                <AnimatePresence>
-                  {pageType === "link" && (
-                    <motion.div
-                      key="url-field"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="overflow-hidden space-y-2"
-                    >
-                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1 block">
-                        URL
-                      </label>
-                      <input
-                        type="url"
-                        placeholder="https://example.com"
-                        value={pageUrl}
-                        onChange={(e) => setPageUrl(e.target.value)}
-                        className="w-full px-5 py-4 bg-gray-50 rounded-2xl text-sm font-bold text-gray-900 outline-none border border-transparent focus:bg-white focus:border-gray-200 focus:shadow-sm transition-all placeholder:text-gray-300"
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Modal footer */}
-              <div className="flex justify-end px-8 py-5 border-t border-gray-50">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleSave}
-                  disabled={isSaving || !pageName.trim() || (pageType === "link" && !pageUrl.trim())}
-                  className="flex items-center gap-2 px-8 py-3.5 rounded-2xl text-sm font-black text-white transition-all disabled:opacity-40 shadow-lg"
-                  style={{ backgroundColor: brandColor, boxShadow: `0 8px 24px ${brandColor}30` }}
-                >
-                  {isSaving && (
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  )}
-                  {isSaving ? "Saving..." : "Save"}
-                </motion.button>
+                <div className="pt-4 flex items-center gap-3">
+                  <button onClick={() => { setShowModal(false); resetForm(); }} className="flex-1 py-2 text-xs font-bold text-gray-400 hover:text-gray-900 transition-colors">Discard</button>
+                  <button 
+                    onClick={handleSave}
+                    disabled={isSaving || !pageName.trim() || (pageType === "link" && !pageUrl.trim())}
+                    className="flex-1 py-2.5 bg-gray-900 text-white rounded-lg text-xs font-bold hover:bg-black transition-all disabled:opacity-30"
+                  >
+                    {isSaving ? "Saving..." : "Create Page"}
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -492,7 +482,7 @@ export function PagesView() {
                 </button>
               </div>
 
-              <div className="px-8 py-6 max-h-[60vh] overflow-y-auto">
+              <div className="px-8 py-6 max-h-[60vh] overflow-y-auto scrollbar-hide">
                 <AnimatePresence mode="wait">
                   {toolsActiveTab === "general" ? (
                     <motion.div
@@ -748,7 +738,7 @@ export function PagesView() {
               </div>
 
               {/* Editor Body */}
-              <div className="flex-1 bg-gray-50/50 p-4 sm:p-8 overflow-y-auto relative flex flex-col items-center">
+              <div className="flex-1 bg-gray-50/50 p-4 sm:p-8 overflow-y-auto scrollbar-hide relative flex flex-col items-center">
                 
                 {/* Floating Movable Device Toolbar */}
                 <motion.div
@@ -846,6 +836,5 @@ export function PagesView() {
         )}
       </AnimatePresence>
     </div>
-
   );
 }

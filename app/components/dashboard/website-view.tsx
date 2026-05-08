@@ -163,7 +163,7 @@ export function WebsiteView() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 24 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-white rounded-[32px] p-8 w-full max-w-md shadow-2xl"
+              className="bg-white rounded-[32px] p-8 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto scrollbar-hide"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}

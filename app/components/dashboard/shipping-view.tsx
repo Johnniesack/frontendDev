@@ -14,17 +14,17 @@ interface ShippingZone {
 }
 
 const ZONES: ShippingZone[] = [
-  { id: "SH-0941", countryCode: "gh", country: "Ghana",          fee: 0,     currency: "GHS", status: "Exempted",  comment: "Free shipping for West African cluster" },
-  { id: "SH-0001", countryCode: "us", country: "All",            fee: 18.45, currency: "USD", status: "Subjected", comment: "Global flat rate standard shipping" },
-  { id: "SH-0822", countryCode: "gb", country: "United Kingdom", fee: 12.5,  currency: "GBP", status: "Subjected", comment: "Priority handling included" },
+  { id: "SH-0941", countryCode: "gh", country: "Ghana", fee: 0, currency: "GHS", status: "Exempted", comment: "Free shipping for West African cluster" },
+  { id: "SH-0001", countryCode: "us", country: "All", fee: 18.45, currency: "USD", status: "Subjected", comment: "Global flat rate standard shipping" },
+  { id: "SH-0822", countryCode: "gb", country: "United Kingdom", fee: 12.5, currency: "GBP", status: "Subjected", comment: "Priority handling included" },
 ];
 
 const COUNTRIES = [
   { code: "all", name: "All Countries" }, { code: "us", name: "United States" },
-  { code: "ca", name: "Canada" },         { code: "gb", name: "United Kingdom" },
-  { code: "ng", name: "Nigeria" },        { code: "gh", name: "Ghana" },
-  { code: "ke", name: "Kenya" },          { code: "za", name: "South Africa" },
-  { code: "de", name: "Germany" },        { code: "fr", name: "France" },
+  { code: "ca", name: "Canada" }, { code: "gb", name: "United Kingdom" },
+  { code: "ng", name: "Nigeria" }, { code: "gh", name: "Ghana" },
+  { code: "ke", name: "Kenya" }, { code: "za", name: "South Africa" },
+  { code: "de", name: "Germany" }, { code: "fr", name: "France" },
 ];
 
 const CURRENCIES = [
@@ -56,7 +56,7 @@ function Sel({ label, options, placeholder, value, onChange }: {
       <AnimatePresence>
         {open && (
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 2 }} exit={{ opacity: 0, y: 6 }}
-            className="absolute left-0 right-0 top-full z-[110] bg-white rounded-xl shadow-xl border border-gray-100 p-1.5 max-h-44 overflow-y-auto">
+            className="absolute left-0 right-0 top-full z-[110] bg-white rounded-xl shadow-xl border border-gray-100 p-1.5 max-h-44 overflow-y-auto scrollbar-hide">
             {options.map(o => (
               <button key={o.code} type="button" onClick={() => { onChange(o.code); setOpen(false); }}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-all ${value === o.code ? "bg-[#22C55E]/10 text-[#22C55E]" : "text-gray-600 hover:bg-gray-50"}`}>
@@ -78,13 +78,19 @@ export default function ShippingView() {
   const [fee, setFee] = useState("");
   const [comment, setComment] = useState("");
 
-  React.useEffect(() => {
-    const handler = () => setModal(true);
-    window.addEventListener("open-add-shipping", handler);
-    return () => window.removeEventListener("open-add-shipping", handler);
-  }, []);
+  const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
+  const [editingZone, setEditingZone] = useState<ShippingZone | null>(null);
+  const [zones, setZones] = useState<ShippingZone[]>(ZONES);
 
-  const [status, setStatus] = useState<"Exempted"|"Subjected">("Subjected");
+  const handleDelete = () => {
+    if (isDeletingId) {
+      setZones(zones.filter(z => z.id !== isDeletingId));
+      setIsDeletingId(null);
+    }
+  };
+
+
+  const [status, setStatus] = useState<"Exempted" | "Subjected">("Subjected");
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("All");
   const [filterCurrency, setFilterCurrency] = useState<string>("All");
@@ -96,23 +102,50 @@ export default function ShippingView() {
     return () => window.removeEventListener("click", h);
   }, []);
 
-  const filtered = ZONES.filter(z => {
+  const filtered = zones.filter(z => {
     const matchesQuery = z.country.toLowerCase().includes(q.toLowerCase()) ||
-                        z.id.toLowerCase().includes(q.toLowerCase()) ||
-                        z.currency.toLowerCase().includes(q.toLowerCase());
+      z.id.toLowerCase().includes(q.toLowerCase()) ||
+      z.currency.toLowerCase().includes(q.toLowerCase());
     const matchesStatus = filterStatus === "All" || z.status === filterStatus;
     const matchesCurrency = filterCurrency === "All" || z.currency === filterCurrency;
     return matchesQuery && matchesStatus && matchesCurrency;
   });
 
   const STATS = [
-    { label: "Total Zones",  value: "14 Regions",   icon: Globe,       bg: "#F0FDF4", color: "#22C55E" },
-    { label: "Average Fee",  value: "$18.45",        icon: DollarSign,  bg: "#F0FDF4", color: "#22C55E" },
-    { label: "Exempted",     value: "2 Locations",   icon: ShieldCheck, bg: "#F0FDF4", color: "#22C55E" },
+    { label: "Total Zones", value: `${zones.length} Regions`, icon: Globe, bg: "#F0FDF4", color: "#22C55E" },
+    { label: "Average Fee", value: "$18.45", icon: DollarSign, bg: "#F0FDF4", color: "#22C55E" },
+    { label: "Exempted", value: `${zones.filter(z => z.status === "Exempted").length} Locations`, icon: ShieldCheck, bg: "#F0FDF4", color: "#22C55E" },
   ];
 
   return (
     <div className="px-3 sm:px-6 pt-4 sm:pt-6 pb-10 sm:pb-12 flex flex-col gap-4 sm:gap-5 min-w-0">
+
+      {/* Header Area */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-5 mb-2 sm:mb-4">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-[#22C55E] flex-shrink-0">
+            <Truck size={24} strokeWidth={2.5} />
+          </div>
+          <div>
+            <p className="text-[10px] sm:text-xs text-gray-400 font-black uppercase tracking-[0.2em] leading-none mb-1">
+              Zone Management
+            </p>
+            <p className="text-xs sm:text-sm text-gray-500 font-medium leading-tight">
+              Configure regional shipping fees and logic.
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => setModal(true)}
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-black transition-all w-full sm:w-auto"
+        >
+          <Plus size={14} strokeWidth={3} />
+          Add Shipping
+        </button>
+      </motion.div>
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 flex-shrink-0">
@@ -150,9 +183,8 @@ export default function ShippingView() {
             <div className="relative" ref={filterRef}>
               <button
                 onClick={() => setFilterOpen(!filterOpen)}
-                className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-all flex-shrink-0 ${
-                  filterOpen ? "bg-[#22C55E] text-white border-[#22C55E] shadow-lg shadow-green-100" : "border-gray-100 bg-gray-50 text-gray-500 hover:bg-gray-100"
-                }`}>
+                className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-all flex-shrink-0 ${filterOpen ? "bg-[#22C55E] text-white border-[#22C55E] shadow-lg shadow-green-100" : "border-gray-100 bg-gray-50 text-gray-500 hover:bg-gray-100"
+                  }`}>
                 <SlidersHorizontal size={13} />
               </button>
 
@@ -174,9 +206,8 @@ export default function ShippingView() {
                             <button
                               key={s}
                               onClick={() => setFilterStatus(s)}
-                              className={`px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all border ${
-                                filterStatus === s ? "bg-[#22C55E] text-white border-[#22C55E]" : "bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100"
-                              }`}
+                              className={`px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all border ${filterStatus === s ? "bg-[#22C55E] text-white border-[#22C55E]" : "bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100"
+                                }`}
                             >
                               {s}
                             </button>
@@ -191,9 +222,8 @@ export default function ShippingView() {
                             <button
                               key={c}
                               onClick={() => setFilterCurrency(c)}
-                              className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border ${
-                                filterCurrency === c ? "bg-[#22C55E] text-white border-[#22C55E]" : "bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100"
-                              }`}
+                              className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border ${filterCurrency === c ? "bg-[#22C55E] text-white border-[#22C55E]" : "bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100"
+                                }`}
                             >
                               {c}
                             </button>
@@ -236,9 +266,28 @@ export default function ShippingView() {
                   <span className="text-sm font-black text-gray-900 truncate max-w-[8.5rem]">{z.country}</span>
                   <span className="text-[10px] font-bold text-gray-400">#{z.id}</span>
                 </div>
-                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
-                  <Trash2 size={16} strokeWidth={2} />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => {
+                      setEditingZone(z);
+                      setCountry(z.countryCode);
+                      setCurrency(z.currency);
+                      setFee(z.fee.toString());
+                      setComment(z.comment);
+                      setStatus(z.status);
+                      setModal(true);
+                    }}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-all"
+                  >
+                    <Plus size={16} className="rotate-45" strokeWidth={2} />
+                  </button>
+                  <button
+                    onClick={() => setIsDeletingId(z.id)}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                  >
+                    <Trash2 size={16} strokeWidth={2} />
+                  </button>
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <div>
@@ -270,11 +319,11 @@ export default function ShippingView() {
         </div>
 
         {/* Desktop Table (Hidden on Mobile) */}
-        <div className="hidden md:block overflow-x-auto">
+        <div className="hidden md:block overflow-x-auto scrollbar-hide">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/40">
-                {["ID","Action","Country","Fee","Currency","Status","Comment"].map(h => (
+                {["ID", "Action", "Country", "Fee", "Currency", "Status", "Comment"].map(h => (
                   <th key={h} className="px-5 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-gray-400 border-b border-gray-50">{h}</th>
                 ))}
               </tr>
@@ -285,9 +334,28 @@ export default function ShippingView() {
                   className="hover:bg-gray-50/60 transition-colors">
                   <td className="px-5 py-4 text-xs font-bold text-gray-500 whitespace-nowrap">{z.id}</td>
                   <td className="px-5 py-4">
-                    <button className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
-                      <Trash2 size={14} strokeWidth={2} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => {
+                          setEditingZone(z);
+                          setCountry(z.countryCode);
+                          setCurrency(z.currency);
+                          setFee(z.fee.toString());
+                          setComment(z.comment);
+                          setStatus(z.status);
+                          setModal(true);
+                        }}
+                        className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-all"
+                      >
+                        <Plus size={14} className="rotate-45" strokeWidth={2} />
+                      </button>
+                      <button
+                        onClick={() => setIsDeletingId(z.id)}
+                        className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                      >
+                        <Trash2 size={14} strokeWidth={2} />
+                      </button>
+                    </div>
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2">
@@ -362,10 +430,10 @@ export default function ShippingView() {
         {modal && (
           <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center px-0 sm:px-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setModal(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+              onClick={() => { setModal(false); setEditingZone(null); }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
             <motion.div initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96 }} transition={{ type: "spring", stiffness: 320, damping: 28 }}
-              className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 max-h-[92vh] overflow-y-auto">
+              className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 max-h-[92vh] overflow-y-auto scrollbar-hide">
               {/* Premium Header with Gradient */}
               <div className="bg-gradient-to-br from-green-50 to-emerald-50/30 px-6 sm:px-8 py-6 sm:py-8 relative">
                 <div className="absolute top-0 right-0 p-8 opacity-10 hidden sm:block">
@@ -373,17 +441,17 @@ export default function ShippingView() {
                 </div>
                 <div className="flex items-center gap-4 relative z-10">
                   <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white shadow-xl shadow-green-100 flex items-center justify-center text-[#22C55E]">
-                    <Plus size={24} className="sm:w-7 sm:h-7" strokeWidth={3} />
+                    {editingZone ? <Plus size={24} className="sm:w-7 sm:h-7 rotate-45" strokeWidth={3} /> : <Plus size={24} className="sm:w-7 sm:h-7" strokeWidth={3} />}
                   </div>
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-black text-gray-900 leading-none mb-1">New Shipping Zone</h3>
+                    <h3 className="text-xl sm:text-2xl font-black text-gray-900 leading-none mb-1">{editingZone ? "Edit Shipping Zone" : "New Shipping Zone"}</h3>
                     <p className="text-xs sm:text-sm text-gray-500 font-medium">Configure regional pricing and logic.</p>
                   </div>
                 </div>
               </div>
 
               <div className="p-6 sm:p-8">
-                <form className="space-y-5 sm:space-y-6" onSubmit={e => { e.preventDefault(); setModal(false); }}>
+                <form className="space-y-5 sm:space-y-6" onSubmit={e => { e.preventDefault(); setModal(false); setEditingZone(null); }}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Sel label="Region / Country" options={COUNTRIES} placeholder="Select country" value={country} onChange={setCountry} />
                     <Sel label="Operating Currency" options={CURRENCIES} placeholder="Select currency" value={currency} onChange={setCurrency} />
@@ -401,7 +469,7 @@ export default function ShippingView() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Exemption Status</label>
                     <div className="flex gap-3">
-                      {(["Subjected","Exempted"] as const).map(s => (
+                      {(["Subjected", "Exempted"] as const).map(s => (
                         <button key={s} type="button" onClick={() => setStatus(s)}
                           className={`flex-1 py-4 rounded-2xl text-xs font-black border transition-all ${status === s ? (s === "Exempted" ? "bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm" : "bg-amber-50 text-amber-600 border-amber-200 shadow-sm") : "bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100"}`}>
                           <div className="flex items-center justify-center gap-2">
@@ -420,17 +488,42 @@ export default function ShippingView() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 mt-4 border-t border-gray-50">
-                    <button type="button" onClick={() => setModal(false)} className="w-full sm:w-auto px-8 py-4 text-gray-400 hover:text-gray-700 rounded-2xl text-sm font-bold transition-colors">Discard</button>
+                    <button type="button" onClick={() => { setModal(false); setEditingZone(null); }} className="w-full sm:w-auto px-8 py-4 text-gray-400 hover:text-gray-700 rounded-2xl text-sm font-bold transition-colors">Discard</button>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       type="submit"
-                      className="w-full sm:w-auto px-10 py-4 bg-[#22C55E] text-white rounded-2xl text-sm font-bold hover:bg-[#16A34A] transition-all shadow-xl shadow-green-100"
+                      className="w-full sm:w-auto px-10 py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
                     >
-                      Save Configuration
+                      {editingZone ? "Update Configuration" : "Save Configuration"}
                     </motion.button>
                   </div>
                 </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {isDeletingId && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setIsDeletingId(null)} className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 p-8 text-center">
+              <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Trash2 size={32} />
+              </div>
+              <h3 className="text-xl font-black text-gray-900 mb-2">Delete Zone?</h3>
+              <p className="text-sm text-gray-500 font-medium mb-8 leading-relaxed">
+                This will permanently remove the shipping rule for this region. This action cannot be undone.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <button onClick={() => setIsDeletingId(null)} className="py-3.5 bg-gray-50 text-gray-500 rounded-2xl text-sm font-bold hover:bg-gray-100 transition-all">Cancel</button>
+                <button onClick={handleDelete} className="py-3.5 bg-red-500 text-white rounded-2xl text-sm font-bold hover:bg-red-600 transition-all shadow-lg shadow-red-100">Delete</button>
               </div>
             </motion.div>
           </div>

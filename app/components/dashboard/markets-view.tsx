@@ -13,6 +13,7 @@ import {
   Package,
   Trash2,
   Check,
+  X,
 } from "lucide-react";
 
 interface MarketPricing {
@@ -108,7 +109,7 @@ function CustomSelect({
           }`}
       >
         <span className={!selectedOption ? "text-gray-300" : "text-gray-900"}>
-          {selectedOption ? (selectedOption.name.includes("Dollar") ? `${selectedOption.code} - ${selectedOption.name}` : selectedOption.name) : placeholder}
+          {selectedOption ? (label.includes("Currency") ? `${selectedOption.code} - ${selectedOption.name}` : selectedOption.name) : placeholder}
         </span>
         <motion.div animate={{ rotate: isOpen ? 180 : 0 }}>
           <ChevronDown className="text-gray-400 group-hover:text-[#22C55E] transition-colors" size={18} />
@@ -137,7 +138,7 @@ function CustomSelect({
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
               >
-                <span>{option.name.includes("Dollar") || label.includes("Currency") ? `${option.code} - ${option.name}` : option.name}</span>
+                <span>{label.includes("Currency") ? `${option.code} - ${option.name}` : option.name}</span>
                 {value === option.code && <Check size={16} strokeWidth={3} />}
               </button>
             ))}
@@ -185,15 +186,13 @@ export function MarketsView() {
             </p>
           </div>
         </div>
-        <motion.button
+        <button
           onClick={() => setIsAddModalOpen(true)}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="flex items-center justify-center gap-2 px-5 py-3 bg-[#22C55E] text-white rounded-2xl text-sm font-bold shadow-lg shadow-green-100 hover:bg-[#16A34A] transition-all w-full sm:w-auto"
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-black transition-all w-full sm:w-auto"
         >
-          <Plus size={18} strokeWidth={3} />
+          <Plus size={14} strokeWidth={3} />
           Add Pricing
-        </motion.button>
+        </button>
       </motion.div>
 
       {/* Main Table Card */}
@@ -233,7 +232,7 @@ export function MarketsView() {
         </div>
 
         {/* Desktop Table View (Hidden on Mobile) */}
-        <div className="hidden sm:block overflow-x-auto">
+        <div className="hidden sm:block overflow-x-auto scrollbar-hide">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/50">
@@ -396,82 +395,84 @@ export function MarketsView() {
         </div>
       </motion.div>
 
-      {/* Add Pricing Modal */}
       <AnimatePresence>
         {isAddModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center px-0 sm:px-4">
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsAddModalOpen(false)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+              className="absolute inset-0 bg-gray-900/10 backdrop-blur-sm"
             />
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative w-full max-w-xl bg-white rounded-t-[40px] sm:rounded-[40px] p-6 sm:p-10 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto overflow-x-hidden scrollbar-hide"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="relative w-full max-w-lg bg-white rounded-xl shadow-[0_20px_70px_rgba(0,0,0,0.1)] overflow-y-auto scrollbar-hide max-h-[90vh] border border-gray-100"
             >
-              {/* Decorative background element - now contained properly */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl hidden sm:block pointer-events-none" />
-
-              <div className="relative mb-6 sm:mb-8 text-center sm:text-left">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-green-50 flex items-center justify-center text-[#22C55E] mb-4 sm:mb-6 mx-auto sm:mx-0">
-                  <Globe size={28} strokeWidth={2.5} />
+              <div className="p-0">
+                {/* Premium Header with Gradient */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50/30 px-6 sm:px-8 py-6 sm:py-8 relative">
+                  <div className="absolute top-0 right-0 p-8 opacity-10 hidden sm:block">
+                    <Globe size={120} strokeWidth={1} />
+                  </div>
+                  <div className="flex items-center justify-between relative z-10">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white shadow-xl shadow-green-100 flex items-center justify-center text-[#22C55E]">
+                        <Plus size={24} className="sm:w-7 sm:h-7" strokeWidth={3} />
+                      </div>
+                      <div>
+                        <h3 className="text-xl sm:text-2xl font-black text-gray-900 leading-none mb-1">Add Market</h3>
+                        <p className="text-xs sm:text-sm text-gray-500 font-medium">Configure regional pricing and logic.</p>
+                      </div>
+                    </div>
+                    <button onClick={() => setIsAddModalOpen(false)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/50 text-gray-400 hover:text-gray-900 transition-all border border-transparent hover:border-gray-200">
+                      <X size={20} />
+                    </button>
+                  </div>
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2">Add Market</h3>
-                <p className="text-xs sm:text-sm text-gray-500 font-medium leading-relaxed px-4 sm:px-0">
-                  Configure regional pricing and specific currency rules for your global customers.
-                </p>
+
+                <div className="p-6 sm:p-8 space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <CustomSelect 
+                      label="Region / Country" 
+                      options={COUNTRIES} 
+                      placeholder="Select country" 
+                      value={selectedCountry} 
+                      onChange={setSelectedCountry} 
+                    />
+                    <CustomSelect 
+                      label="Operating Currency" 
+                      options={CURRENCIES} 
+                      placeholder="Select currency" 
+                      value={selectedCurrency} 
+                      onChange={setSelectedCurrency} 
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Internal Log</label>
+                    <textarea 
+                      placeholder="Add any strategic notes about this regional rule..." 
+                      rows={3}
+                      className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none transition-all"
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-gray-50">
+                    <button onClick={() => setIsAddModalOpen(false)} className="w-full sm:w-auto px-8 py-4 text-gray-400 hover:text-gray-700 rounded-2xl text-sm font-bold transition-colors">Discard</button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setIsAddModalOpen(false)}
+                      className="w-full sm:w-auto px-10 py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                    >
+                      Save Configuration
+                    </motion.button>
+                  </div>
+                </div>
               </div>
-
-              <form className="relative space-y-5 sm:space-y-6" onSubmit={(e) => { e.preventDefault(); setIsAddModalOpen(false); }}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-                  <CustomSelect
-                    label="Region / Country"
-                    options={COUNTRIES}
-                    placeholder="Select a country"
-                    value={selectedCountry}
-                    onChange={setSelectedCountry}
-                  />
-                  <CustomSelect
-                    label="Default Currency"
-                    options={CURRENCIES}
-                    placeholder="Select currency"
-                    value={selectedCurrency}
-                    onChange={setSelectedCurrency}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">
-                    Internal Comment
-                  </label>
-                  <textarea
-                    placeholder="Describe the strategic importance..."
-                    rows={2}
-                    className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none"
-                  />
-                </div>
-
-                <div className="pt-6 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-gray-50 mt-4 sm:mt-8">
-                  <button
-                    type="submit"
-                    className="w-full sm:w-auto px-10 py-4 bg-[#22C55E] text-white rounded-2xl text-sm font-bold shadow-xl shadow-green-100 hover:bg-[#16A34A] transition-all order-1 sm:order-2"
-                  >
-                    Create Market
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsAddModalOpen(false)}
-                    className="w-full sm:w-auto px-8 py-4 text-gray-400 hover:text-gray-600 rounded-2xl text-sm font-bold transition-colors order-2 sm:order-1"
-                  >
-                    Dismiss
-                  </button>
-                </div>
-              </form>
             </motion.div>
           </div>
         )}

@@ -50,6 +50,7 @@ import { MarketsView } from "./markets-view";
 import ShippingView from "./shipping-view";
 import { WebsiteView } from "./website-view";
 import { PagesView } from "./pages-view";
+import { CouponsView } from "./coupons-view";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 const STATS = [
@@ -722,30 +723,19 @@ export function DashboardLayout() {
           {/* Right: Bell + context action */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <NotificationBell />
-            {activeNav === "Shipping" ? (
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => window.dispatchEvent(new Event("open-add-shipping"))}
-                className="flex items-center gap-1.5 px-3 sm:px-5 py-2.5 bg-[#22C55E] text-white rounded-xl text-xs sm:text-sm font-black shadow-sm hover:bg-[#16A34A] transition-colors"
-              >
-                <Plus size={15} strokeWidth={2.5} />
-                <span className="hidden sm:inline">Add Shipping</span>
-                <span className="sm:hidden">Add</span>
-              </motion.button>
-            ) : (
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowLogoutConfirm(true)}
-                className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-[#22C55E] text-white rounded-xl text-sm font-black shadow-sm hover:bg-[#16A34A] transition-colors"
-              >
-                <LogOut size={14} strokeWidth={2.5} />
-                Logout
-              </motion.button>
-            )}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowLogoutConfirm(true)}
+              className="flex items-center gap-2 px-3 sm:px-5 py-2.5 bg-[#22C55E] text-white rounded-xl text-xs sm:text-sm font-black shadow-sm hover:bg-[#16A34A] transition-colors"
+            >
+              <LogOut size={14} strokeWidth={2.5} />
+              <span className="hidden sm:inline">Logout</span>
+              <span className="sm:hidden text-[10px]">Logout</span>
+            </motion.button>
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto pb-24 md:pb-4" style={{ scrollbarGutter: "stable" }}>
+        <div className="flex-1 overflow-y-auto scrollbar-hide pb-24 md:pb-4" style={{ scrollbarGutter: "stable" }}>
           {activeNav === "Website" ? (
             <WebsiteView />
           ) : activeNav === "Account" ? (
@@ -756,6 +746,8 @@ export function DashboardLayout() {
             <ShippingView />
           ) : activeNav === "Pages" ? (
             <PagesView />
+          ) : activeNav === "Coupons" ? (
+            <CouponsView />
           ) : (
             <div className="px-4 sm:px-8 pt-4 sm:pt-6 pb-8 space-y-4 sm:space-y-6">
               {/* ── Stat Cards ── */}
