@@ -12,6 +12,7 @@
   --color-purple-haze: #1F1433;
   --color-paper-card: #121419;
   --color-border: rgba(255, 255, 255, 0.08);
+  --app-bg: var(--color-paper);
 }
 
 @theme {
@@ -46,15 +47,24 @@
     scroll-behavior: smooth;
   }
 
-  /* When dashboard is active, switch bg to light and hide auth bg */
+  /* When dashboard is active, switch bg to light and hide auth bg components */
+  html.dashboard-active {
+    --app-bg: #F5F7FA;
+    color-scheme: light;
+  }
+
   html.dashboard-active,
   html.dashboard-active body {
     background-color: #F5F7FA !important;
     color: #111827 !important;
   }
 
-  html.dashboard-active .auth-background {
+  html.dashboard-active .auth-background div:not(.bg-paper) {
     display: none !important;
+  }
+
+  html.dashboard-active .auth-background {
+    background-color: #F5F7FA !important;
   }
 
   /* Global scrollbar hide */
