@@ -48,7 +48,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-body bg-paper text-ink selection:bg-brand/20 selection:text-brand relative">
         {/* Stable Fixed Background */}
-        <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
+        <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden auth-background">
           <div className="absolute inset-0 bg-[#0A0A0B]" />
           <div 
             className="absolute inset-0 opacity-40"

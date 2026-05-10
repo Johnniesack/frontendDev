@@ -46,11 +46,15 @@
     scroll-behavior: smooth;
   }
 
-  /* When dashboard is active, switch bg to light */
+  /* When dashboard is active, switch bg to light and hide auth bg */
   html.dashboard-active,
   html.dashboard-active body {
     background-color: #F5F7FA !important;
     color: #111827 !important;
+  }
+
+  html.dashboard-active .auth-background {
+    display: none !important;
   }
 
   /* Global scrollbar hide */
