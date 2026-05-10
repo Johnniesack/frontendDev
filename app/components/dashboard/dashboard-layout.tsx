@@ -300,7 +300,7 @@ function MobileBottomNav({
   return (
     <>
       {/* Bottom bar */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-t border-gray-100 flex items-stretch shadow-2xl shadow-black/10 pb-safe">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-t border-gray-100 flex items-stretch shadow-2xl shadow-black/10 pb-safe px-safe">
         {BOTTOM_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeNav === tab.label;
@@ -684,11 +684,26 @@ export function DashboardLayout() {
     window.location.href = "/";
   };
 
+  React.useEffect(() => {
+    // Add class to html to enable light-mode dashboard background
+    // This overrides the dark auth background via CSS class specificity
+    document.documentElement.classList.add('dashboard-active');
+    // Also set meta theme-color for status bar on mobile browsers
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', '#F5F7FA');
+    return () => {
+      document.documentElement.classList.remove('dashboard-active');
+      if (meta) meta.setAttribute('content', '#0A0A0B');
+    };
+  }, []);
+
   return (
     <div
-      className="flex h-[100dvh] bg-[#F5F7FA] overflow-hidden"
+      className="flex h-[100dvh] min-h-[100dvh] bg-[#F5F7FA] overflow-hidden relative"
       style={{ fontFamily: "'Space Grotesk', sans-serif" }}
     >
+      {/* Full-bleed background that covers ALL safe area zones (notch, home indicator) */}
+      <div className="fixed inset-0 bg-[#F5F7FA] -z-10" />
       {/* ── Desktop Sidebar ── */}
       <aside className="hidden lg:flex w-[210px] flex-shrink-0 bg-white border-r border-gray-100 flex-col h-full shadow-sm">
         <SidebarContent activeNav={activeNav} setActiveNav={setActiveNav} />
@@ -703,7 +718,7 @@ export function DashboardLayout() {
       {/* ── Main ── */}
       <main className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Top bar */}
-        <header className="flex items-center justify-between gap-3 px-4 md:px-6 lg:px-8 pt-[calc(max(2.5rem,env(safe-area-inset-top,0px)))] md:pt-4 pb-3 flex-shrink-0 bg-[#F5F7FA]">
+        <header className="flex items-center justify-between gap-3 px-4 md:px-6 lg:px-8 pt-header-safe md:pt-4 pb-3 bg-[#F5F7FA] flex-shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             {/* Mobile: brand mark instead of hamburger */}
             <div className="md:hidden w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-900 text-[11px] font-black flex-shrink-0">
@@ -735,7 +750,7 @@ export function DashboardLayout() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto scrollbar-hide pb-24 md:pb-4">
+        <div className="flex-1 overflow-y-auto scrollbar-hide pb-24 md:pb-4" style={{ WebkitOverflowScrolling: 'touch' }}>
           {activeNav === "Website" ? (
             <WebsiteView />
           ) : activeNav === "Account" ? (
