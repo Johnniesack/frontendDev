@@ -270,14 +270,14 @@ export default function ShippingView() {
         </div>
 
         {/* Mobile Card List (Hidden on Desktop) */}
-        <div className="block md:hidden divide-y divide-gray-50/50">
+        <div className="block md:hidden space-y-3 p-4 bg-gray-50/30">
           {filtered.map((z, i) => (
             <motion.div
               key={z.id}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="p-4 sm:p-5 space-y-4 hover:bg-gray-50/50 transition-colors"
+              className="p-5 space-y-4 bg-white rounded-2xl border border-gray-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)]"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
@@ -484,7 +484,7 @@ export default function ShippingView() {
                     <div className="relative group">
                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#22C55E] font-bold text-sm transition-colors">$</div>
                       <input type="number" min="0" step="0.01" placeholder="0.00" value={fee} onChange={e => setFee(e.target.value)}
-                        className="w-full py-4 pl-8 pr-4 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
+                        className="w-full py-4 pl-8 pr-4 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-base font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
                     </div>
                   </div>
 

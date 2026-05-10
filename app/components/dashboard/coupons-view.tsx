@@ -228,14 +228,14 @@ export function CouponsView() {
           </div>
 
           {/* Mobile/Tablet Card List (Visible on smaller screens) */}
-          <div className="block lg:hidden divide-y divide-gray-50">
+          <div className="block lg:hidden space-y-3 p-4 bg-gray-50/30">
             {filteredCoupons.map((c, i) => (
               <motion.div
                 key={c.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className="p-4 sm:p-5 space-y-4 hover:bg-gray-50/50 transition-colors"
+                className="p-5 space-y-4 bg-white rounded-2xl border border-gray-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)]"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
@@ -362,7 +362,7 @@ export function CouponsView() {
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Coupon Type</label>
                       <div className="relative group">
-                        <select className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer">
+                        <select className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-base font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer">
                           <option>Standard Coupon</option>
                           <option>Loyalty Card</option>
                         </select>
@@ -371,7 +371,7 @@ export function CouponsView() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Code Prefix</label>
-                      <input type="text" placeholder="e.g. SAVE-" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
+                      <input type="text" placeholder="e.g. SAVE-" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-base font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
                     </div>
                   </div>
 
@@ -379,7 +379,7 @@ export function CouponsView() {
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Currency</label>
                       <div className="relative group">
-                        <select className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer">
+                        <select className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-base font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer">
                           <option>GHS (Cedis)</option>
                           <option>USD (Dollar)</option>
                         </select>
@@ -388,13 +388,13 @@ export function CouponsView() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Discount Value</label>
-                      <input type="number" placeholder="0.00" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
+                      <input type="number" placeholder="0.00" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-base font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Batch Quantity</label>
-                    <input type="number" placeholder="100" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
+                    <input type="number" placeholder="100" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-base font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
                   </div>
                   <div className="pt-4 flex flex-col gap-2 pb-8">
                     <motion.button
@@ -475,7 +475,7 @@ export function CouponsView() {
                       <div className="relative group">
                         <select
                           defaultValue={editingCoupon.status}
-                          className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer"
+                          className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-base font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer"
                         >
                           <option value="Active">Active</option>
                           <option value="Used">Used</option>
@@ -493,7 +493,7 @@ export function CouponsView() {
                         <input
                           type="number"
                           defaultValue={editingCoupon.value}
-                          className="flex-1 py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 outline-none transition-all"
+                          className="flex-1 py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-base font-bold text-gray-900 outline-none transition-all"
                         />
                       </div>
                     </div>
