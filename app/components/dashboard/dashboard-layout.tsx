@@ -423,7 +423,7 @@ function TabletSidebar({
   setActiveNav: (v: string) => void;
 }) {
   return (
-    <aside className="hidden md:flex lg:hidden w-[68px] flex-shrink-0 bg-white border-r border-gray-100 flex-col items-center pt-[calc(1rem+env(safe-area-inset-top,0px))] pb-4 gap-1 shadow-sm">
+    <aside className="hidden md:flex lg:hidden w-[68px] flex-shrink-0 bg-white border-r border-gray-100 flex-col items-center pt-[calc(max(2.5rem,env(safe-area-inset-top,0px)))] md:pt-4 pb-4 gap-1 shadow-sm">
       {/* Logo mark */}
       <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-900 text-[11px] font-black mb-3">
         K
@@ -467,7 +467,7 @@ function SidebarContent({
   return (
     <div className="flex flex-col h-full">
       {/* Brand */}
-      <div className="px-6 pt-[calc(1rem+env(safe-area-inset-top,0px))] pb-4">
+      <div className="px-6 pt-[calc(max(2.5rem,env(safe-area-inset-top,0px)))] md:pt-4 pb-4">
         <h1 className="text-2xl font-bold tracking-tight text-gray-900 leading-none">
           KRIFTH
         </h1>
@@ -703,7 +703,7 @@ export function DashboardLayout() {
       {/* ── Main ── */}
       <main className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Top bar */}
-        <header className="flex items-center justify-between gap-3 px-4 md:px-6 lg:px-8 pt-[calc(1rem+env(safe-area-inset-top,0px))] pb-3 flex-shrink-0 bg-[#F5F7FA]">
+        <header className="flex items-center justify-between gap-3 px-4 md:px-6 lg:px-8 pt-[calc(max(2.5rem,env(safe-area-inset-top,0px)))] md:pt-4 pb-3 flex-shrink-0 bg-[#F5F7FA]">
           <div className="flex items-center gap-3 min-w-0">
             {/* Mobile: brand mark instead of hamburger */}
             <div className="md:hidden w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-900 text-[11px] font-black flex-shrink-0">
