@@ -37,6 +37,7 @@ const ROLES = ["Admin", "Manager", "Staff"];
 export function PersonnelView() {
   const [personnel, setPersonnel] = useState<Personnel[]>(MOCK_PERSONNEL);
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<Personnel | null>(null);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
@@ -48,10 +49,17 @@ export function PersonnelView() {
     role: "Staff" as Personnel["role"],
   });
 
-  const filteredPersonnel = personnel.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    p.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredPersonnel = personnel.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      p.email.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesTab = 
+      activeTab === "All" || 
+      (activeTab === "Admins" && p.role === "Admin") || 
+      (activeTab === "Staff" && p.role === "Staff");
+
+    return matchesSearch && matchesTab;
+  });
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +112,8 @@ export function PersonnelView() {
             {["All", "Admins", "Staff"].map((tab) => (
               <button
                 key={tab}
-                className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-colors ${tab === "All" ? "text-gray-900" : "text-gray-400 hover:text-gray-600"}`}
+                onClick={() => setActiveTab(tab)}
+                className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-colors ${activeTab === tab ? "text-gray-900" : "text-gray-400 hover:text-gray-600"}`}
               >
                 {tab}
               </button>
@@ -303,7 +312,7 @@ export function PersonnelView() {
               </div>
 
               {/* Modal Header - Fixed */}
-              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0">
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0 rounded-t-[32px] sm:rounded-t-none">
                 <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
                   <Users size={160} strokeWidth={1} className="text-white" />
                 </div>
@@ -361,21 +370,19 @@ export function PersonnelView() {
                       <ChevronDown size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-gray-900 transition-colors" />
                     </div>
                   </div>
+                  <div className="pt-4 flex flex-col gap-2 pb-8">
+                    <motion.button 
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                      form="personnel-form"
+                      type="submit"
+                      className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-black transition-all shadow-xl shadow-gray-200"
+                    >
+                      {editingMember ? "Update Member" : "Invite Member"}
+                    </motion.button>
+                    <button type="button" onClick={closeModal} className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard Changes</button>
+                  </div>
                 </form>
-              </div>
-
-              {/* Fixed Footer with Blur */}
-              <div className="px-6 sm:px-8 py-4 sm:py-6 border-t border-gray-50 bg-white/80 backdrop-blur-md flex flex-col gap-2 shrink-0 pb-10 sm:pb-6">
-                <motion.button 
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  form="personnel-form"
-                  type="submit"
-                  className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-black transition-all shadow-xl shadow-gray-200"
-                >
-                  {editingMember ? "Update Member" : "Invite Member"}
-                </motion.button>
-                <button type="button" onClick={closeModal} className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard Changes</button>
               </div>
             </motion.div>
           </div>

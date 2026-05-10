@@ -345,18 +345,18 @@ export default function ShippingView() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-200">
               {filtered.map((z, i) => (
                 <motion.tr key={z.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.04 }}
-                  className="hover:bg-gray-50/60 transition-colors">
-                  <td className="px-5 py-4 text-xs font-bold text-gray-500 whitespace-nowrap">{z.id}</td>
-                  <td className="px-5 py-4">
+                  className={`group transition-colors ${i % 2 === 0 ? "bg-white" : "bg-gray-50/50"} hover:bg-[#22C55E]/5`}>
+                  <td className="px-5 py-6 text-xs font-bold text-gray-400 border-l-2 border-transparent group-hover:border-[#22C55E] transition-all whitespace-nowrap">{z.id}</td>
+                  <td className="px-5 py-6">
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => openEdit(z)}
                         className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-all"
                       >
-                        <Plus size={14} className="rotate-45" strokeWidth={2} />
+                        <Edit3 size={14} strokeWidth={2} />
                       </button>
                       <button
                         onClick={() => setIsDeletingId(z.id)}
@@ -366,7 +366,7 @@ export default function ShippingView() {
                       </button>
                     </div>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-5 py-6">
                     <div className="flex items-center gap-2">
                       <div className="rounded overflow-hidden border border-gray-100 flex-shrink-0" style={{ width: 24, height: 16 }}>
                         <img src={`https://flagcdn.com/${z.countryCode}.svg`} alt={z.country} className="w-full h-full object-cover" />
@@ -374,14 +374,14 @@ export default function ShippingView() {
                       <span className="text-xs font-bold text-gray-900 whitespace-nowrap">{z.country}</span>
                     </div>
                   </td>
-                  <td className="px-5 py-4 text-xs font-bold text-gray-900 whitespace-nowrap">${z.fee.toFixed(2)}</td>
-                  <td className="px-5 py-4 text-xs font-semibold text-gray-500">{z.currency}</td>
-                  <td className="px-5 py-4">
+                  <td className="px-5 py-6 text-xs font-bold text-gray-900 whitespace-nowrap">${z.fee.toFixed(2)}</td>
+                  <td className="px-5 py-6 text-xs font-semibold text-gray-500">{z.currency}</td>
+                  <td className="px-5 py-6">
                     <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black ${z.status === "Exempted" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}>
                       {z.status}
                     </span>
                   </td>
-                  <td className="px-5 py-4 text-xs text-gray-400 max-w-[200px]">
+                  <td className="px-5 py-6 text-xs text-gray-400 max-w-[200px]">
                     <span className="truncate block">{z.comment}</span>
                   </td>
                 </motion.tr>
@@ -440,10 +440,10 @@ export default function ShippingView() {
           <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => { setModal(false); setEditingZone(null); }} className="absolute inset-0 bg-black/60 backdrop-blur-md" />
-            <motion.div 
-              initial={{ y: "100%", opacity: 0 }} 
+            <motion.div
+              initial={{ y: "100%", opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "100%", opacity: 0 }} 
+              exit={{ y: "100%", opacity: 0 }}
               transition={{ type: "spring", damping: 32, stiffness: 350 }}
               className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl border border-gray-100 flex flex-col max-h-[92vh] overflow-hidden"
             >
@@ -453,7 +453,7 @@ export default function ShippingView() {
               </div>
 
               {/* Premium Header with Gradient - Fixed */}
-              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0">
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0 rounded-t-[32px] sm:rounded-t-none">
                 <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
                   <Truck size={160} strokeWidth={1} className="text-white" />
                 </div>
@@ -508,27 +508,25 @@ export default function ShippingView() {
                     <textarea rows={2} placeholder="Add a note about this regional rule..." value={comment} onChange={e => setComment(e.target.value)}
                       className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none transition-all" />
                   </div>
+                  <div className="pt-4 flex flex-col gap-2 pb-8">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      form="shipping-form"
+                      type="submit"
+                      className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                    >
+                      {editingZone ? "Update Configuration" : "Save Configuration"}
+                    </motion.button>
+                    <button
+                      type="button"
+                      onClick={() => { setModal(false); setEditingZone(null); }}
+                      className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors"
+                    >
+                      Discard Changes
+                    </button>
+                  </div>
                 </form>
-              </div>
-
-              {/* Fixed Footer with Blur */}
-              <div className="px-5 sm:px-8 py-4 sm:py-6 border-t border-gray-50 bg-white/80 backdrop-blur-md flex flex-col gap-2 shrink-0 pb-8 sm:pb-6">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  form="shipping-form"
-                  type="submit"
-                  className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
-                >
-                  {editingZone ? "Update Configuration" : "Save Configuration"}
-                </motion.button>
-                <button 
-                  type="button" 
-                  onClick={() => { setModal(false); setEditingZone(null); }} 
-                  className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors"
-                >
-                  Discard Changes
-                </button>
               </div>
             </motion.div>
           </div>

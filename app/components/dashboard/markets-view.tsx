@@ -241,17 +241,17 @@ export function MarketsView() {
                 <th className="px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-50">Comment</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-200">
               {MOCK_DATA.map((item, idx) => (
                 <motion.tr
                   key={item.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: idx * 0.05 }}
-                  className="group hover:bg-gray-50/50 transition-colors"
+                  className={`group transition-colors ${idx % 2 === 0 ? "bg-white" : "bg-gray-50/30"} hover:bg-[#22C55E]/5`}
                 >
-                  <td className="px-6 py-5 text-sm font-bold text-gray-500">{item.id}</td>
-                  <td className="px-6 py-5 relative">
+                  <td className="px-6 py-6 text-sm font-bold text-gray-400 border-l-2 border-transparent group-hover:border-[#22C55E] transition-all">{item.id}</td>
+                  <td className="px-6 py-6 relative">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -298,7 +298,7 @@ export function MarketsView() {
                       )}
                     </AnimatePresence>
                   </td>
-                  <td className="px-6 py-5">
+                  <td className="px-6 py-6">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-5 rounded-md overflow-hidden shadow-sm border border-gray-100 flex-shrink-0">
                         <img
@@ -310,12 +310,12 @@ export function MarketsView() {
                       <span className="text-sm font-bold text-gray-900">{item.place}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-5">
+                  <td className="px-6 py-6">
                     <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-black tracking-wider">
                       {item.currency}
                     </span>
                   </td>
-                  <td className="px-6 py-5">
+                  <td className="px-6 py-6">
                     <p className="text-sm font-semibold text-gray-600 max-w-xs truncate">
                       {item.comment}
                     </p>
@@ -421,7 +421,7 @@ export function MarketsView() {
               </div>
 
               {/* Premium Header with Gradient - Fixed */}
-              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0">
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0 rounded-t-[32px] sm:rounded-t-none">
                 <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
                   <Globe size={160} strokeWidth={1} className="text-white" />
                 </div>
@@ -467,20 +467,18 @@ export function MarketsView() {
                       className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none transition-all"
                     />
                   </div>
+                  <div className="pt-4 flex flex-col gap-2 pb-8">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setIsAddModalOpen(false)}
+                      className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                    >
+                      Save Configuration
+                    </motion.button>
+                    <button onClick={() => setIsAddModalOpen(false)} className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard Configuration</button>
+                  </div>
                 </div>
-              </div>
-
-              {/* Fixed Footer with Blur */}
-              <div className="px-6 sm:px-8 py-4 sm:py-6 border-t border-gray-50 bg-white/80 backdrop-blur-md flex flex-col gap-2 shrink-0 pb-10 sm:pb-6">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
-                >
-                  Save Configuration
-                </motion.button>
-                <button onClick={() => setIsAddModalOpen(false)} className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard Configuration</button>
               </div>
             </motion.div>
           </div>

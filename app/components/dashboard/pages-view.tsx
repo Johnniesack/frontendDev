@@ -317,7 +317,7 @@ export function PagesView() {
             >
               <div className="p-0">
                 {/* Premium Header with Gradient */}
-                <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-10 relative overflow-hidden">
+                <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-10 relative overflow-hidden rounded-t-[32px]">
                   <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
                     <FileText size={160} strokeWidth={1} className="text-white" />
                   </div>
@@ -436,7 +436,7 @@ export function PagesView() {
               className="relative w-full max-w-md bg-white rounded-[32px] overflow-hidden shadow-2xl"
             >
                 {/* Premium Header with Gradient */}
-                <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 relative overflow-hidden">
+                <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 relative overflow-hidden rounded-t-[32px] sm:rounded-t-none">
                   <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
                     <Wrench size={160} strokeWidth={1} className="text-white" />
                   </div>

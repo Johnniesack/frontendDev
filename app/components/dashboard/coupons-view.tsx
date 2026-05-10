@@ -337,7 +337,7 @@ export function CouponsView() {
               </div>
 
               {/* Modal Header - Fixed */}
-              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0">
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0 rounded-t-[32px] sm:rounded-t-none">
                 <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
                   <Ticket size={160} strokeWidth={1} className="text-white" />
                 </div>
@@ -396,20 +396,18 @@ export function CouponsView() {
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Batch Quantity</label>
                     <input type="number" placeholder="100" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
                   </div>
+                  <div className="pt-4 flex flex-col gap-2 pb-8">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setIsCreating(false)}
+                      className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                    >
+                      Generate Coupons
+                    </motion.button>
+                    <button onClick={() => setIsCreating(false)} className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard Configuration</button>
+                  </div>
                 </div>
-              </div>
-
-              {/* Fixed Footer with Blur */}
-              <div className="px-6 sm:px-8 py-4 sm:py-6 border-t border-gray-50 bg-white/80 backdrop-blur-md flex flex-col gap-2 shrink-0 pb-10 sm:pb-6">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setIsCreating(false)}
-                  className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
-                >
-                  Generate Coupons
-                </motion.button>
-                <button onClick={() => setIsCreating(false)} className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard Configuration</button>
               </div>
             </motion.div>
           </div>
@@ -440,7 +438,7 @@ export function CouponsView() {
               </div>
 
               {/* Modal Header - Fixed */}
-              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0">
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0 rounded-t-[32px] sm:rounded-t-none">
                 <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
                   <Edit3 size={160} strokeWidth={1} className="text-white" />
                 </div>
@@ -500,20 +498,18 @@ export function CouponsView() {
                       </div>
                     </div>
                   </div>
+                  <div className="pt-4 flex flex-col gap-2 pb-8">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleUpdate({ ...editingCoupon, status: "Active" })}
+                      className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                    >
+                      Save Changes
+                    </motion.button>
+                    <button onClick={() => setEditingCoupon(null)} className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard Changes</button>
+                  </div>
                 </div>
-              </div>
-
-              {/* Fixed Footer with Blur */}
-              <div className="px-6 sm:px-8 py-4 sm:py-6 border-t border-gray-50 bg-white/80 backdrop-blur-md flex flex-col gap-2 shrink-0 pb-10 sm:pb-6">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleUpdate({ ...editingCoupon, status: "Active" })}
-                  className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
-                >
-                  Save Changes
-                </motion.button>
-                <button onClick={() => setEditingCoupon(null)} className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard Changes</button>
               </div>
             </motion.div>
           </div>
