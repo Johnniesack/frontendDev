@@ -21,12 +21,17 @@ const dmMono = DM_Mono({
 export const metadata: Metadata = {
   title: "Krifth | Your hustle, automated.",
   description: "Set up your storefront and leverage AI-driven streetwear management.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+  },
 };
 
 export const viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: "#F5F7FA",
 };
 
 export default function RootLayout({

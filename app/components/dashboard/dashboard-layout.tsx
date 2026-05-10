@@ -684,11 +684,23 @@ export function DashboardLayout() {
     window.location.href = "/";
   };
 
+  React.useEffect(() => {
+    // Force background color for safe areas
+    document.documentElement.style.backgroundColor = '#F5F7FA';
+    document.body.style.backgroundColor = '#F5F7FA';
+    return () => {
+      document.documentElement.style.backgroundColor = '';
+      document.body.style.backgroundColor = '';
+    };
+  }, []);
+
   return (
     <div
-      className="flex h-[100dvh] bg-[#F5F7FA] overflow-hidden"
+      className="flex h-[100dvh] bg-[#F5F7FA] overflow-hidden relative"
       style={{ fontFamily: "'Space Grotesk', sans-serif" }}
     >
+      {/* Ensure background fills safe area */}
+      <div className="fixed inset-0 bg-[#F5F7FA] -z-10" />
       {/* ── Desktop Sidebar ── */}
       <aside className="hidden lg:flex w-[210px] flex-shrink-0 bg-white border-r border-gray-100 flex-col h-full shadow-sm">
         <SidebarContent activeNav={activeNav} setActiveNav={setActiveNav} />
