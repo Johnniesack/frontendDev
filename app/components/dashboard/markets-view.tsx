@@ -327,9 +327,9 @@ export function MarketsView() {
         </div>
 
         {/* Mobile Card List View (Visible on Mobile Only) */}
-        <div className="block sm:hidden divide-y divide-gray-50">
+        <div className="block sm:hidden space-y-3 p-4 bg-gray-50/30">
           {MOCK_DATA.map((item, idx) => (
-            <div key={item.id} className="p-4 sm:p-5 space-y-4 hover:bg-gray-50/50 transition-colors">
+            <div key={item.id} className="p-5 space-y-4 bg-white rounded-2xl border border-gray-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)]">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100 overflow-hidden shrink-0">
@@ -464,7 +464,7 @@ export function MarketsView() {
                     <textarea
                       placeholder="Add any strategic notes about this regional rule..."
                       rows={3}
-                      className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none transition-all"
+                      className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-base font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none transition-all"
                     />
                   </div>
                   <div className="pt-4 flex flex-col gap-2 pb-8">

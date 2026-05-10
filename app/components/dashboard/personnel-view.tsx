@@ -245,14 +245,14 @@ export function PersonnelView() {
           </div>
 
           {/* Mobile/Tablet Card List (Visible on smaller screens) */}
-          <div className="block lg:hidden divide-y divide-gray-50">
+          <div className="block lg:hidden space-y-3 p-4 bg-gray-50/30">
             {filteredPersonnel.map((member, i) => (
               <motion.div
                 key={member.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className="p-4 sm:p-5 space-y-4 hover:bg-gray-50/50 transition-colors"
+                className="p-5 space-y-4 bg-white rounded-2xl border border-gray-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)]"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
@@ -341,7 +341,7 @@ export function PersonnelView() {
                       placeholder="e.g. John Doe"
                       value={formData.name}
                       onChange={e => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-gray-200 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" 
+                      className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-gray-200 text-base font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" 
                     />
                   </div>
 
@@ -353,7 +353,7 @@ export function PersonnelView() {
                       placeholder="john@example.com"
                       value={formData.email}
                       onChange={e => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-gray-200 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" 
+                      className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-gray-200 text-base font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" 
                     />
                   </div>
 
@@ -363,7 +363,7 @@ export function PersonnelView() {
                       <select 
                         value={formData.role}
                         onChange={e => setFormData({ ...formData, role: e.target.value as Personnel["role"] })}
-                        className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-gray-200 text-sm font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer"
+                        className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-gray-200 text-base font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer"
                       >
                         {ROLES.map(role => <option key={role} value={role}>{role}</option>)}
                       </select>
