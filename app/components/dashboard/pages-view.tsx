@@ -160,127 +160,94 @@ export function PagesView() {
     <div className="flex-1 px-4 sm:px-8 pt-4 sm:pt-6 pb-8 animate-in fade-in duration-500">
       <div className="max-w-6xl mx-auto space-y-6">
 
-        {/* ── Header ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-white/50 backdrop-blur-xl p-4 sm:p-6 rounded-[28px] sm:rounded-[32px] border border-white shadow-sm">
-          <div>
-            <h1 className="text-2xl font-black text-gray-900 tracking-tight">Pages</h1>
-            <p className="text-sm text-gray-500 font-medium mt-1">Manage your storefront's static and custom pages</p>
+      {/* ─── Integrated Header ─── */}
+      <div className="px-4 sm:px-8 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-30 gap-4">
+        <div className="flex items-center justify-between sm:justify-start gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-900">
+              <FileText size={15} strokeWidth={2.5} />
+            </div>
+            <span className="text-sm font-black text-gray-900 tracking-tight">Pages</span>
           </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-black transition-all w-full sm:w-auto"
-          >
-            <Plus size={14} strokeWidth={3} />
-            Add Page
-          </button>
+          <div className="h-4 w-px bg-gray-200 hidden sm:block" />
+          <div className="flex items-center gap-4">
+            {["all", "blank_canvas", "link"].map((type) => (
+              <button
+                key={type}
+                onClick={() => setFilterType(type as any)}
+                className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-colors ${filterType === type ? "text-gray-900" : "text-gray-400 hover:text-gray-600"}`}
+              >
+                {type === 'all' ? 'All' : type === 'blank_canvas' ? 'Canvas' : 'Links'}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* ── Filters & Search ── */}
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <div className="relative flex-1 w-full">
-            <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-gray-400">
-              <Search size={18} />
-            </div>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="relative group flex-1 sm:flex-initial">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gray-900 transition-colors" size={14} />
             <input
               type="text"
               placeholder="Search pages..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-6 py-4 bg-white border border-gray-100 rounded-2xl text-sm font-bold text-gray-900 focus:ring-4 focus:ring-gray-50 transition-all outline-none shadow-sm placeholder:text-gray-300"
+              className="pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-medium outline-none focus:bg-white focus:border-gray-200 transition-all w-full sm:w-48 lg:w-64"
             />
           </div>
-          <div className="relative w-full sm:w-52">
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value as any)}
-              className="w-full appearance-none pl-6 pr-10 py-4 bg-white border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:ring-4 focus:ring-gray-50 transition-all outline-none shadow-sm cursor-pointer"
-            >
-              <option value="all">All Types</option>
-              <option value="blank_canvas">Blank Canvas</option>
-              <option value="link">Link</option>
-            </select>
-            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
-              <ChevronDown size={16} />
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowModal(true)}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all sm:w-auto shadow-lg shadow-gray-200 shrink-0"
+          >
+            <div className="w-5 h-5 rounded-lg bg-white/10 flex items-center justify-center">
+              <Plus size={14} strokeWidth={3} />
             </div>
-          </div>
+            <span className="hidden sm:inline">Add Page</span>
+            <span className="sm:hidden">Add</span>
+          </motion.button>
         </div>
+      </div>
 
-        {/* ── Page Cards Grid ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <AnimatePresence mode="popLayout">
-            {filteredPages.map((page, index) => (
-              <motion.div
-                layout
-                key={page.id}
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                transition={{ delay: index * 0.05 }}
-                className="group bg-white rounded-[28px] p-7 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden"
-              >
-                {/* Decorative hover glow */}
-                <div
-                  className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{ backgroundColor: `${brandColor}08`, transform: "translate(40%, -40%)" }}
-                />
-
-                <div className="relative z-10">
-                  {/* Type pill + delete */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest"
-                      style={{
-                        backgroundColor: page.type === "link" ? "#EFF6FF" : `${brandColor}12`,
-                        color: page.type === "link" ? "#3B82F6" : brandColor,
-                      }}
-                    >
-                      {page.type === "link" ? <LinkIcon size={9} /> : <FileText size={9} />}
-                      {page.type === "link" ? "Link" : "Blank Canvas"}
-                    </span>
-
-                    <button
-                      onClick={() => deletePage(page.id)}
-                      className="opacity-0 group-hover:opacity-100 p-2 rounded-xl text-gray-300 hover:text-red-400 hover:bg-red-50 transition-all"
-                    >
-                      <Trash2 size={15} />
-                    </button>
+        {/* ─── Premium Grid Content ─── */}
+        <div className="flex-1 px-4 sm:px-8 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
+            <AnimatePresence mode="popLayout">
+              {filteredPages.map((page, index) => (
+                <motion.div
+                  layout
+                  key={page.id}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ delay: index * 0.04 }}
+                  className="group bg-white rounded-xl p-5 border border-gray-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:border-gray-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all flex flex-col justify-between"
+                >
+                  <div className="flex items-start justify-between gap-4 mb-6">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-gray-900 group-hover:text-white transition-all shadow-sm">
+                        {page.type === "link" ? <LinkIcon size={20} /> : <FileText size={20} />}
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-[15px] font-black text-gray-900 truncate mb-0.5">{page.name}</h4>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest truncate">
+                          {page.type === "link" ? page.url : `/${page.slug}`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <div className={`w-2 h-2 rounded-full ${page.isVisible ? "bg-[#22C55E] shadow-[0_0_8px_rgba(34,197,94,0.3)]" : "bg-gray-300"}`} />
+                      <span className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded-lg text-[8px] font-black uppercase tracking-wider border border-gray-100">
+                        {page.type === "link" ? "External" : "Canvas"}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Visibility Badge */}
-                  {!page.isVisible && (
-                    <div className="absolute top-0 right-10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded-lg">
-                      <EyeOff size={12} />
-                      Hidden
-                    </div>
-                  )}
-
-                  {/* Page name */}
-                  <h3
-                    className="text-xl font-black mb-1.5 transition-colors truncate"
-                    style={{ color: brandColor }}
-                  >
-                    {page.name}
-                  </h3>
-
-                  {/* Slug / URL */}
-                  <p className="text-sm font-bold text-gray-400 mb-6 flex items-center gap-1.5 truncate">
-                    {page.type === "link" ? (
-                      <>
-                        <ExternalLink size={13} className="flex-shrink-0" />
-                        {page.url}
-                      </>
-                    ) : (
-                      page.slug
-                    )}
-                  </p>
-
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 pt-4 border-t border-gray-50">
                     {page.type === "blank_canvas" && (
                       <button
                         onClick={() => openEditor(page)}
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black text-white transition-all hover:opacity-90 shadow-sm"
-                        style={{ backgroundColor: brandColor }}
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gray-900 text-white rounded-xl text-[11px] font-black transition-all active:scale-[0.98] shadow-sm"
                       >
                         <PenLine size={13} />
                         Edit Content
@@ -288,140 +255,161 @@ export function PagesView() {
                     )}
                     <button
                       onClick={() => openTools(page)}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black transition-all border-2 hover:bg-gray-50"
-                      style={{ borderColor: `${brandColor}30`, color: brandColor }}
+                      className={`flex items-center justify-center gap-2 py-2.5 bg-white border border-gray-100 rounded-xl text-[11px] font-black text-gray-600 transition-all hover:bg-gray-50 active:scale-[0.98] ${page.type === 'link' ? 'flex-1' : 'w-11'}`}
                     >
                       <Wrench size={13} />
-                      Tools
+                      {page.type === 'link' && "Configure"}
+                    </button>
+                    <button
+                      onClick={() => deletePage(page.id)}
+                      className="w-11 h-11 flex items-center justify-center bg-white text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl border border-transparent hover:border-red-100 transition-all active:scale-[0.98]"
+                    >
+                      <Trash2 size={15} />
                     </button>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
-          {/* Empty state */}
-          {filteredPages.length === 0 && (
-            <div className="col-span-full py-20 flex flex-col items-center justify-center text-center bg-white/50 backdrop-blur-xl rounded-[40px] border-2 border-dashed border-gray-100">
-              <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-gray-300 mb-6 shadow-xl shadow-gray-100/50">
-                <FileText size={32} strokeWidth={1} />
+            {filteredPages.length === 0 && (
+              <div className="col-span-full py-24 flex flex-col items-center justify-center text-center">
+                <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center text-gray-300 mb-6">
+                  <FileText size={32} strokeWidth={1} />
+                </div>
+                <h3 className="text-lg font-black text-gray-900 mb-2">No pages found</h3>
+                <p className="text-sm text-gray-500 font-medium max-w-xs mx-auto mb-8">
+                  {searchQuery
+                    ? "We couldn't find any pages matching your search."
+                    : "Add your first page to build out your storefront navigation."}
+                </p>
+                {searchQuery && (
+                  <button
+                    onClick={() => { setSearchQuery(""); setFilterType("all"); }}
+                    className="text-sm font-bold hover:underline"
+                    style={{ color: brandColor }}
+                  >
+                    Clear filters
+                  </button>
+                )}
               </div>
-              <h3 className="text-xl font-black text-gray-900 mb-2">No pages found</h3>
-              <p className="text-sm text-gray-500 font-medium max-w-xs mx-auto mb-8">
-                {searchQuery
-                  ? "We couldn't find any pages matching your search."
-                  : "Add your first page to build out your storefront navigation."}
-              </p>
-              {searchQuery && (
-                <button
-                  onClick={() => { setSearchQuery(""); setFilterType("all"); }}
-                  className="text-sm font-bold hover:underline"
-                  style={{ color: brandColor }}
-                >
-                  Clear filters
-                </button>
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
       {/* ── Add Page Modal ── */}
       <AnimatePresence>
         {showModal && (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center px-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => { setShowModal(false); resetForm(); }}
-              className="absolute inset-0 bg-gray-900/10 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
             />
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="relative w-full max-w-lg bg-white rounded-xl shadow-[0_20px_70px_rgba(0,0,0,0.1)] overflow-hidden border border-gray-100"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-lg bg-white rounded-[32px] shadow-2xl overflow-hidden border border-gray-100 max-h-[92vh] overflow-y-auto scrollbar-hide"
             >
-              <div className="p-8 space-y-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-gray-900 tracking-tight">Create Page</h2>
-                  <button onClick={() => { setShowModal(false); resetForm(); }} className="text-gray-400 hover:text-gray-900 transition-colors">
-                    <X size={20} />
-                  </button>
+              <div className="p-0">
+                {/* Premium Header with Gradient */}
+                <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-10 relative overflow-hidden">
+                  <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
+                    <FileText size={160} strokeWidth={1} className="text-white" />
+                  </div>
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                      <Plus size={24} strokeWidth={3} />
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-3xl font-black text-white leading-tight">Create Page</h3>
+                      <p className="text-[10px] sm:text-sm text-white/60 font-medium tracking-wide">Configuration</p>
+                    </div>
+                    <button onClick={() => { setShowModal(false); resetForm(); }} className="ml-auto w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                      <Plus size={18} className="rotate-45" />
+                    </button>
+                  </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider pl-1">Page Name</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. About Us"
-                      value={pageName}
-                      onChange={(e) => setPageName(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-semibold text-gray-900 outline-none focus:border-gray-300 transition-all placeholder:text-gray-300"
-                    />
-                  </div>
+                <div className="p-6 sm:p-8 space-y-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1 block">Page Name</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. About Us"
+                        value={pageName}
+                        onChange={(e) => setPageName(e.target.value)}
+                        className="w-full py-4 px-5 bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all rounded-2xl"
+                      />
+                    </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider pl-1">Type</label>
-                      <div className="relative group">
-                        <select
-                          value={pageType}
-                          onChange={(e) => setPageType(e.target.value as PageType)}
-                          className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-semibold text-gray-900 outline-none focus:border-gray-300 appearance-none transition-all cursor-pointer"
-                        >
-                          <option value="blank_canvas">Blank Canvas</option>
-                          <option value="link">Link</option>
-                        </select>
-                        <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-gray-900 transition-colors" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1 block">Type</label>
+                        <div className="relative group">
+                          <select
+                            value={pageType}
+                            onChange={(e) => setPageType(e.target.value as PageType)}
+                            className="w-full py-4 px-5 bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 appearance-none transition-all cursor-pointer rounded-2xl outline-none"
+                          >
+                            <option value="blank_canvas">Blank Canvas</option>
+                            <option value="link">Link</option>
+                          </select>
+                          <ChevronDown size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-[#22C55E] transition-colors" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1 block">Visibility</label>
+                        <div className="relative group">
+                          <select
+                            className="w-full py-4 px-5 bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 appearance-none transition-all cursor-pointer rounded-2xl outline-none"
+                          >
+                            <option>Visible</option>
+                            <option>Draft</option>
+                          </select>
+                          <ChevronDown size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-[#22C55E] transition-colors" />
+                        </div>
                       </div>
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider pl-1">Visibility</label>
-                      <div className="relative group">
-                        <select
-                          className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-semibold text-gray-900 outline-none focus:border-gray-300 appearance-none transition-all cursor-pointer"
+
+                    <AnimatePresence>
+                      {pageType === "link" && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-2 overflow-hidden"
                         >
-                          <option>Visible</option>
-                          <option>Draft</option>
-                        </select>
-                        <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-gray-900 transition-colors" />
-                      </div>
-                    </div>
+                          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1 block">External URL</label>
+                          <input
+                            type="url"
+                            placeholder="https://instagram.com/..."
+                            value={pageUrl}
+                            onChange={(e) => setPageUrl(e.target.value)}
+                            className="w-full py-4 px-5 bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all rounded-2xl"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
 
-                  <AnimatePresence>
-                    {pageType === "link" && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="space-y-1.5 overflow-hidden"
-                      >
-                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider pl-1">External URL</label>
-                        <input
-                          type="url"
-                          placeholder="https://instagram.com/..."
-                          value={pageUrl}
-                          onChange={(e) => setPageUrl(e.target.value)}
-                          className="w-full px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-semibold text-gray-900 outline-none focus:border-gray-300 transition-all placeholder:text-gray-300"
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <div className="pt-4 flex items-center gap-3">
-                  <button onClick={() => { setShowModal(false); resetForm(); }} className="flex-1 py-2 text-xs font-bold text-gray-400 hover:text-gray-900 transition-colors">Discard</button>
-                  <button 
-                    onClick={handleSave}
-                    disabled={isSaving || !pageName.trim() || (pageType === "link" && !pageUrl.trim())}
-                    className="flex-1 py-2.5 bg-gray-900 text-white rounded-lg text-xs font-bold hover:bg-black transition-all disabled:opacity-30"
-                  >
-                    {isSaving ? "Saving..." : "Create Page"}
-                  </button>
+                  <div className="flex flex-col items-center gap-3 pt-6 border-t border-gray-50">
+                    <button onClick={() => { setShowModal(false); resetForm(); }} className="w-full py-4 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard</button>
+                    <motion.button 
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleSave}
+                      disabled={isSaving || !pageName.trim() || (pageType === "link" && !pageUrl.trim())}
+                      className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200 disabled:opacity-30"
+                    >
+                      {isSaving ? "Saving..." : "Create Page"}
+                    </motion.button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -447,18 +435,24 @@ export function PagesView() {
               transition={{ type: "spring", damping: 26, stiffness: 320 }}
               className="relative w-full max-w-md bg-white rounded-[32px] overflow-hidden shadow-2xl"
             >
-              <div className="flex items-center justify-between px-8 py-6 border-b border-gray-50">
-                <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                  <Wrench size={18} className="text-gray-400" />
-                  Page Tools
-                </h3>
-                <button
-                  onClick={() => setToolsPage(null)}
-                  className="w-9 h-9 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-700 transition-all"
-                >
-                  <X size={18} />
-                </button>
-              </div>
+                {/* Premium Header with Gradient */}
+                <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 relative overflow-hidden">
+                  <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
+                    <Wrench size={160} strokeWidth={1} className="text-white" />
+                  </div>
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                      <Wrench size={24} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-white leading-tight">Page Tools</h3>
+                      <p className="text-[10px] text-white/60 font-medium tracking-wide">Configuration</p>
+                    </div>
+                    <button onClick={() => setToolsPage(null)} className="ml-auto w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                      <Plus size={18} className="rotate-45" />
+                    </button>
+                  </div>
+                </div>
 
               {/* Modal Tabs */}
               <div className="flex px-8 pt-4 border-b border-gray-100 gap-6">
@@ -717,24 +711,23 @@ export function PagesView() {
               className="relative w-full h-full sm:h-[90vh] max-w-5xl bg-white sm:rounded-[32px] overflow-hidden shadow-2xl flex flex-col"
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 flex-shrink-0 bg-white z-10">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${brandColor}15`, color: brandColor }}>
-                    <PenLine size={18} strokeWidth={2.5} />
+              {/* Premium Header with Gradient */}
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-6 py-5 relative overflow-hidden flex-shrink-0">
+                <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
+                  <PenLine size={160} strokeWidth={1} className="text-white" />
+                </div>
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                    <PenLine size={24} strokeWidth={2.5} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-gray-900 tracking-tight leading-none mb-1">
-                      {editingPage.name}
-                    </h3>
-                    <p className="text-xs font-bold text-gray-400">Editing Content • {editingPage.slug}</p>
+                    <h3 className="text-xl font-black text-white leading-tight">{editingPage.name}</h3>
+                    <p className="text-[10px] text-white/60 font-medium tracking-wide">Editing Content • {editingPage.slug}</p>
                   </div>
+                  <button onClick={() => setEditingPage(null)} className="ml-auto w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                    <Plus size={24} className="rotate-45" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => setEditingPage(null)}
-                  className="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-700 transition-all"
-                >
-                  <X size={20} />
-                </button>
               </div>
 
               {/* Editor Body */}

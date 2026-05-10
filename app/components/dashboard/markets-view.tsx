@@ -105,7 +105,7 @@ function CustomSelect({
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className={`w-full py-4 px-6 rounded-2xl bg-gray-50 border transition-all text-sm font-bold flex items-center justify-between group ${isOpen ? "bg-white border-[#22C55E]/30 ring-8 ring-[#22C55E]/5 shadow-sm" : "border-transparent text-gray-900"
+        className={`w-full py-4 px-6 rounded-xl bg-gray-50 border transition-all text-sm font-bold flex items-center justify-between group ${isOpen ? "bg-white border-gray-900 ring-8 ring-gray-900/5 shadow-sm" : "border-transparent text-gray-900"
           }`}
       >
         <span className={!selectedOption ? "text-gray-300" : "text-gray-900"}>
@@ -168,39 +168,37 @@ export function MarketsView() {
 
   return (
     <div className="flex-1 px-3 sm:px-8 pt-4 sm:pt-6 pb-8 min-w-0 overflow-x-hidden">
-      {/* Header Area */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-5 mb-6 sm:mb-8">
-          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-          <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-[#22C55E] flex-shrink-0">
-            <Globe size={24} strokeWidth={2.5} />
+      {/* ─── Integrated Header ─── */}
+      <div className="px-4 sm:px-8 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-30 gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-900">
+            <Globe size={15} strokeWidth={2.5} />
           </div>
-          <div>
-            <p className="text-[10px] sm:text-xs text-gray-400 font-black uppercase tracking-[0.2em] leading-none mb-1">
-              Market Management
-            </p>
-            <p className="text-xs sm:text-sm text-gray-500 font-medium leading-tight">
-              Configure regional pricing and specific settings.
-            </p>
-          </div>
+          <span className="text-sm font-black text-gray-900 tracking-tight">Market Pricing</span>
         </div>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-black transition-all w-full sm:w-auto"
-        >
-          <Plus size={14} strokeWidth={3} />
-          Add Pricing
-        </button>
-      </motion.div>
+
+        <div className="flex items-center gap-2 sm:gap-3">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all sm:w-auto shadow-lg shadow-gray-200 shrink-0"
+          >
+            <div className="w-5 h-5 rounded-lg bg-white/10 flex items-center justify-center">
+              <Plus size={14} strokeWidth={3} />
+            </div>
+            <span className="hidden sm:inline">Add Pricing</span>
+            <span className="sm:hidden">Add</span>
+          </motion.button>
+        </div>
+      </div>
 
       {/* Main Table Card */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="bg-white rounded-[24px] sm:rounded-[32px] shadow-sm border border-gray-100 overflow-hidden">
+        className="bg-white rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 overflow-hidden">
         {/* Filter Bar */}
         <div className="p-4 sm:p-6 border-b border-gray-50 flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
           <div className="relative w-full lg:w-80 group">
@@ -331,41 +329,46 @@ export function MarketsView() {
         {/* Mobile Card List View (Visible on Mobile Only) */}
         <div className="block sm:hidden divide-y divide-gray-50">
           {MOCK_DATA.map((item, idx) => (
-            <div key={item.id} className="p-4 space-y-3.5">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-5 rounded-md overflow-hidden shadow-sm border border-gray-50 flex-shrink-0">
+            <div key={item.id} className="p-4 sm:p-5 space-y-4 hover:bg-gray-50/50 transition-colors">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100 overflow-hidden shrink-0">
                     <img
                       src={`https://flagcdn.com/${item.countryCode}.svg`}
                       alt={`${item.place} flag`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover p-2.5"
                     />
                   </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-gray-900">{item.place}</h4>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">ID: {item.id}</p>
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-black text-gray-900 truncate">{item.place}</h4>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">ID: #{item.id}</p>
                   </div>
                 </div>
-                <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-[10px] font-black tracking-wider">
-                  {item.currency}
-                </span>
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-[10px] font-black tracking-wider border border-gray-200/50">
+                    {item.currency}
+                  </span>
+                </div>
               </div>
 
-              <p className="text-xs font-semibold text-gray-500 leading-relaxed bg-gray-50/50 p-3 rounded-xl">
-                {item.comment}
-              </p>
+              <div className="bg-gray-50/50 p-3 rounded-xl border border-transparent group-hover:border-gray-100 transition-colors">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Market Notes</p>
+                <p className="text-xs font-semibold text-gray-600 leading-relaxed">
+                  {item.comment}
+                </p>
+              </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => console.log("Inventory", item.id)}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#22C55E]/10 text-[#22C55E] rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-900 text-white rounded-xl text-xs font-black transition-all active:scale-[0.98] shadow-lg shadow-gray-200"
                 >
                   <Package size={14} />
-                  Inventory
+                  Manage Inventory
                 </button>
                 <button
                   onClick={() => console.log("Delete", item.id)}
-                  className="flex items-center justify-center w-10 h-10 bg-red-50 text-red-500 rounded-xl transition-all active:scale-[0.98]"
+                  className="w-12 h-12 flex items-center justify-center bg-red-50 text-red-500 rounded-xl border border-red-100 transition-all active:scale-[0.98]"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -405,74 +408,72 @@ export function MarketsView() {
               onClick={() => setIsAddModalOpen(false)}
               className="absolute inset-0 bg-gray-900/10 backdrop-blur-sm"
             />
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="relative w-full max-w-lg bg-white rounded-xl shadow-[0_20px_70px_rgba(0,0,0,0.1)] overflow-y-auto scrollbar-hide max-h-[90vh] border border-gray-100"
-            >
-              <div className="p-0">
-                {/* Premium Header with Gradient */}
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50/30 px-6 sm:px-8 py-6 sm:py-8 relative">
-                  <div className="absolute top-0 right-0 p-8 opacity-10 hidden sm:block">
-                    <Globe size={120} strokeWidth={1} />
-                  </div>
-                  <div className="flex items-center justify-between relative z-10">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white shadow-xl shadow-green-100 flex items-center justify-center text-[#22C55E]">
-                        <Plus size={24} className="sm:w-7 sm:h-7" strokeWidth={3} />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="relative w-full max-w-lg bg-white rounded-[32px] shadow-[0_20px_70px_rgba(0,0,0,0.1)] overflow-y-auto scrollbar-hide max-h-[90vh] border border-gray-100"
+              >
+                <div className="p-0">
+                  {/* Premium Header with Gradient */}
+                  <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-10 relative overflow-hidden">
+                    <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
+                      <Globe size={160} strokeWidth={1} className="text-white" />
+                    </div>
+                    <div className="flex items-center gap-4 relative z-10">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                        <Plus size={24} strokeWidth={3} />
                       </div>
                       <div>
-                        <h3 className="text-xl sm:text-2xl font-black text-gray-900 leading-none mb-1">Add Market</h3>
-                        <p className="text-xs sm:text-sm text-gray-500 font-medium">Configure regional pricing and logic.</p>
+                        <h3 className="text-xl sm:text-3xl font-black text-white leading-tight">Add Market</h3>
+                        <p className="text-[10px] sm:text-sm text-white/60 font-medium tracking-wide">Configuration</p>
                       </div>
+                      <button onClick={() => setIsAddModalOpen(false)} className="ml-auto w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                        <Plus size={18} className="rotate-45" />
+                      </button>
                     </div>
-                    <button onClick={() => setIsAddModalOpen(false)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/50 text-gray-400 hover:text-gray-900 transition-all border border-transparent hover:border-gray-200">
-                      <X size={20} />
-                    </button>
+                  </div>
+
+                  <div className="p-6 sm:p-8 space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <CustomSelect
+                        label="Region / Country"
+                        options={COUNTRIES}
+                        placeholder="Select country"
+                        value={selectedCountry}
+                        onChange={setSelectedCountry}
+                      />
+                      <CustomSelect
+                        label="Operating Currency"
+                        options={CURRENCIES}
+                        placeholder="Select currency"
+                        value={selectedCurrency}
+                        onChange={setSelectedCurrency}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Internal Log</label>
+                      <textarea
+                        placeholder="Add any strategic notes about this regional rule..."
+                        rows={3}
+                        className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none transition-all"
+                      />
+                    </div>
+
+                    <div className="flex flex-col items-center gap-3 pt-6 border-t border-gray-50">
+                      <button onClick={() => setIsAddModalOpen(false)} className="w-full py-4 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard</button>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setIsAddModalOpen(false)}
+                        className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                      >
+                        Save Configuration
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
-
-                <div className="p-6 sm:p-8 space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <CustomSelect 
-                      label="Region / Country" 
-                      options={COUNTRIES} 
-                      placeholder="Select country" 
-                      value={selectedCountry} 
-                      onChange={setSelectedCountry} 
-                    />
-                    <CustomSelect 
-                      label="Operating Currency" 
-                      options={CURRENCIES} 
-                      placeholder="Select currency" 
-                      value={selectedCurrency} 
-                      onChange={setSelectedCurrency} 
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Internal Log</label>
-                    <textarea 
-                      placeholder="Add any strategic notes about this regional rule..." 
-                      rows={3}
-                      className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none transition-all"
-                    />
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-gray-50">
-                    <button onClick={() => setIsAddModalOpen(false)} className="w-full sm:w-auto px-8 py-4 text-gray-400 hover:text-gray-700 rounded-2xl text-sm font-bold transition-colors">Discard</button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setIsAddModalOpen(false)}
-                      className="w-full sm:w-auto px-10 py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
-                    >
-                      Save Configuration
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
             </motion.div>
           </div>
         )}

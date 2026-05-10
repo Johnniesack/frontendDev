@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Globe, Truck, DollarSign, ShieldCheck,
   Trash2, ChevronLeft, ChevronRight, SlidersHorizontal,
-  Info, Monitor, Check, ChevronDown, Plus,
+  Info, Monitor, Check, ChevronDown, Plus, Edit3, Settings2,
 } from "lucide-react";
 
 interface ShippingZone {
@@ -49,7 +49,7 @@ function Sel({ label, options, placeholder, value, onChange }: {
     <div className="relative" ref={ref}>
       <p className="text-[9px] font-black uppercase tracking-[0.18em] text-gray-400 mb-1 pl-0.5">{label}</p>
       <button type="button" onClick={e => { e.stopPropagation(); setOpen(!open); }}
-        className={`w-full py-2.5 px-4 rounded-xl bg-gray-50 border text-sm font-semibold flex items-center justify-between transition-all ${open ? "bg-white border-[#22C55E]/30 ring-4 ring-[#22C55E]/5" : "border-transparent"}`}>
+        className={`w-full py-2 sm:py-2.5 px-4 rounded-xl bg-gray-50 border text-sm font-semibold flex items-center justify-between transition-all ${open ? "bg-white border-[#22C55E]/30 ring-4 ring-[#22C55E]/5" : "border-transparent"}`}>
         <span className={sel ? "text-gray-900" : "text-gray-300"}>{sel ? sel.name : placeholder}</span>
         <motion.div animate={{ rotate: open ? 180 : 0 }}><ChevronDown size={14} className="text-gray-400" /></motion.div>
       </button>
@@ -81,6 +81,16 @@ export default function ShippingView() {
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [editingZone, setEditingZone] = useState<ShippingZone | null>(null);
   const [zones, setZones] = useState<ShippingZone[]>(ZONES);
+
+  const openEdit = (z: ShippingZone) => {
+    setEditingZone(z);
+    setCountry(z.countryCode);
+    setCurrency(z.currency);
+    setFee(z.fee.toString());
+    setComment(z.comment);
+    setStatus(z.status);
+    setModal(true);
+  };
 
   const handleDelete = () => {
     if (isDeletingId) {
@@ -118,49 +128,47 @@ export default function ShippingView() {
   ];
 
   return (
-    <div className="px-3 sm:px-6 pt-4 sm:pt-6 pb-10 sm:pb-12 flex flex-col gap-4 sm:gap-5 min-w-0">
+    <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-10 sm:pb-12 flex flex-col gap-4 sm:gap-6 min-w-0">
 
-      {/* Header Area */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-5 mb-2 sm:mb-4">
-        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-          <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-[#22C55E] flex-shrink-0">
-            <Truck size={24} strokeWidth={2.5} />
+      {/* ─── Integrated Header ─── */}
+      <div className="px-4 sm:px-8 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-30 gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-900">
+            <Truck size={15} strokeWidth={2.5} />
           </div>
-          <div>
-            <p className="text-[10px] sm:text-xs text-gray-400 font-black uppercase tracking-[0.2em] leading-none mb-1">
-              Zone Management
-            </p>
-            <p className="text-xs sm:text-sm text-gray-500 font-medium leading-tight">
-              Configure regional shipping fees and logic.
-            </p>
-          </div>
+          <span className="text-sm font-black text-gray-900 tracking-tight">Shipping Rules</span>
         </div>
-        <button
-          onClick={() => setModal(true)}
-          className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-black transition-all w-full sm:w-auto"
-        >
-          <Plus size={14} strokeWidth={3} />
-          Add Shipping
-        </button>
-      </motion.div>
+
+        <div className="flex items-center gap-2 sm:gap-3">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setModal(true)}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all sm:w-auto shadow-lg shadow-gray-200 shrink-0"
+          >
+            <div className="w-5 h-5 rounded-lg bg-white/10 flex items-center justify-center">
+              <Plus size={14} strokeWidth={3} />
+            </div>
+            <span className="hidden sm:inline">New Shipping</span>
+            <span className="sm:hidden">Add</span>
+          </motion.button>
+        </div>
+      </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 flex-shrink-0">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 flex-shrink-0">
         {STATS.map((s, i) => {
           const Icon = s.icon;
           return (
             <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.06 }}
-              className="bg-white rounded-2xl px-4 sm:px-5 py-3.5 sm:py-4 flex items-center gap-3 sm:gap-4 shadow-sm border border-gray-100">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: s.bg }}>
-                <Icon size={19} color={s.color} strokeWidth={2} />
+              className={`bg-white rounded-2xl px-4 sm:px-5 py-3.5 sm:py-4 flex items-center gap-3 sm:gap-4 shadow-sm border border-gray-100 ${i === 2 ? "col-span-2 sm:col-span-1" : ""}`}>
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: s.bg }}>
+                <Icon size={18} color={s.color} strokeWidth={2} />
               </div>
               <div>
-                <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest leading-none mb-1">{s.label}</p>
-                <p className="text-lg font-black text-gray-900 leading-none">{s.value}</p>
+                <p className="text-[9px] sm:text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mb-1">{s.label}</p>
+                <p className="text-base sm:text-lg font-black text-gray-900 leading-none">{s.value}</p>
               </div>
             </motion.div>
           );
@@ -169,23 +177,31 @@ export default function ShippingView() {
 
       {/* Table Card */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
-        className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0">
+        className="bg-white rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 overflow-hidden flex-shrink-0">
 
         {/* Table toolbar */}
-        <div className="px-3.5 sm:px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-50 gap-3">
-          <p className="text-sm font-black text-gray-900 whitespace-nowrap">Zone Management</p>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="relative group flex-1 sm:flex-initial">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#22C55E] transition-colors" size={13} />
-              <input type="text" placeholder="Search zone..." value={q} onChange={e => setQ(e.target.value)}
-                className="pl-8 pr-3 py-2 bg-gray-50 border border-transparent rounded-xl text-xs font-semibold text-gray-700 focus:bg-white focus:border-[#22C55E]/30 focus:ring-4 focus:ring-[#22C55E]/5 outline-none placeholder:text-gray-400 w-full sm:w-52 transition-all min-w-0" />
+        <div className="px-4 sm:px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-50 gap-4">
+          <div className="flex items-center justify-between w-full sm:w-auto">
+            <p className="text-sm font-black text-gray-900">Zone Management</p>
+            <div className="flex md:hidden items-center gap-2">
+              <button onClick={() => setFilterOpen(!filterOpen)} className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-all ${filterOpen ? "bg-[#22C55E] text-white border-[#22C55E]" : "bg-gray-50 text-gray-400 border-transparent"}`}>
+                <SlidersHorizontal size={14} />
+              </button>
             </div>
-            <div className="relative" ref={filterRef}>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="relative group flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#22C55E] transition-colors" size={14} />
+              <input type="text" placeholder="Search zone..." value={q} onChange={e => setQ(e.target.value)}
+                className="pl-10 pr-4 py-2.5 bg-gray-50 border border-transparent rounded-xl text-xs font-bold text-gray-700 focus:bg-white focus:border-[#22C55E]/30 focus:ring-4 focus:ring-[#22C55E]/5 outline-none placeholder:text-gray-400 w-full sm:w-60 transition-all shadow-inner-sm" />
+            </div>
+            <div className="relative hidden md:block" ref={filterRef}>
               <button
                 onClick={() => setFilterOpen(!filterOpen)}
-                className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-all flex-shrink-0 ${filterOpen ? "bg-[#22C55E] text-white border-[#22C55E] shadow-lg shadow-green-100" : "border-gray-100 bg-gray-50 text-gray-500 hover:bg-gray-100"
+                className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-all ${filterOpen ? "bg-[#22C55E] text-white border-[#22C55E] shadow-lg shadow-green-100" : "border-gray-100 bg-gray-50 text-gray-500 hover:bg-gray-100"
                   }`}>
-                <SlidersHorizontal size={13} />
+                <SlidersHorizontal size={16} />
               </button>
 
               <AnimatePresence>
@@ -254,58 +270,59 @@ export default function ShippingView() {
         </div>
 
         {/* Mobile Card List (Hidden on Desktop) */}
-        <div className="block md:hidden divide-y divide-gray-50">
+        <div className="block md:hidden divide-y divide-gray-50/50">
           {filtered.map((z, i) => (
-            <motion.div key={z.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.04 }}
-              className="p-3.5 space-y-3 hover:bg-gray-50/60 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="rounded overflow-hidden border border-gray-100 flex-shrink-0" style={{ width: 24, height: 16 }}>
-                    <img src={`https://flagcdn.com/${z.countryCode}.svg`} alt={z.country} className="w-full h-full object-cover" />
+            <motion.div
+              key={z.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="p-4 sm:p-5 space-y-4 hover:bg-gray-50/50 transition-colors"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100 overflow-hidden shrink-0">
+                    <img
+                      src={`https://flagcdn.com/${z.countryCode}.svg`}
+                      alt={z.country}
+                      className="w-full h-full object-cover p-2.5"
+                    />
                   </div>
-                  <span className="text-sm font-black text-gray-900 truncate max-w-[8.5rem]">{z.country}</span>
-                  <span className="text-[10px] font-bold text-gray-400">#{z.id}</span>
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-black text-gray-900 truncate">{z.country}</h4>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">Shipping ID: #{z.id}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => {
-                      setEditingZone(z);
-                      setCountry(z.countryCode);
-                      setCurrency(z.currency);
-                      setFee(z.fee.toString());
-                      setComment(z.comment);
-                      setStatus(z.status);
-                      setModal(true);
-                    }}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-all"
-                  >
-                    <Plus size={16} className="rotate-45" strokeWidth={2} />
-                  </button>
-                  <button
-                    onClick={() => setIsDeletingId(z.id)}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
-                  >
-                    <Trash2 size={16} strokeWidth={2} />
-                  </button>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">FEE</p>
-                  <p className="text-sm font-black text-gray-900">${z.fee.toFixed(2)} <span className="text-gray-400 font-bold ml-1">{z.currency}</span></p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">STATUS</p>
-                  <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black ${z.status === "Exempted" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}>
-                    {z.status}
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <div className={`w-2 h-2 rounded-full ${z.status === "Exempted" ? "bg-[#22C55E]" : "bg-gray-300"}`} />
+                  <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-[10px] font-black tracking-wider border border-gray-200/50">
+                    ${z.fee.toFixed(2)} {z.currency}
                   </span>
                 </div>
               </div>
-              {z.comment && (
-                <div className="bg-gray-50 rounded-xl p-3">
-                  <p className="text-[10px] font-medium text-gray-500 leading-relaxed">{z.comment}</p>
-                </div>
-              )}
+
+              <div className="bg-gray-50/50 p-3 rounded-xl border border-transparent group-hover:border-gray-100 transition-colors">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Shipping Log</p>
+                <p className="text-xs font-semibold text-gray-600 leading-relaxed truncate">
+                  {z.comment || "Standard delivery profile"}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => openEdit(z)}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-900 text-white rounded-xl text-xs font-black transition-all active:scale-[0.98] shadow-lg shadow-gray-200"
+                >
+                  <Settings2 size={14} />
+                  Configure
+                </button>
+                <button
+                  onClick={() => setIsDeletingId(z.id)}
+                  className="w-12 h-12 flex items-center justify-center bg-red-50 text-red-500 rounded-xl border border-red-100 transition-all active:scale-[0.98]"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
             </motion.div>
           ))}
           {filtered.length === 0 && (
@@ -336,15 +353,7 @@ export default function ShippingView() {
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => {
-                          setEditingZone(z);
-                          setCountry(z.countryCode);
-                          setCurrency(z.currency);
-                          setFee(z.fee.toString());
-                          setComment(z.comment);
-                          setStatus(z.status);
-                          setModal(true);
-                        }}
+                        onClick={() => openEdit(z)}
                         className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-all"
                       >
                         <Plus size={14} className="rotate-45" strokeWidth={2} />
@@ -428,30 +437,33 @@ export default function ShippingView() {
       {/* Modal */}
       <AnimatePresence>
         {modal && (
-          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center px-0 sm:px-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 sm:px-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => { setModal(false); setEditingZone(null); }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96 }} transition={{ type: "spring", stiffness: 320, damping: 28 }}
-              className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 max-h-[92vh] overflow-y-auto scrollbar-hide">
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }} transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-lg bg-white rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 max-h-[92vh] overflow-y-auto scrollbar-hide">
               {/* Premium Header with Gradient */}
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50/30 px-6 sm:px-8 py-6 sm:py-8 relative">
-                <div className="absolute top-0 right-0 p-8 opacity-10 hidden sm:block">
-                  <Truck size={120} strokeWidth={1} />
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-10 relative overflow-hidden">
+                <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
+                  <Truck size={160} strokeWidth={1} className="text-white" />
                 </div>
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white shadow-xl shadow-green-100 flex items-center justify-center text-[#22C55E]">
-                    {editingZone ? <Plus size={24} className="sm:w-7 sm:h-7 rotate-45" strokeWidth={3} /> : <Plus size={24} className="sm:w-7 sm:h-7" strokeWidth={3} />}
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                    {editingZone ? <Settings2 size={24} strokeWidth={2.5} /> : <Plus size={24} strokeWidth={3} />}
                   </div>
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-black text-gray-900 leading-none mb-1">{editingZone ? "Edit Shipping Zone" : "New Shipping Zone"}</h3>
-                    <p className="text-xs sm:text-sm text-gray-500 font-medium">Configure regional pricing and logic.</p>
+                    <h3 className="text-xl sm:text-3xl font-black text-white leading-tight">{editingZone ? "Edit Shipping" : "New Shipping"}</h3>
+                    <p className="text-[10px] sm:text-sm text-white/60 font-medium tracking-wide">#{editingZone ? editingZone.id : "Configuration"}</p>
                   </div>
+                  <button onClick={() => { setModal(false); setEditingZone(null); }} className="ml-auto w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                    <Plus size={18} className="rotate-45" />
+                  </button>
                 </div>
               </div>
 
-              <div className="p-6 sm:p-8">
-                <form className="space-y-5 sm:space-y-6" onSubmit={e => { e.preventDefault(); setModal(false); setEditingZone(null); }}>
+              <div className="p-5 sm:p-8">
+                <form className="space-y-4 sm:space-y-6" onSubmit={e => { e.preventDefault(); setModal(false); setEditingZone(null); }}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Sel label="Region / Country" options={COUNTRIES} placeholder="Select country" value={country} onChange={setCountry} />
                     <Sel label="Operating Currency" options={CURRENCIES} placeholder="Select currency" value={currency} onChange={setCurrency} />
@@ -462,7 +474,7 @@ export default function ShippingView() {
                     <div className="relative group">
                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#22C55E] font-bold text-sm transition-colors">$</div>
                       <input type="number" min="0" step="0.01" placeholder="0.00" value={fee} onChange={e => setFee(e.target.value)}
-                        className="w-full py-4 pl-8 pr-4 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
+                        className="w-full py-3.5 sm:py-4 pl-8 pr-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
                     </div>
                   </div>
 
@@ -471,7 +483,7 @@ export default function ShippingView() {
                     <div className="flex gap-3">
                       {(["Subjected", "Exempted"] as const).map(s => (
                         <button key={s} type="button" onClick={() => setStatus(s)}
-                          className={`flex-1 py-4 rounded-2xl text-xs font-black border transition-all ${status === s ? (s === "Exempted" ? "bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm" : "bg-amber-50 text-amber-600 border-amber-200 shadow-sm") : "bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100"}`}>
+                          className={`flex-1 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xs font-black border transition-all ${status === s ? (s === "Exempted" ? "bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm" : "bg-amber-50 text-amber-600 border-amber-200 shadow-sm") : "bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100"}`}>
                           <div className="flex items-center justify-center gap-2">
                             {status === s && <Check size={14} strokeWidth={3} />}
                             {s}
@@ -484,16 +496,16 @@ export default function ShippingView() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Internal Log</label>
                     <textarea rows={2} placeholder="Add a note about this regional rule..." value={comment} onChange={e => setComment(e.target.value)}
-                      className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none transition-all" />
+                      className="w-full py-3.5 sm:py-4 px-4 sm:px-5 rounded-xl sm:rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none transition-all" />
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 mt-4 border-t border-gray-50">
-                    <button type="button" onClick={() => { setModal(false); setEditingZone(null); }} className="w-full sm:w-auto px-8 py-4 text-gray-400 hover:text-gray-700 rounded-2xl text-sm font-bold transition-colors">Discard</button>
+                  <div className="flex flex-col items-center gap-3 pt-6 mt-4 border-t border-gray-50">
+                    <button type="button" onClick={() => { setModal(false); setEditingZone(null); }} className="w-full py-4 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard</button>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       type="submit"
-                      className="w-full sm:w-auto px-10 py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                      className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
                     >
                       {editingZone ? "Update Configuration" : "Save Configuration"}
                     </motion.button>
@@ -517,7 +529,7 @@ export default function ShippingView() {
               <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Trash2 size={32} />
               </div>
-              <h3 className="text-xl font-black text-gray-900 mb-2">Delete Zone?</h3>
+              <h3 className="text-xl font-black text-gray-900 mb-2">Delete Shipping?</h3>
               <p className="text-sm text-gray-500 font-medium mb-8 leading-relaxed">
                 This will permanently remove the shipping rule for this region. This action cannot be undone.
               </p>

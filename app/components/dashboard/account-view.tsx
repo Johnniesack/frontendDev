@@ -83,7 +83,7 @@ export function AccountView() {
           >
             {/* Main Content - Moves below sidebar on mobile */}
             <div className="lg:col-span-8 space-y-6 order-2 lg:order-1">
-              <section className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-50">
+              <section className="bg-white rounded-xl p-5 sm:p-8 shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-50">
                 <div className="mb-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-1">Profile Details</h3>
                   <p className="text-sm text-gray-500 font-medium">
@@ -173,7 +173,7 @@ export function AccountView() {
             {/* Sidebar - Appears at the top on mobile */}
             <aside className="lg:col-span-4 space-y-6 sm:space-y-8 order-1 lg:order-2">
               {/* User Profile Card */}
-              <section className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-gray-50 flex flex-col items-center text-center">
+              <section className="bg-white rounded-xl p-5 sm:p-6 shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col items-center text-center">
                 <div className="relative mb-4">
                   <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gray-50 flex items-center justify-center shadow-inner ring-4 ring-gray-50 text-gray-300">
                     <User size={40} className="sm:w-12 sm:h-12" />
@@ -192,7 +192,7 @@ export function AccountView() {
               </section>
 
               {/* Security Status Card */}
-              <section className="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-gray-50">
+              <section className="bg-white rounded-xl p-5 sm:p-6 shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-50">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
                     <ShieldCheck size={16} className="sm:w-[18px] sm:h-[18px]" />
@@ -281,7 +281,7 @@ export function AccountView() {
                       key={plan.id}
                       onClick={() => !isCurrent && setSelectedPlan(plan.id)}
                       disabled={isCurrent}
-                      className={`relative flex flex-col p-6 rounded-[28px] border-2 text-left transition-all duration-300 group ${isSelected && !isCurrent
+                      className={`relative flex flex-col p-6 rounded-xl border-2 text-left transition-all duration-300 group ${isSelected && !isCurrent
                         ? "shadow-xl scale-[1.02] z-10"
                         : isCurrent
                           ? "border-gray-100 bg-gray-50/50 cursor-default"

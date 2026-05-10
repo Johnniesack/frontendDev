@@ -51,6 +51,8 @@ import ShippingView from "./shipping-view";
 import { WebsiteView } from "./website-view";
 import { PagesView } from "./pages-view";
 import { CouponsView } from "./coupons-view";
+import { PersonnelView } from "./personnel-view";
+import { TutorialsView } from "./tutorials-view";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 const STATS = [
@@ -423,11 +425,11 @@ function TabletSidebar({
   return (
     <aside className="hidden md:flex lg:hidden w-[68px] flex-shrink-0 bg-white border-r border-gray-100 flex-col items-center py-4 gap-1 shadow-sm">
       {/* Logo mark */}
-      <div className="w-9 h-9 rounded-xl bg-gray-900 flex items-center justify-center text-white text-[11px] font-black mb-3">
+      <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-900 text-[11px] font-black mb-3">
         K
       </div>
       <div className="w-8 h-px bg-gray-100 mb-2" />
-      <div className="flex-1 flex flex-col gap-1 w-full px-2 overflow-y-auto">
+      <div className="flex-1 flex flex-col gap-1 w-full px-2 overflow-y-auto scrollbar-hide">
         {ALL_FLAT_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeNav === item.label;
@@ -474,7 +476,7 @@ function SidebarContent({
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 space-y-1 overflow-y-auto scrollbar-hide">
         {NAV_ITEMS.map((item) => (
           <NavItem
             key={item.label}
@@ -489,7 +491,7 @@ function SidebarContent({
       {/* User */}
       <div className="px-4 py-5 border-t border-gray-100">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-700 text-[10px] font-bold flex-shrink-0">
             AR
           </div>
           <span className="text-sm font-semibold text-gray-700 truncate">
@@ -614,7 +616,7 @@ function NotificationBell() {
             </div>
 
             {/* Notification list */}
-            <div className="divide-y divide-gray-50 max-h-[360px] overflow-y-auto">
+            <div className="divide-y divide-gray-50 max-h-[360px] overflow-y-auto scrollbar-hide">
               {notifications.map((n, i) => {
                 const Icon = n.icon;
                 return (
@@ -706,7 +708,7 @@ export function DashboardLayout() {
         <header className="flex items-center justify-between gap-3 px-4 md:px-6 lg:px-8 pt-4 pb-3 flex-shrink-0 bg-[#F5F7FA]">
           <div className="flex items-center gap-3 min-w-0">
             {/* Mobile: brand mark instead of hamburger */}
-            <div className="md:hidden w-8 h-8 rounded-xl bg-gray-900 flex items-center justify-center text-white text-[11px] font-black flex-shrink-0">
+            <div className="md:hidden w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-900 text-[11px] font-black flex-shrink-0">
               K
             </div>
             <h2 className="text-base sm:text-xl lg:text-2xl font-black text-gray-900 tracking-tight leading-tight truncate">
@@ -735,7 +737,7 @@ export function DashboardLayout() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto scrollbar-hide pb-24 md:pb-4" style={{ scrollbarGutter: "stable" }}>
+        <div className="flex-1 overflow-y-auto scrollbar-hide pb-24 md:pb-4">
           {activeNav === "Website" ? (
             <WebsiteView />
           ) : activeNav === "Account" ? (
@@ -748,6 +750,10 @@ export function DashboardLayout() {
             <PagesView />
           ) : activeNav === "Coupons" ? (
             <CouponsView />
+          ) : activeNav === "Personnel" ? (
+            <PersonnelView />
+          ) : activeNav === "Tutorials" ? (
+            <TutorialsView />
           ) : (
             <div className="px-4 sm:px-8 pt-4 sm:pt-6 pb-8 space-y-4 sm:space-y-6">
               {/* ── Stat Cards ── */}
@@ -757,10 +763,10 @@ export function DashboardLayout() {
                   return (
                     <motion.div
                       key={stat.label}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: i * 0.08, duration: 0.4 }}
-                      className="bg-white rounded-3xl p-5 sm:p-6 flex items-center gap-5 sm:gap-6 border-l-4 shadow-sm hover:shadow-md transition-shadow cursor-default"
+                      className="bg-white rounded-xl p-5 sm:p-6 flex items-center gap-5 sm:gap-6 border-l-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all cursor-default"
                       style={{ borderLeftColor: stat.border }}
                     >
                       <div
@@ -787,12 +793,12 @@ export function DashboardLayout() {
               </div>
 
               {/* ── Performance Chart ── */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.25, duration: 0.5 }}
-                className="bg-white rounded-2xl p-3 sm:p-6 shadow-sm"
-              >
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25, duration: 0.5 }}
+                  className="bg-white rounded-xl p-4 sm:p-8 border border-gray-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
+                >
                 {/* Chart header */}
                 <div className="flex items-start justify-between mb-4 sm:mb-6 gap-2">
                   <div>

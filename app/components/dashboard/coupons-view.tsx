@@ -108,14 +108,18 @@ export function CouponsView() {
               className="pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-medium outline-none focus:bg-white focus:border-gray-200 transition-all w-full sm:w-48 lg:w-64"
             />
           </div>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setIsCreating(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all shrink-0"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all sm:w-auto shadow-lg shadow-gray-200 shrink-0"
           >
-            <Plus size={14} strokeWidth={3} />
+            <div className="w-5 h-5 rounded-lg bg-white/10 flex items-center justify-center">
+              <Plus size={14} strokeWidth={3} />
+            </div>
             <span className="hidden sm:inline">Add Coupon</span>
             <span className="sm:hidden">Add</span>
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -131,7 +135,7 @@ export function CouponsView() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            className={`p-4 sm:p-5 bg-white border border-gray-100 rounded-2xl shadow-sm flex items-center justify-between ${i === 2 ? "sm:col-span-2 lg:col-span-1" : ""}`}
+            className={`p-4 sm:p-5 bg-white border border-gray-100 rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.02)] flex items-center justify-between ${i === 2 ? "sm:col-span-2 lg:col-span-1" : ""}`}
           >
             <div className="space-y-1">
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">{stat.label}</p>
@@ -149,7 +153,7 @@ export function CouponsView() {
 
       {/* ─── High-Density Content ─── */}
       <div className="flex-1 px-4 sm:px-8 py-6">
-        <div className="border border-gray-100 rounded-2xl overflow-hidden bg-white shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+        <div className="border border-gray-100 rounded-xl overflow-hidden bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02),0_4px_12px_rgba(0,0,0,0.01)]">
 
           {/* Desktop Table (Hidden on Mobile) */}
           <div className="hidden lg:block overflow-x-auto scrollbar-hide">
@@ -312,7 +316,7 @@ export function CouponsView() {
       {/* ─── Create Coupon Modal ─── */}
       <AnimatePresence>
         {isCreating && (
-          <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center px-0 sm:px-4">
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center px-4 sm:px-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -321,29 +325,27 @@ export function CouponsView() {
               className="absolute inset-0 bg-black/60 backdrop-blur-md"
             />
             <motion.div
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 100 }}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto scrollbar-hide"
+              className="relative w-full max-w-lg bg-white rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto scrollbar-hide"
             >
               {/* Modal Header */}
-              <div className="bg-gradient-to-br from-gray-50 to-white px-6 sm:px-8 py-6 sm:py-8 border-b border-gray-50 relative">
-                <div className="absolute top-0 right-0 p-8 opacity-5 hidden sm:block">
-                  <Ticket size={120} strokeWidth={1} />
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-10 relative overflow-hidden">
+                <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
+                  <Ticket size={160} strokeWidth={1} className="text-white" />
                 </div>
-                <div className="flex items-center justify-between relative z-10">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white shadow-xl shadow-gray-100 flex items-center justify-center text-[#22C55E]">
-                      <Plus size={24} className="sm:w-7 sm:h-7" strokeWidth={3} />
-                    </div>
-                    <div>
-                      <h3 className="text-xl sm:text-2xl font-black text-gray-900 leading-none mb-1">Create Coupon</h3>
-                      <p className="text-xs sm:text-sm text-gray-500 font-medium">Generate a new promotional code.</p>
-                    </div>
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                    <Plus size={24} strokeWidth={3} />
                   </div>
-                  <button onClick={() => setIsCreating(false)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/50 text-gray-400 hover:text-gray-900 transition-all border border-transparent hover:border-gray-100">
-                    <X size={20} />
+                  <div>
+                    <h3 className="text-xl sm:text-3xl font-black text-white leading-tight">Create Coupon</h3>
+                    <p className="text-[10px] sm:text-sm text-white/60 font-medium tracking-wide">Configuration</p>
+                  </div>
+                  <button onClick={() => setIsCreating(false)} className="ml-auto w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                    <Plus size={18} className="rotate-45" />
                   </button>
                 </div>
               </div>
@@ -388,13 +390,13 @@ export function CouponsView() {
                   <input type="number" placeholder="100" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-gray-50">
-                  <button onClick={() => setIsCreating(false)} className="w-full sm:w-auto px-8 py-4 text-gray-400 hover:text-gray-700 rounded-2xl text-sm font-bold transition-colors">Discard</button>
+                <div className="flex flex-col items-center gap-3 pt-6 border-t border-gray-50">
+                  <button onClick={() => setIsCreating(false)} className="w-full py-4 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard</button>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setIsCreating(false)}
-                    className="w-full sm:w-auto px-10 py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                    className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
                   >
                     Generate Coupons
                   </motion.button>
@@ -408,7 +410,7 @@ export function CouponsView() {
       {/* ─── Edit Coupon Modal ─── */}
       <AnimatePresence>
         {editingCoupon && (
-          <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center px-0 sm:px-4">
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center px-4 sm:px-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -424,22 +426,20 @@ export function CouponsView() {
               className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto scrollbar-hide"
             >
               {/* Modal Header */}
-              <div className="bg-gradient-to-br from-emerald-50 to-white px-6 sm:px-8 py-6 sm:py-8 border-b border-gray-50 relative">
-                <div className="absolute top-0 right-0 p-8 opacity-5 hidden sm:block">
-                  <Edit3 size={120} strokeWidth={1} />
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-10 relative overflow-hidden">
+                <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
+                  <Edit3 size={160} strokeWidth={1} className="text-white" />
                 </div>
-                <div className="flex items-center justify-between relative z-10">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white shadow-xl shadow-green-100 flex items-center justify-center text-[#22C55E]">
-                      <Edit3 size={24} className="sm:w-7 sm:h-7" strokeWidth={3} />
-                    </div>
-                    <div>
-                      <h3 className="text-xl sm:text-2xl font-black text-gray-900 leading-none mb-1">Edit Coupon</h3>
-                      <p className="text-xs sm:text-sm text-gray-500 font-medium">Modify existing promotion rules.</p>
-                    </div>
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                    <Edit3 size={24} strokeWidth={2.5} />
                   </div>
-                  <button onClick={() => setEditingCoupon(null)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/50 text-gray-400 hover:text-gray-900 transition-all border border-transparent hover:border-gray-100">
-                    <X size={20} />
+                  <div>
+                    <h3 className="text-xl sm:text-3xl font-black text-white leading-tight">Edit Coupon</h3>
+                    <p className="text-[10px] sm:text-sm text-white/60 font-medium tracking-wide">#{editingCoupon.id}</p>
+                  </div>
+                  <button onClick={() => setEditingCoupon(null)} className="ml-auto w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                    <Plus size={18} className="rotate-45" />
                   </button>
                 </div>
               </div>
@@ -485,13 +485,13 @@ export function CouponsView() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-gray-50">
-                  <button onClick={() => setEditingCoupon(null)} className="w-full sm:w-auto px-8 py-4 text-gray-400 hover:text-gray-700 rounded-2xl text-sm font-bold transition-colors">Discard</button>
+                <div className="flex flex-col items-center gap-3 pt-6 border-t border-gray-50">
+                  <button onClick={() => setEditingCoupon(null)} className="w-full py-4 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard</button>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleUpdate({ ...editingCoupon, status: "Active" })}
-                    className="w-full sm:w-auto px-10 py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                    className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
                   >
                     Save Changes
                   </motion.button>
@@ -505,7 +505,7 @@ export function CouponsView() {
       {/* ─── Delete Confirmation Modal ─── */}
       <AnimatePresence>
         {deletingId && (
-          <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center px-0 sm:px-4">
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center px-4 sm:px-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -514,10 +514,10 @@ export function CouponsView() {
               className="absolute inset-0 bg-black/60 backdrop-blur-md"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 100 }}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 100 }}
-              className="relative w-full max-w-sm bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl overflow-hidden border border-gray-100"
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-sm bg-white rounded-[32px] shadow-2xl overflow-hidden border border-gray-100"
             >
               <div className="p-8 text-center space-y-5">
                 <div className="w-20 h-20 bg-red-50 rounded-[24px] flex items-center justify-center mx-auto mb-2 rotate-3">

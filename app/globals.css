@@ -44,11 +44,15 @@
     padding: 0;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+  }
+
+  /* Global scrollbar hide */
+  * {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
 
-  html::-webkit-scrollbar, body::-webkit-scrollbar {
+  *::-webkit-scrollbar {
     display: none;
   }
 }

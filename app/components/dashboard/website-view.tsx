@@ -362,7 +362,7 @@ export function WebsiteView() {
             className="grid grid-cols-1 lg:grid-cols-12 gap-8"
           >
             <div className="lg:col-span-7 space-y-6">
-              <section className="bg-white rounded-[32px] p-6 sm:p-8 shadow-sm border border-gray-100 relative overflow-hidden group">
+              <section className="bg-white rounded-xl p-6 sm:p-8 shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl -mr-16 -mt-16 opacity-40 group-hover:opacity-60 transition-opacity" style={{ backgroundColor: `${brandColor}15` }} />
 
                 <div className="relative z-10 mb-8">
@@ -566,7 +566,7 @@ export function WebsiteView() {
             </div>
 
             <div className="lg:col-span-5 space-y-6">
-              <section className="bg-gray-900 rounded-[32px] p-8 text-white relative overflow-hidden shadow-2xl">
+              <section className="bg-gray-900 rounded-xl p-8 text-white relative overflow-hidden shadow-2xl">
                 <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -mr-32 -mt-32" style={{ backgroundColor: `${brandColor}30` }} />
 
                 <div className="relative z-10">
@@ -654,7 +654,7 @@ export function WebsiteView() {
             transition={{ duration: 0.3 }}
             className="space-y-6"
           >
-            <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-8 shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                   <h3 className="text-xl font-black text-gray-900 mb-1">Homepage Sliders</h3>
@@ -679,41 +679,48 @@ export function WebsiteView() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="space-y-3">
                 <AnimatePresence mode="popLayout">
                   {sliders.map((slider) => (
                     <motion.div
                       layout
-                      initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 10 }}
                       key={slider.id}
-                      className="group relative aspect-video rounded-3xl bg-gray-50 border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                      className="group flex items-center gap-4 p-4 bg-gray-50 border border-transparent hover:bg-white hover:border-gray-100 hover:shadow-sm rounded-xl transition-all"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
-                      <div className="absolute inset-0 flex items-center justify-center text-gray-200">
+                      <div className="w-20 h-12 rounded-lg bg-gray-100 overflow-hidden shrink-0 border border-gray-200/50">
                         {slider.image ? (
                           <img src={slider.image} className="w-full h-full object-cover" alt="" />
                         ) : (
-                          <ImageIcon size={48} strokeWidth={1} />
+                          <div className="w-full h-full flex items-center justify-center text-gray-300">
+                            <ImageIcon size={20} strokeWidth={1} />
+                          </div>
                         )}
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 p-5 w-full z-20">
+                      
+                      <div className="flex-1 min-w-0">
                         <input
                           type="text"
                           value={slider.title}
                           onChange={(e) => updateSlideTitle(slider.id, e.target.value)}
-                          className="bg-transparent text-white font-bold text-sm w-full outline-none focus:bg-white/10 rounded px-1 -ml-1 transition-colors border-b border-transparent focus:border-white/20"
+                          className="bg-transparent text-sm font-black text-gray-900 w-full outline-none focus:ring-2 focus:ring-gray-900/5 rounded px-1 -ml-1 transition-all"
                         />
-                        <p className="text-white/70 text-[10px] font-medium mt-1">Active Slide • Priority {slider.priority}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Priority {slider.priority}</span>
+                          <span className="w-1 h-1 rounded-full bg-gray-300" />
+                          <span className="text-[10px] font-black text-[#22C55E] uppercase tracking-tighter">Active</span>
+                        </div>
                       </div>
-                      <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="w-8 h-8 rounded-xl bg-white/90 backdrop-blur shadow-lg flex items-center justify-center text-gray-700 hover:text-[#22C55E] transition-colors">
+
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
                           <Layout size={14} />
                         </button>
                         <button
                           onClick={() => deleteSlide(slider.id)}
-                          className="w-8 h-8 rounded-xl bg-white/90 backdrop-blur shadow-lg flex items-center justify-center text-gray-700 hover:text-red-500 transition-colors"
+                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -722,12 +729,11 @@ export function WebsiteView() {
                   ))}
                 </AnimatePresence>
                 {sliders.length === 0 && (
-                  <div className="col-span-full py-12 flex flex-col items-center justify-center text-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-100">
-                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-gray-300 mb-4 shadow-sm">
+                  <div className="py-12 flex flex-col items-center justify-center text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-100">
+                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-gray-300 mb-4 shadow-sm">
                       <ImageIcon size={24} />
                     </div>
                     <p className="text-sm font-bold text-gray-500">No sliders configured</p>
-                    <p className="text-xs text-gray-400 mt-1">Add your first hero banner to get started</p>
                   </div>
                 )}
               </div>
@@ -745,7 +751,7 @@ export function WebsiteView() {
             className="grid grid-cols-1 lg:grid-cols-2 gap-8"
           >
             {/* Left Panel — always visible */}
-            <section className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
+            <section className="bg-white rounded-xl p-8 shadow-[0_1px_2px_rgba(0,0,0,0.02)] border border-gray-100">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h3 className="text-xl font-black text-gray-900 mb-1">Storefront URL</h3>
