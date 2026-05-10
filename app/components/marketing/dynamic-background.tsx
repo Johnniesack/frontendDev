@@ -49,7 +49,7 @@ const NeuralNetwork = () => {
             strokeLinecap="round"
             filter="url(#neon-glow)"
             initial={{ pathLength: 0, opacity: 0.06 }}
-            animate={{ pathLength: [0, 1, 0], opacity: [0.06, 0.18, 0.06] }}
+            animate={{ pathLength: [0, 1, 0], opacity: [0.1, 0.25, 0.1] }}
             transition={{ duration: path.duration * 2, delay: path.delay, repeat: Infinity, ease: "easeInOut" }}
           />
         ))}
@@ -86,15 +86,15 @@ export const DynamicBackground = () => {
   const rotate = useTransform(scrollYProgress, [0, 1], [0, 15]);
 
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-black">
-      {/* Base Background Gradient */}
+    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      {/* Base Background Gradient - Static on mobile for smoothness */}
       <motion.div 
-        style={{ y: y3 }}
-        className="absolute -inset-[200px] bg-gradient-to-br from-[#0A2621] via-[#050505] to-[#1E1235]" 
+        className="absolute -inset-[200px] bg-gradient-to-br from-[#0A2621] via-[#050505] to-[#1E1235] will-change-transform" 
+        style={{ y: typeof window !== 'undefined' && window.innerWidth > 1024 ? y3 : 0 }}
       />
 
-      {/* Tectonic Layers - Hidden on mobile entirely to ensure NO movement */}
-      <div className="hidden lg:block">
+      {/* Tectonic Layers - Hidden on mobile, visible on tablet/laptop */}
+      <div className="hidden md:block">
         {/* Circuit Texture Overlay */}
         <motion.div 
           className="absolute -inset-[200px] opacity-[0.04] mix-blend-overlay"

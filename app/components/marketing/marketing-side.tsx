@@ -3,6 +3,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Rocket, Fingerprint, Share2, Shield } from "lucide-react";
+import { Logo } from "../ui/logo";
 
 const features = [
   {
@@ -61,7 +62,7 @@ const RotatingWords = ({ words, colorClass = "text-[#22C55E]" }: { words: string
 export function MarketingSide({ mode = "signin" }: { mode?: "signin" | "signup" | "verify" | "forgot-password" }) {
   return (
     <div
-      className="relative flex flex-col justify-center flex-1 px-6 sm:px-10 lg:px-12 lg:py-12 xl:px-14 pt-20 pb-14 lg:pt-16 lg:pb-10 min-[1441px]:px-12 min-[1441px]:py-16 overflow-hidden min-h-0 lg:h-full"
+      className="relative flex flex-col justify-center flex-1 px-6 sm:px-10 lg:px-12 lg:py-12 xl:px-14 pt-20 pb-14 lg:pt-16 lg:pb-10 min-[1441px]:px-12 min-[1441px]:py-16 min-h-0"
     >
       {/* Ultra-wide: soft focal glow so the left panel feels full, not empty */}
       <div
@@ -71,8 +72,15 @@ export function MarketingSide({ mode = "signin" }: { mode?: "signin" | "signup" 
         <div className="absolute left-1/2 top-[42%] h-[min(78vh,820px)] w-[min(92%,42rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(34,197,94,0.11),transparent_72%)] blur-2xl" />
         <div className="absolute bottom-[8%] left-1/2 h-[40%] w-[70%] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(168,85,247,0.06),transparent_70%)] blur-3xl" />
       </div>
-      <div className="relative z-10 flex w-full max-w-lg min-[1441px]:max-w-2xl xl:pl-4 min-[1441px]:pl-10 flex-col gap-7 lg:gap-9 min-h-[500px] lg:min-h-0 justify-center">
-        <div className="flex w-full flex-col gap-7 lg:gap-9">
+      <div className="relative z-10 flex w-full max-w-lg min-[1441px]:max-w-2xl xl:pl-4 min-[1441px]:pl-10 flex-col gap-4 lg:gap-6 min-h-[500px] lg:min-h-0 justify-center">
+        {/* Top-aligned Logo - Desktop only (signin only) */}
+        {mode === "signin" && (
+          <div className="absolute top-0 left-0 xl:left-4 min-[1441px]:left-10 lg:block hidden -translate-y-32">
+            <Logo />
+          </div>
+        )}
+
+        <div className="flex w-full flex-col gap-4 lg:gap-6">
           {mode === "verify" && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
@@ -125,8 +133,8 @@ export function MarketingSide({ mode = "signin" }: { mode?: "signin" | "signup" 
                 : mode === "signup"
                   ? "Create your account and let AI agents help you launch and run your online shop effortlessly."
                   : mode === "forgot-password"
-                  ? "Retrieve your Krifth account access and get back to managing your commerce securely."
-                  : "Advanced biometric and neural-link verification protocols protecting your synthetic intelligence assets."}
+                    ? "Retrieve your Krifth account access and get back to managing your commerce securely."
+                    : "Advanced biometric and neural-link verification protocols protecting your synthetic intelligence assets."}
             </p>
           </div>
 
@@ -146,24 +154,7 @@ export function MarketingSide({ mode = "signin" }: { mode?: "signin" | "signup" 
                 </li>
               ))}
             </ul>
-          ) : mode === "signup" ? (
-            <div className="flex flex-col sm:flex-row gap-4 mt-2 min-[1441px]:max-w-xl min-[1441px]:w-full">
-              <div className="flex-1 p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-md">
-                <div className="flex items-center gap-2 mb-3">
-                  <Zap size={14} className="text-[#22C55E]" />
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Lightning Fast AI</span>
-                </div>
-                <p className="text-xl font-bold text-white">0.4ms Response</p>
-              </div>
-              <div className="flex-1 p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-md">
-                <div className="flex items-center gap-2 mb-3">
-                  <Share2 size={14} className="text-[#22C55E]" />
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Seamless Sync</span>
-                </div>
-                <p className="text-xl font-bold text-white">Real-time Connection</p>
-              </div>
-            </div>
-          ) : mode === "forgot-password" ? (
+          ) : mode === "signup" ? null : mode === "forgot-password" ? (
             <div className="flex flex-col gap-4 mt-2 max-w-md">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-[#22C55E]/10 flex items-center justify-center shrink-0">
