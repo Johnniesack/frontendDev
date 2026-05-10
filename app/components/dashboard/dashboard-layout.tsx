@@ -438,9 +438,8 @@ function TabletSidebar({
               key={item.label}
               onClick={() => setActiveNav(item.label)}
               title={item.label}
-              className={`w-full flex items-center justify-center p-3 rounded-xl transition-all ${
-                isActive ? "bg-[#22C55E] text-white shadow-sm" : "text-gray-400 hover:bg-gray-50 hover:text-gray-700"
-              }`}
+              className={`w-full flex items-center justify-center p-3 rounded-xl transition-all ${isActive ? "bg-[#22C55E] text-white shadow-sm" : "text-gray-400 hover:bg-gray-50 hover:text-gray-700"
+                }`}
             >
               <Icon size={19} strokeWidth={isActive ? 2.5 : 1.8} />
             </button>
@@ -632,9 +631,8 @@ function NotificationBell() {
                         )
                       )
                     }
-                    className={`flex items-start gap-3 px-5 py-4 cursor-pointer transition-colors ${
-                      n.read ? "hover:bg-gray-50/60" : "bg-green-50/30 hover:bg-green-50/60"
-                    }`}
+                    className={`flex items-start gap-3 px-5 py-4 cursor-pointer transition-colors ${n.read ? "hover:bg-gray-50/60" : "bg-green-50/30 hover:bg-green-50/60"
+                      }`}
                   >
                     <div
                       className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
@@ -714,11 +712,11 @@ export function DashboardLayout() {
             <h2 className="text-base sm:text-xl lg:text-2xl font-black text-gray-900 tracking-tight leading-tight truncate">
               {activeNav === "Website" ? "Shop Settings"
                 : activeNav === "Account" ? "Account Settings"
-                : activeNav === "Markets" ? "Market Pricing"
-                : activeNav === "Shipping" ? "Shipping"
-                : activeNav === "Pages" ? "Pages"
-                : activeNav === "Dashboard" ? "Dashboard"
-                : activeNav}
+                  : activeNav === "Markets" ? "Market Pricing"
+                    : activeNav === "Shipping" ? "Shipping"
+                      : activeNav === "Pages" ? "Pages"
+                        : activeNav === "Dashboard" ? "Dashboard"
+                          : activeNav}
             </h2>
           </div>
 
@@ -793,12 +791,12 @@ export function DashboardLayout() {
               </div>
 
               {/* ── Performance Chart ── */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.25, duration: 0.5 }}
-                  className="bg-white rounded-xl p-4 sm:p-8 border border-gray-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
-                >
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.5 }}
+                className="bg-white rounded-xl p-4 sm:p-8 border border-gray-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
+              >
                 {/* Chart header */}
                 <div className="flex items-start justify-between mb-4 sm:mb-6 gap-2">
                   <div>
@@ -922,17 +920,17 @@ export function DashboardLayout() {
               className="relative w-full max-w-sm bg-white rounded-[32px] p-8 shadow-2xl overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full blur-3xl -mr-16 -mt-16 opacity-50" />
-              
+
               <div className="relative z-10 text-center">
                 <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <LogOut size={28} className="text-red-500" />
                 </div>
-                
+
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Confirm Logout</h3>
                 <p className="text-sm text-gray-500 font-medium leading-relaxed mb-8">
                   Are you sure you want to log out? You&apos;ll need to sign in again to access your dashboard.
                 </p>
-                
+
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setShowLogoutConfirm(false)}

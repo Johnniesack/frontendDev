@@ -316,7 +316,7 @@ export function CouponsView() {
       {/* ─── Create Coupon Modal ─── */}
       <AnimatePresence>
         {isCreating && (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center px-4 sm:px-4">
+          <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -325,24 +325,29 @@ export function CouponsView() {
               className="absolute inset-0 bg-black/60 backdrop-blur-md"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-lg bg-white rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto scrollbar-hide"
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0 }}
+              transition={{ type: "spring", damping: 32, stiffness: 350 }}
+              className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl border border-gray-100 flex flex-col max-h-[92vh] overflow-hidden"
             >
-              {/* Modal Header */}
-              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-10 relative overflow-hidden">
+              {/* Mobile Handle */}
+              <div className="sm:hidden flex justify-center py-3 shrink-0">
+                <div className="w-10 h-1.5 bg-gray-200 rounded-full" />
+              </div>
+
+              {/* Modal Header - Fixed */}
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0">
                 <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
                   <Ticket size={160} strokeWidth={1} className="text-white" />
                 </div>
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
-                    <Plus size={24} strokeWidth={3} />
+                  <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                    <Plus size={22} strokeWidth={3} />
                   </div>
                   <div>
-                    <h3 className="text-xl sm:text-3xl font-black text-white leading-tight">Create Coupon</h3>
-                    <p className="text-[10px] sm:text-sm text-white/60 font-medium tracking-wide">Configuration</p>
+                    <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">Create Coupon</h3>
+                    <p className="text-[10px] text-white/60 font-medium tracking-wide">Configuration</p>
                   </div>
                   <button onClick={() => setIsCreating(false)} className="ml-auto w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
                     <Plus size={18} className="rotate-45" />
@@ -350,57 +355,61 @@ export function CouponsView() {
                 </div>
               </div>
 
-              <div className="p-6 sm:p-8 space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Coupon Type</label>
-                    <div className="relative group">
-                      <select className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer">
-                        <option>Standard Coupon</option>
-                        <option>Loyalty Card</option>
-                      </select>
-                      <ChevronDown size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-[#22C55E] transition-colors" />
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto scrollbar-hide px-6 sm:px-8 py-6 sm:py-8">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Coupon Type</label>
+                      <div className="relative group">
+                        <select className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer">
+                          <option>Standard Coupon</option>
+                          <option>Loyalty Card</option>
+                        </select>
+                        <ChevronDown size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-[#22C55E] transition-colors" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Code Prefix</label>
+                      <input type="text" placeholder="e.g. SAVE-" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Code Prefix</label>
-                    <input type="text" placeholder="e.g. SAVE-" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Currency</label>
-                    <div className="relative group">
-                      <select className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer">
-                        <option>GHS (Cedis)</option>
-                        <option>USD (Dollar)</option>
-                      </select>
-                      <ChevronDown size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-[#22C55E] transition-colors" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Currency</label>
+                      <div className="relative group">
+                        <select className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer">
+                          <option>GHS (Cedis)</option>
+                          <option>USD (Dollar)</option>
+                        </select>
+                        <ChevronDown size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-[#22C55E] transition-colors" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Discount Value</label>
+                      <input type="number" placeholder="0.00" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
                     </div>
                   </div>
+
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Discount Value</label>
-                    <input type="number" placeholder="0.00" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Batch Quantity</label>
+                    <input type="number" placeholder="100" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
                   </div>
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Batch Quantity</label>
-                  <input type="number" placeholder="100" className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
-                </div>
-
-                <div className="flex flex-col items-center gap-3 pt-6 border-t border-gray-50">
-                  <button onClick={() => setIsCreating(false)} className="w-full py-4 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard</button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setIsCreating(false)}
-                    className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
-                  >
-                    Generate Coupons
-                  </motion.button>
-                </div>
+              {/* Fixed Footer with Blur */}
+              <div className="px-6 sm:px-8 py-4 sm:py-6 border-t border-gray-50 bg-white/80 backdrop-blur-md flex flex-col gap-2 shrink-0 pb-10 sm:pb-6">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setIsCreating(false)}
+                  className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                >
+                  Generate Coupons
+                </motion.button>
+                <button onClick={() => setIsCreating(false)} className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard Configuration</button>
               </div>
             </motion.div>
           </div>
@@ -410,7 +419,7 @@ export function CouponsView() {
       {/* ─── Edit Coupon Modal ─── */}
       <AnimatePresence>
         {editingCoupon && (
-          <div className="fixed inset-0 z-[1000] flex items-center justify-center px-4 sm:px-4">
+          <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -419,24 +428,29 @@ export function CouponsView() {
               className="absolute inset-0 bg-black/60 backdrop-blur-md"
             />
             <motion.div
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 100 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto scrollbar-hide"
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0 }}
+              transition={{ type: "spring", damping: 32, stiffness: 350 }}
+              className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl border border-gray-100 flex flex-col max-h-[92vh] overflow-hidden"
             >
-              {/* Modal Header */}
-              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-10 relative overflow-hidden">
+              {/* Mobile Handle */}
+              <div className="sm:hidden flex justify-center py-3 shrink-0">
+                <div className="w-10 h-1.5 bg-gray-200 rounded-full" />
+              </div>
+
+              {/* Modal Header - Fixed */}
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0">
                 <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
                   <Edit3 size={160} strokeWidth={1} className="text-white" />
                 </div>
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
-                    <Edit3 size={24} strokeWidth={2.5} />
+                  <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                    <Edit3 size={22} strokeWidth={2.5} />
                   </div>
                   <div>
-                    <h3 className="text-xl sm:text-3xl font-black text-white leading-tight">Edit Coupon</h3>
-                    <p className="text-[10px] sm:text-sm text-white/60 font-medium tracking-wide">#{editingCoupon.id}</p>
+                    <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">Edit Coupon</h3>
+                    <p className="text-[10px] text-white/60 font-medium tracking-wide">#{editingCoupon.id}</p>
                   </div>
                   <button onClick={() => setEditingCoupon(null)} className="ml-auto w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
                     <Plus size={18} className="rotate-45" />
@@ -444,58 +458,62 @@ export function CouponsView() {
                 </div>
               </div>
 
-              <div className="p-6 sm:p-8 space-y-6">
-                <div className="space-y-5">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Coupon Code</label>
-                    <input
-                      type="text"
-                      defaultValue={editingCoupon.code}
-                      className="w-full py-4 px-5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-black text-gray-400 outline-none cursor-not-allowed font-mono"
-                      disabled
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Update Status</label>
-                    <div className="relative group">
-                      <select
-                        defaultValue={editingCoupon.status}
-                        className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer"
-                      >
-                        <option value="Active">Active</option>
-                        <option value="Used">Used</option>
-                      </select>
-                      <ChevronDown size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-[#22C55E] transition-colors" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Discount Amount</label>
-                    <div className="flex gap-2">
-                      <div className="w-20 py-4 flex items-center justify-center bg-gray-100 border border-gray-100 rounded-2xl text-xs font-black text-gray-500 uppercase tracking-widest">
-                        {editingCoupon.currency}
-                      </div>
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto scrollbar-hide px-6 sm:px-8 py-6 sm:py-8">
+                <div className="space-y-6">
+                  <div className="space-y-5">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Coupon Code</label>
                       <input
-                        type="number"
-                        defaultValue={editingCoupon.value}
-                        className="flex-1 py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 outline-none transition-all"
+                        type="text"
+                        defaultValue={editingCoupon.code}
+                        className="w-full py-4 px-5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-black text-gray-400 outline-none cursor-not-allowed font-mono"
+                        disabled
                       />
                     </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Update Status</label>
+                      <div className="relative group">
+                        <select
+                          defaultValue={editingCoupon.status}
+                          className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer"
+                        >
+                          <option value="Active">Active</option>
+                          <option value="Used">Used</option>
+                        </select>
+                        <ChevronDown size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-[#22C55E] transition-colors" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Discount Amount</label>
+                      <div className="flex gap-2">
+                        <div className="w-20 py-4 flex items-center justify-center bg-gray-100 border border-gray-100 rounded-2xl text-xs font-black text-gray-500 uppercase tracking-widest">
+                          {editingCoupon.currency}
+                        </div>
+                        <input
+                          type="number"
+                          defaultValue={editingCoupon.value}
+                          className="flex-1 py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 text-sm font-bold text-gray-900 outline-none transition-all"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                <div className="flex flex-col items-center gap-3 pt-6 border-t border-gray-50">
-                  <button onClick={() => setEditingCoupon(null)} className="w-full py-4 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard</button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleUpdate({ ...editingCoupon, status: "Active" })}
-                    className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
-                  >
-                    Save Changes
-                  </motion.button>
-                </div>
+              {/* Fixed Footer with Blur */}
+              <div className="px-6 sm:px-8 py-4 sm:py-6 border-t border-gray-50 bg-white/80 backdrop-blur-md flex flex-col gap-2 shrink-0 pb-10 sm:pb-6">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleUpdate({ ...editingCoupon, status: "Active" })}
+                  className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                >
+                  Save Changes
+                </motion.button>
+                <button onClick={() => setEditingCoupon(null)} className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard Changes</button>
               </div>
             </motion.div>
           </div>

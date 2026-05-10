@@ -437,24 +437,33 @@ export default function ShippingView() {
       {/* Modal */}
       <AnimatePresence>
         {modal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 sm:px-4">
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => { setModal(false); setEditingZone(null); }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }} transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative w-full max-w-lg bg-white rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 max-h-[92vh] overflow-y-auto scrollbar-hide">
-              {/* Premium Header with Gradient */}
-              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-10 relative overflow-hidden">
+              onClick={() => { setModal(false); setEditingZone(null); }} className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+            <motion.div 
+              initial={{ y: "100%", opacity: 0 }} 
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0 }} 
+              transition={{ type: "spring", damping: 32, stiffness: 350 }}
+              className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl border border-gray-100 flex flex-col max-h-[92vh] overflow-hidden"
+            >
+              {/* Mobile Handle */}
+              <div className="sm:hidden flex justify-center py-3 shrink-0">
+                <div className="w-10 h-1.5 bg-gray-200 rounded-full" />
+              </div>
+
+              {/* Premium Header with Gradient - Fixed */}
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0">
                 <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
                   <Truck size={160} strokeWidth={1} className="text-white" />
                 </div>
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
-                    {editingZone ? <Settings2 size={24} strokeWidth={2.5} /> : <Plus size={24} strokeWidth={3} />}
+                  <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                    {editingZone ? <Settings2 size={22} strokeWidth={2.5} /> : <Plus size={22} strokeWidth={3} />}
                   </div>
                   <div>
-                    <h3 className="text-xl sm:text-3xl font-black text-white leading-tight">{editingZone ? "Edit Shipping" : "New Shipping"}</h3>
-                    <p className="text-[10px] sm:text-sm text-white/60 font-medium tracking-wide">#{editingZone ? editingZone.id : "Configuration"}</p>
+                    <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">{editingZone ? "Edit Shipping" : "New Shipping"}</h3>
+                    <p className="text-[10px] text-white/60 font-medium tracking-wide">#{editingZone ? editingZone.id : "Configuration"}</p>
                   </div>
                   <button onClick={() => { setModal(false); setEditingZone(null); }} className="ml-auto w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
                     <Plus size={18} className="rotate-45" />
@@ -462,8 +471,9 @@ export default function ShippingView() {
                 </div>
               </div>
 
-              <div className="p-5 sm:p-8">
-                <form className="space-y-4 sm:space-y-6" onSubmit={e => { e.preventDefault(); setModal(false); setEditingZone(null); }}>
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto scrollbar-hide px-5 sm:px-8 py-6 sm:py-8">
+                <form id="shipping-form" className="space-y-6" onSubmit={e => { e.preventDefault(); setModal(false); setEditingZone(null); }}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Sel label="Region / Country" options={COUNTRIES} placeholder="Select country" value={country} onChange={setCountry} />
                     <Sel label="Operating Currency" options={CURRENCIES} placeholder="Select currency" value={currency} onChange={setCurrency} />
@@ -474,7 +484,7 @@ export default function ShippingView() {
                     <div className="relative group">
                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#22C55E] font-bold text-sm transition-colors">$</div>
                       <input type="number" min="0" step="0.01" placeholder="0.00" value={fee} onChange={e => setFee(e.target.value)}
-                        className="w-full py-3.5 sm:py-4 pl-8 pr-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
+                        className="w-full py-4 pl-8 pr-4 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" />
                     </div>
                   </div>
 
@@ -483,7 +493,7 @@ export default function ShippingView() {
                     <div className="flex gap-3">
                       {(["Subjected", "Exempted"] as const).map(s => (
                         <button key={s} type="button" onClick={() => setStatus(s)}
-                          className={`flex-1 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xs font-black border transition-all ${status === s ? (s === "Exempted" ? "bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm" : "bg-amber-50 text-amber-600 border-amber-200 shadow-sm") : "bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100"}`}>
+                          className={`flex-1 py-4 rounded-2xl text-xs font-black border transition-all ${status === s ? (s === "Exempted" ? "bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm" : "bg-amber-50 text-amber-600 border-amber-200 shadow-sm") : "bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100"}`}>
                           <div className="flex items-center justify-center gap-2">
                             {status === s && <Check size={14} strokeWidth={3} />}
                             {s}
@@ -496,21 +506,29 @@ export default function ShippingView() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Internal Log</label>
                     <textarea rows={2} placeholder="Add a note about this regional rule..." value={comment} onChange={e => setComment(e.target.value)}
-                      className="w-full py-3.5 sm:py-4 px-4 sm:px-5 rounded-xl sm:rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none transition-all" />
-                  </div>
-
-                  <div className="flex flex-col items-center gap-3 pt-6 mt-4 border-t border-gray-50">
-                    <button type="button" onClick={() => { setModal(false); setEditingZone(null); }} className="w-full py-4 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard</button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      type="submit"
-                      className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
-                    >
-                      {editingZone ? "Update Configuration" : "Save Configuration"}
-                    </motion.button>
+                      className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-[#22C55E]/30 focus:ring-8 focus:ring-[#22C55E]/5 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none resize-none transition-all" />
                   </div>
                 </form>
+              </div>
+
+              {/* Fixed Footer with Blur */}
+              <div className="px-5 sm:px-8 py-4 sm:py-6 border-t border-gray-50 bg-white/80 backdrop-blur-md flex flex-col gap-2 shrink-0 pb-8 sm:pb-6">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  form="shipping-form"
+                  type="submit"
+                  className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                >
+                  {editingZone ? "Update Configuration" : "Save Configuration"}
+                </motion.button>
+                <button 
+                  type="button" 
+                  onClick={() => { setModal(false); setEditingZone(null); }} 
+                  className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors"
+                >
+                  Discard Changes
+                </button>
               </div>
             </motion.div>
           </div>

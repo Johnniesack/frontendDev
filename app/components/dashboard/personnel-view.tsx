@@ -287,27 +287,43 @@ export function PersonnelView() {
       {/* Add/Edit Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={closeModal} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+              onClick={closeModal} className="absolute inset-0 bg-black/60 backdrop-blur-md" />
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }} 
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-lg bg-white rounded-2xl overflow-hidden shadow-2xl border border-gray-100"
+              initial={{ y: "100%", opacity: 0 }} 
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0 }} 
+              transition={{ type: "spring", damping: 32, stiffness: 350 }}
+              className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl border border-gray-100 flex flex-col max-h-[92vh] overflow-hidden"
             >
-              <div className="p-6 sm:p-8 space-y-6">
-                <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <h3 className="text-xl font-black text-gray-900">{editingMember ? "Edit Personnel" : "New Personnel"}</h3>
-                    <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Configure access & permissions</p>
+              {/* Mobile Handle */}
+              <div className="sm:hidden flex justify-center py-3 shrink-0">
+                <div className="w-10 h-1.5 bg-gray-200 rounded-full" />
+              </div>
+
+              {/* Modal Header - Fixed */}
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-5 sm:px-8 py-6 sm:py-8 relative overflow-hidden shrink-0">
+                <div className="absolute -right-8 -bottom-8 opacity-10 rotate-12">
+                  <Users size={160} strokeWidth={1} className="text-white" />
+                </div>
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+                    {editingMember ? <Edit2 size={22} strokeWidth={2.5} /> : <Plus size={22} strokeWidth={3} />}
                   </div>
-                  <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-900 transition-colors">
-                    <X size={20} />
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">{editingMember ? "Edit Personnel" : "New Personnel"}</h3>
+                    <p className="text-[10px] text-white/60 font-medium tracking-wide">Configure access & permissions</p>
+                  </div>
+                  <button onClick={closeModal} className="ml-auto w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                    <Plus size={18} className="rotate-45" />
                   </button>
                 </div>
+              </div>
 
-                <form onSubmit={handleSave} className="space-y-5">
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto scrollbar-hide px-6 sm:px-8 py-6 sm:py-8">
+                <form id="personnel-form" onSubmit={handleSave} className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Full Name</label>
                     <input 
@@ -316,7 +332,7 @@ export function PersonnelView() {
                       placeholder="e.g. John Doe"
                       value={formData.name}
                       onChange={e => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full py-3.5 px-5 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-gray-200 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" 
+                      className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-gray-200 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" 
                     />
                   </div>
 
@@ -328,7 +344,7 @@ export function PersonnelView() {
                       placeholder="john@example.com"
                       value={formData.email}
                       onChange={e => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full py-3.5 px-5 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-gray-200 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" 
+                      className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-gray-200 text-sm font-bold text-gray-900 placeholder:text-gray-300 outline-none transition-all" 
                     />
                   </div>
 
@@ -338,26 +354,28 @@ export function PersonnelView() {
                       <select 
                         value={formData.role}
                         onChange={e => setFormData({ ...formData, role: e.target.value as Personnel["role"] })}
-                        className="w-full py-3.5 px-5 rounded-xl bg-gray-50 border border-transparent focus:bg-white focus:border-gray-200 text-sm font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer"
+                        className="w-full py-4 px-5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-gray-200 text-sm font-bold text-gray-900 outline-none transition-all appearance-none cursor-pointer"
                       >
                         {ROLES.map(role => <option key={role} value={role}>{role}</option>)}
                       </select>
                       <ChevronDown size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-gray-900 transition-colors" />
                     </div>
                   </div>
-
-                  <div className="flex gap-3 pt-6">
-                    <button type="button" onClick={closeModal} className="flex-1 py-4 text-gray-500 text-sm font-black border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">Discard</button>
-                    <motion.button 
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
-                      type="submit"
-                      className="flex-[2] py-4 bg-gray-900 text-white rounded-xl text-sm font-black hover:bg-black transition-all shadow-lg shadow-gray-200"
-                    >
-                      {editingMember ? "Update Member" : "Invite Member"}
-                    </motion.button>
-                  </div>
                 </form>
+              </div>
+
+              {/* Fixed Footer with Blur */}
+              <div className="px-6 sm:px-8 py-4 sm:py-6 border-t border-gray-50 bg-white/80 backdrop-blur-md flex flex-col gap-2 shrink-0 pb-10 sm:pb-6">
+                <motion.button 
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  form="personnel-form"
+                  type="submit"
+                  className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-black transition-all shadow-xl shadow-gray-200"
+                >
+                  {editingMember ? "Update Member" : "Invite Member"}
+                </motion.button>
+                <button type="button" onClick={closeModal} className="w-full py-3 text-gray-400 hover:text-gray-700 text-sm font-bold transition-colors">Discard Changes</button>
               </div>
             </motion.div>
           </div>
@@ -367,14 +385,16 @@ export function PersonnelView() {
       {/* Delete Modal */}
       <AnimatePresence>
         {isDeletingId && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setIsDeletingId(null)} className="absolute inset-0 bg-black/60 backdrop-blur-md" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="relative w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl border border-gray-100 p-8 text-center"
+            <motion.div 
+              initial={{ y: "100%", opacity: 0 }} 
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0 }}
+              className="relative w-full max-w-sm bg-white rounded-t-[32px] sm:rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 p-8 text-center pb-10 sm:pb-8"
             >
-              <div className="w-16 h-16 bg-red-50 text-red-500 rounded-xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Trash2 size={28} />
               </div>
               <h3 className="text-xl font-black text-gray-900 mb-2">Remove Access?</h3>
@@ -382,7 +402,7 @@ export function PersonnelView() {
                 This will revoke all access for this personnel member. This action cannot be undone.
               </p>
               <div className="flex flex-col gap-3">
-                <button onClick={handleDelete} className="w-full py-4 bg-red-500 text-white rounded-xl text-sm font-black hover:bg-red-600 transition-all">Yes, Remove Access</button>
+                <button onClick={handleDelete} className="w-full py-4 bg-red-500 text-white rounded-2xl text-sm font-black hover:bg-red-600 transition-all">Yes, Remove Access</button>
                 <button onClick={() => setIsDeletingId(null)} className="w-full py-3 text-sm font-bold text-gray-400 hover:text-gray-900 transition-colors">Cancel</button>
               </div>
             </motion.div>
