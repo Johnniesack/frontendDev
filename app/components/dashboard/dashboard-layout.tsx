@@ -699,11 +699,11 @@ export function DashboardLayout() {
 
   return (
     <div
-      className="flex h-[100dvh] min-h-[100dvh] bg-[#F5F7FA] overflow-hidden relative"
+      className="flex w-full h-[100dvh] min-h-[100dvh] bg-[#F5F7FA] overflow-hidden relative"
       style={{ fontFamily: "'Space Grotesk', sans-serif" }}
     >
       {/* Full-bleed background that covers ALL safe area zones (notch, home indicator) */}
-      <div className="fixed inset-0 bg-[#F5F7FA] -z-10" />
+      <div className="fixed inset-0 bg-[#F5F7FA] -z-1" />
       {/* ── Desktop Sidebar ── */}
       <aside className="hidden lg:flex w-[210px] flex-shrink-0 bg-white border-r border-gray-100 flex-col h-full shadow-sm">
         <SidebarContent activeNav={activeNav} setActiveNav={setActiveNav} />
