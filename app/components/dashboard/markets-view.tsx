@@ -149,7 +149,7 @@ function CustomSelect({
   );
 }
 
-export function MarketsView() {
+export function MarketsView({ setActiveNav }: { setActiveNav?: (nav: string) => void }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState("10");
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
@@ -282,7 +282,10 @@ export function MarketsView() {
                         >
                           <button
                             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#22C55E] transition-all"
-                            onClick={() => setOpenDropdownId(null)}
+                            onClick={() => {
+                              setOpenDropdownId(null);
+                              setActiveNav?.("Inventory");
+                            }}
                           >
                             <Package size={16} strokeWidth={2.5} />
                             Inventory
@@ -360,7 +363,7 @@ export function MarketsView() {
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => console.log("Inventory", item.id)}
+                  onClick={() => setActiveNav?.("Inventory")}
                   className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-900 text-white rounded-xl text-xs font-black transition-all active:scale-[0.98] shadow-lg shadow-gray-200"
                 >
                   <Package size={14} />

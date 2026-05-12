@@ -53,6 +53,7 @@ import { PagesView } from "./pages-view";
 import { CouponsView } from "./coupons-view";
 import { PersonnelView } from "./personnel-view";
 import { TutorialsView } from "./tutorials-view";
+import InventoryView from "./inventory-view";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 const STATS = [
@@ -102,9 +103,12 @@ const NAV_ITEMS = [
       { label: "Pages", icon: FileText },
       { label: "Personnel", icon: Users },
       { label: "Markets", icon: Globe },
+      { label: "Inventory", icon: Package },
       { label: "Website", icon: Monitor },
       { label: "Shipping", icon: Truck },
       { label: "Tutorials", icon: PlayCircle },
+      { label: "Payments", icon: CreditCard },
+      { label: "Transactions", icon: ArrowLeftRight },
     ],
   },
   {
@@ -136,6 +140,7 @@ const MORE_ITEMS = [
   { label: "Pages", icon: FileText },
   { label: "Personnel", icon: Users },
   { label: "Markets", icon: Globe },
+  { label: "Inventory", icon: Package },
   { label: "Tutorials", icon: PlayCircle },
   { label: "Goals", icon: Target },
   { label: "Agents", icon: UserCog },
@@ -408,6 +413,7 @@ const ALL_FLAT_ITEMS = [
   { label: "Shipping", icon: Truck },
   { label: "Pages", icon: FileText },
   { label: "Markets", icon: Globe },
+  { label: "Inventory", icon: Package },
   { label: "Coupons", icon: Ticket },
   { label: "Personnel", icon: Users },
   { label: "Goals", icon: Target },
@@ -756,7 +762,7 @@ export function DashboardLayout() {
           ) : activeNav === "Account" ? (
             <AccountView />
           ) : activeNav === "Markets" ? (
-            <MarketsView />
+            <MarketsView setActiveNav={setActiveNav} />
           ) : activeNav === "Shipping" ? (
             <ShippingView />
           ) : activeNav === "Pages" ? (
@@ -767,6 +773,12 @@ export function DashboardLayout() {
             <PersonnelView />
           ) : activeNav === "Tutorials" ? (
             <TutorialsView />
+          ) : activeNav === "Inventory" ? (
+            <InventoryView />
+          ) : activeNav === "Payments" ? (
+            <div className="flex-1 flex items-center justify-center text-slate-400 font-bold uppercase tracking-[0.2em] text-xs">Payments Module Coming Soon</div>
+          ) : activeNav === "Transactions" ? (
+            <div className="flex-1 flex items-center justify-center text-slate-400 font-bold uppercase tracking-[0.2em] text-xs">Transactions History Coming Soon</div>
           ) : (
             <div className="px-4 sm:px-8 pt-4 sm:pt-6 pb-8 space-y-4 sm:space-y-6">
               {/* ── Stat Cards ── */}
