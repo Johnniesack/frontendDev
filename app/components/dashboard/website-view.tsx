@@ -63,8 +63,8 @@ export function WebsiteView() {
   const [customDomain, setCustomDomain] = useState("");
   const [dnsStatus, setDnsStatus] = useState<"idle" | "verifying" | "connected" | "error">("idle");
   const [sliders, setSliders] = useState<any[]>([
-    { id: 1, title: "Summer Collection 2024", priority: 1, image: null },
-    { id: 2, title: "New Arrivals", priority: 2, image: null },
+    { id: 1, title: "Summer Collection 2024", priority: 1, image: null, layout: "left" },
+    { id: 2, title: "New Arrivals", priority: 2, image: null, layout: "center" },
   ]);
 
   const colorPresets = ["#22C55E", "#3B82F6", "#EF4444", "#F59E0B", "#8B5CF6", "#EC4899", "#111827"];
@@ -92,7 +92,7 @@ export function WebsiteView() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const newId = sliders.length > 0 ? Math.max(...sliders.map(s => s.id)) + 1 : 1;
-      setSliders([{ id: newId, title: "New Banner", priority: 0, image: e.target?.result }, ...sliders]);
+      setSliders([{ id: newId, title: "New Banner", priority: 0, image: e.target?.result, layout: "left" }, ...sliders]);
       triggerToast("Slide added with image", "success");
     };
     reader.readAsDataURL(file);
@@ -105,6 +105,19 @@ export function WebsiteView() {
 
   const updateSlideTitle = (id: number, title: string) => {
     setSliders(sliders.map(s => s.id === id ? { ...s, title } : s));
+  };
+
+  const toggleSlideLayout = (id: number) => {
+    const layouts = ["left", "center", "right"];
+    setSliders(sliders.map(s => {
+      if (s.id === id) {
+        const currentIndex = layouts.indexOf(s.layout || "left");
+        const nextIndex = (currentIndex + 1) % layouts.length;
+        triggerToast(`Layout set to ${layouts[nextIndex]}`, "info");
+        return { ...s, layout: layouts[nextIndex] };
+      }
+      return s;
+    }));
   };
 
   const handleUpgrade = () => {
@@ -701,21 +714,27 @@ export function WebsiteView() {
                       </div>
                       
                       <div className="flex-1 min-w-0">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 block mb-1">Banner Name</label>
                         <input
                           type="text"
                           value={slider.title}
                           onChange={(e) => updateSlideTitle(slider.id, e.target.value)}
-                          className="bg-transparent text-sm font-black text-gray-900 w-full outline-none focus:ring-2 focus:ring-gray-900/5 rounded px-1 -ml-1 transition-all"
+                          className="bg-white/50 border border-gray-100 px-3 py-2 rounded-xl text-sm font-black text-gray-900 w-full outline-none focus:bg-white focus:border-gray-200 focus:shadow-sm transition-all"
                         />
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center gap-2 mt-2">
                           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Priority {slider.priority}</span>
                           <span className="w-1 h-1 rounded-full bg-gray-300" />
                           <span className="text-[10px] font-black text-[#22C55E] uppercase tracking-tighter">Active</span>
+                          <span className="w-1 h-1 rounded-full bg-gray-300" />
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{slider.layout || "left"} layout</span>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                        <button 
+                          onClick={() => toggleSlideLayout(slider.id)}
+                          className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
                           <Layout size={14} />
                         </button>
                         <button
