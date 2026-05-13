@@ -724,7 +724,7 @@ export default function InventoryView() {
               className="relative w-full md:max-w-4xl h-full bg-white shadow-2xl flex flex-col overflow-hidden"
             >
               {/* Detail Header */}
-              <div className="px-6 sm:px-8 py-4 sm:py-6 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
+              <div className="px-6 sm:px-8 py-4 sm:py-6 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-20">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-slate-50 flex items-center justify-center text-slate-900">
                     <Package size={20} />
@@ -744,45 +744,44 @@ export default function InventoryView() {
                   <X size={24} className="text-slate-400 group-hover:text-slate-900 transition-colors" />
                 </button>
               </div>
-
-              <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 sm:space-y-8">
+              <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8">
                 {/* Hero Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div className="aspect-square rounded-[40px] overflow-hidden border border-slate-100 shadow-inner bg-slate-50">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+                  <div className="aspect-square rounded-[32px] sm:rounded-[40px] overflow-hidden border border-slate-100 shadow-inner bg-slate-50">
                     <img src={selectedProductDetail.image} className="w-full h-full object-cover" alt="" />
                   </div>
-                  <div className="flex flex-col justify-between py-4">
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Total Views</span>
+                  <div className="flex flex-col justify-between py-2 sm:py-4">
+                    <div className="space-y-4 sm:space-y-6">
+                      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                        <div className="p-4 sm:p-5 bg-slate-50 rounded-2xl sm:rounded-3xl border border-slate-100">
+                          <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1 sm:mb-2">Total Views</span>
                           <div className="flex items-center gap-2">
-                            <Eye size={20} className="text-slate-900" />
-                            <span className="text-2xl font-black text-slate-900">{selectedProductDetail.views.toLocaleString()}</span>
+                            <Eye size={16} className="text-slate-900" />
+                            <span className="text-lg sm:text-2xl font-black text-slate-900">{selectedProductDetail.views.toLocaleString()}</span>
                           </div>
                         </div>
-                        <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Base Price (USD)</span>
+                        <div className="p-4 sm:p-5 bg-slate-50 rounded-2xl sm:rounded-3xl border border-slate-100">
+                          <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1 sm:mb-2">Base Price (USD)</span>
                           <div className="flex items-center gap-2">
-                            <CreditCard size={20} className="text-slate-900" />
+                            <CreditCard size={16} className="text-slate-900" />
                             {isGlobalEditing ? (
                               <input 
                                 type="number" 
                                 defaultValue={selectedProductDetail.basePrice}
-                                className="text-2xl font-black text-slate-900 bg-white border border-slate-200 rounded-xl px-2 w-full outline-none focus:border-slate-900 transition-all"
+                                className="text-lg sm:text-2xl font-black text-slate-900 bg-white border border-slate-200 rounded-lg px-1.5 w-full outline-none focus:border-slate-900 transition-all"
                               />
                             ) : (
-                              <span className="text-2xl font-black text-slate-900">${selectedProductDetail.basePrice}</span>
+                              <span className="text-lg sm:text-2xl font-black text-slate-900">${selectedProductDetail.basePrice}</span>
                             )}
                           </div>
                         </div>
                       </div>
-                      <div className="p-6 bg-slate-900 rounded-[32px] text-white">
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-xs font-black uppercase tracking-widest opacity-60">Global Trend (7 Days)</span>
-                          <Zap size={16} className="text-amber-400" />
+                      <div className="p-5 sm:p-6 bg-slate-900 rounded-[24px] sm:rounded-[32px] text-white">
+                        <div className="flex items-center justify-between mb-3 sm:mb-4">
+                          <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Global Trend (7 Days)</span>
+                          <Zap size={14} className="text-amber-400" />
                         </div>
-                        <div className="h-20 flex items-end gap-1">
+                        <div className="h-16 sm:h-20 flex items-end gap-1">
                           {selectedProductDetail.trend.map((v, i) => (
                             <motion.div
                               key={i}
@@ -794,51 +793,13 @@ export default function InventoryView() {
                         </div>
                       </div>
                     </div>
-                    {isGlobalEditing ? (
-                      <div className="flex gap-3">
-                        <button 
-                          onClick={() => {
-                            setIsSaving(true);
-                            setTimeout(() => {
-                              setIsSaving(false);
-                              setIsGlobalEditing(false);
-                            }, 1500);
-                          }}
-                          className="flex-[2] py-5 bg-slate-900 text-white rounded-[24px] text-sm font-black shadow-xl shadow-slate-200 hover:bg-black transition-all flex items-center justify-center gap-2"
-                        >
-                          {isSaving ? (
-                            <motion.div
-                              animate={{ rotate: 360 }}
-                              transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                            >
-                              <History size={18} />
-                            </motion.div>
-                          ) : <CheckCircle2 size={18} />}
-                          {isSaving ? "SYNCING..." : "SAVE GLOBAL CHANGES"}
-                        </button>
-                        <button 
-                          onClick={() => setIsGlobalEditing(false)}
-                          className="flex-1 py-5 bg-slate-100 text-slate-900 rounded-[24px] text-sm font-black hover:bg-slate-200 transition-all"
-                        >
-                          CANCEL
-                        </button>
-                      </div>
-                    ) : (
-                      <button 
-                        onClick={() => setIsGlobalEditing(true)}
-                        className="w-full py-5 bg-emerald-500 text-white rounded-[24px] text-sm font-black shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
-                      >
-                        <Edit3 size={18} />
-                        UPDATE GLOBAL DATA
-                      </button>
-                    )}
                   </div>
                 </div>
 
                 {/* Market Breakdown */}
-                <div className="space-y-4">
-                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em]">Market Breakdown</h3>
-                  <div className="grid grid-cols-1 gap-3">
+                <div className="space-y-3 sm:space-y-4">
+                  <h3 className="text-[10px] sm:text-sm font-black text-slate-900 uppercase tracking-[0.2em]">Market Breakdown</h3>
+                  <div className="grid grid-cols-1 gap-2 sm:gap-3">
                     {MARKETS.map((market) => {
                       const mPrice = selectedProductDetail.marketPrices[market.id] || selectedProductDetail.basePrice;
                       const mStock = selectedProductDetail.stock[market.id] || 0;
@@ -898,6 +859,48 @@ export default function InventoryView() {
                     })}
                   </div>
                 </div>
+              </div>
+
+              {/* Sticky Action Bar */}
+              <div className="px-6 sm:px-8 py-4 sm:py-6 border-t border-slate-100 bg-white/80 backdrop-blur-lg sticky bottom-0 z-20">
+                {isGlobalEditing ? (
+                  <div className="flex gap-2 sm:gap-3">
+                    <button 
+                      onClick={() => {
+                        setIsSaving(true);
+                        setTimeout(() => {
+                          setIsSaving(false);
+                          setIsGlobalEditing(false);
+                        }, 1500);
+                      }}
+                      className="flex-[2] py-4 sm:py-5 bg-slate-900 text-white rounded-xl sm:rounded-[24px] text-xs sm:text-sm font-black shadow-xl shadow-slate-200 hover:bg-black transition-all flex items-center justify-center gap-2"
+                    >
+                      {isSaving ? (
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                        >
+                          <History size={16} />
+                        </motion.div>
+                      ) : <CheckCircle2 size={16} />}
+                      {isSaving ? "SYNCING..." : "SAVE CHANGES"}
+                    </button>
+                    <button 
+                      onClick={() => setIsGlobalEditing(false)}
+                      className="flex-1 py-4 sm:py-5 bg-slate-100 text-slate-900 rounded-xl sm:rounded-[24px] text-xs sm:text-sm font-black hover:bg-slate-200 transition-all"
+                    >
+                      CANCEL
+                    </button>
+                  </div>
+                ) : (
+                  <button 
+                    onClick={() => setIsGlobalEditing(true)}
+                    className="w-full py-4 sm:py-5 bg-emerald-500 text-white rounded-xl sm:rounded-[24px] text-xs sm:text-sm font-black shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Edit3 size={16} />
+                    UPDATE GLOBAL DATA
+                  </button>
+                )}
               </div>
             </motion.div>
           </div>
