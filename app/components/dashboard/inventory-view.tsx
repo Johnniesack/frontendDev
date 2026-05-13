@@ -29,6 +29,7 @@ import {
   Image as ImageIcon,
   Eye,
   X,
+  ChevronLeft,
   ChevronRight,
   Grid,
   List as ListIcon,
@@ -725,24 +726,28 @@ export default function InventoryView() {
             >
               {/* Detail Header */}
               <div className="px-6 sm:px-8 py-4 sm:py-6 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-20">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-slate-50 flex items-center justify-center text-slate-900">
-                    <Package size={20} />
-                  </div>
-                  <div>
-                    <h2 className="text-lg sm:text-xl font-black text-slate-900 truncate max-w-[180px] sm:max-w-none">{selectedProductDetail.name}</h2>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{selectedProductDetail.sku} • GLOBAL PERFORMANCE</p>
-                  </div>
-                </div>
                 <button 
                   onClick={() => {
                     setSelectedProductDetail(null);
                     setIsGlobalEditing(false);
                   }}
-                  className="p-2 sm:p-3 hover:bg-slate-50 rounded-xl sm:rounded-2xl transition-colors group"
+                  className="p-2 -ml-2 sm:ml-0 hover:bg-slate-50 rounded-xl transition-all group"
                 >
-                  <X size={24} className="text-slate-400 group-hover:text-slate-900 transition-colors" />
+                  <ChevronLeft size={28} className="text-slate-900 sm:hidden" />
+                  <X size={20} className="text-slate-400 group-hover:text-slate-900 hidden sm:block transition-colors" />
                 </button>
+                
+                <div className="flex items-center gap-3 sm:gap-4 flex-1 justify-center sm:justify-start">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-slate-50 flex items-center justify-center text-slate-900">
+                    <Package size={18} />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-sm sm:text-lg font-black text-slate-900 truncate max-w-[150px] sm:max-w-none">{selectedProductDetail.name}</h2>
+                    <p className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">{selectedProductDetail.sku}</p>
+                  </div>
+                </div>
+
+                <div className="w-10 sm:hidden" /> {/* Spacer to center title on mobile */}
               </div>
               <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8">
                 {/* Hero Section */}
