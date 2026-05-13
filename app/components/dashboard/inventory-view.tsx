@@ -722,7 +722,7 @@ export default function InventoryView() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full md:max-w-4xl h-full bg-white shadow-2xl flex flex-col overflow-hidden"
+              className="relative w-full md:max-w-4xl h-full bg-white shadow-2xl flex flex-col overflow-hidden pt-[env(safe-area-inset-top)]"
             >
               {/* Detail Header */}
               <div className="px-6 sm:px-8 py-4 sm:py-6 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-20">
