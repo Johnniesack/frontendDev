@@ -709,7 +709,7 @@ export default function InventoryView() {
       {/* --- Cross-Market Detail Modal --- */}
       <AnimatePresence>
         {selectedProductDetail && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-end">
+          <div className="fixed inset-0 z-[998] flex items-center justify-end">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
