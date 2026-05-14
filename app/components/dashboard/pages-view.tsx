@@ -198,7 +198,7 @@ export function PagesView() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowModal(true)}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all sm:w-auto shadow-lg shadow-gray-200 shrink-0"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-[#22C55E] text-white rounded-xl text-xs font-bold hover:bg-[#16A34A] transition-all sm:w-auto shadow-lg shadow-emerald-500/20 shrink-0"
           >
             <div className="w-5 h-5 rounded-lg bg-white/10 flex items-center justify-center">
               <Plus size={14} strokeWidth={3} />
@@ -247,7 +247,7 @@ export function PagesView() {
                     {page.type === "blank_canvas" && (
                       <button
                         onClick={() => openEditor(page)}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gray-900 text-white rounded-xl text-[11px] font-black transition-all active:scale-[0.98] shadow-sm"
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#22C55E] text-white rounded-xl text-[11px] font-black transition-all active:scale-[0.98] shadow-sm shadow-emerald-500/10"
                       >
                         <PenLine size={13} />
                         Edit Content
@@ -405,7 +405,7 @@ export function PagesView() {
                       whileTap={{ scale: 0.98 }}
                       onClick={handleSave}
                       disabled={isSaving || !pageName.trim() || (pageType === "link" && !pageUrl.trim())}
-                      className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200 disabled:opacity-30"
+                      className="w-full py-4 bg-[#22C55E] text-white rounded-2xl text-sm font-bold hover:bg-[#16A34A] transition-all shadow-xl shadow-emerald-500/20 disabled:opacity-30"
                     >
                       {isSaving ? "Saving..." : "Create Page"}
                     </motion.button>

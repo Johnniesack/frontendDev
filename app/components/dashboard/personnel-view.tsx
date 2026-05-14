@@ -136,7 +136,7 @@ export function PersonnelView() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all sm:w-auto shadow-lg shadow-gray-200 shrink-0"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-[#22C55E] text-white rounded-xl text-xs font-bold hover:bg-[#16A34A] transition-all sm:w-auto shadow-lg shadow-emerald-500/20 shrink-0"
           >
             <div className="w-5 h-5 rounded-lg bg-white/10 flex items-center justify-center">
               <Plus size={14} strokeWidth={3} />
@@ -376,7 +376,7 @@ export function PersonnelView() {
                       whileTap={{ scale: 0.99 }}
                       form="personnel-form"
                       type="submit"
-                      className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-black transition-all shadow-xl shadow-gray-200"
+                      className="w-full py-4 bg-[#22C55E] text-white rounded-2xl text-sm font-black hover:bg-[#16A34A] transition-all shadow-xl shadow-emerald-500/20"
                     >
                       {editingMember ? "Update Member" : "Invite Member"}
                     </motion.button>

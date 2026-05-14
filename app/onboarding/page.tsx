@@ -5,7 +5,6 @@ import { OnboardingFlow } from "../components/onboarding/onboarding-flow";
 import { DynamicBackground } from "../components/marketing/dynamic-background";
 
 export default function OnboardingPage() {
-  const router = React.useMemo(() => typeof window !== "undefined" ? require("next/navigation").useRouter() : null, []);
 
   React.useEffect(() => {
     const accessToken = localStorage.getItem("access_token");

@@ -68,26 +68,54 @@ function getAuthHeaders(): HeadersInit {
 }
 
 /**
- * SAVE ONBOARDING STEP
+ * SIGN UP FUNCTION
+ * Postman: onboarding/sign_up
  */
-export async function saveOnboardingStep(stepData: any) {
-    const response = await fetch(`${BASE_URL}/auth/onboarding/step/`, {
+export async function signUp(userData: any) {
+    const response = await fetch(`${BASE_URL}/onboarding/sign_up/`, {
         method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify(stepData),
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
     });
 
     return handleResponse(response);
 }
 
 /**
+ * UPDATE STATUS FUNCTION
+ * Postman: onboarding/approved
+ */
+export async function updateOnboardingStatus(id: number, status: 'approved' | 'rejected') {
+    const response = await fetch(`${BASE_URL}/onboarding/update_status/`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ id, status }),
+    });
+
+    return handleResponse(response);
+}
+
+/**
+ * SAVE ONBOARDING STEP
+ */
+export async function saveOnboardingStep(stepData: any) {
+    // Backend doesn't support step-by-step saving. 
+    // We'll just resolve locally and send everything at once in the final step.
+    console.log("Local save for step:", stepData);
+    return Promise.resolve({ success: true });
+}
+
+/**
  * COMPLETE ONBOARDING
  */
-export async function completeOnboarding(plan: string) {
-    const response = await fetch(`${BASE_URL}/auth/onboarding/complete/`, {
-        method: "POST",
+export async function completeOnboarding(id: string | number, onboardingData: any) {
+    // Consolidated endpoint: api/onboarding/{id}/
+    const response = await fetch(`${BASE_URL}/onboarding/${id}/`, {
+        method: "PUT",
         headers: getAuthHeaders(),
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify(onboardingData),
     });
  
     return handleResponse(response);

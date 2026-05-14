@@ -5,12 +5,12 @@ import { verifyOtp, resendOtp } from "@/lib/api/auth";
 
 export function VerifyForm({
   email = "a***n@krifth.com",
-  tempToken,
+  userId,
   onBack,
   onSuccess
 }: {
   email?: string;
-  tempToken?: string;
+  userId?: number;
   onBack: () => void;
   onSuccess: (isOnboarded: boolean) => void;
 }) {
@@ -52,20 +52,25 @@ export function VerifyForm({
       return;
     }
 
+    if (!userId) {
+      setError("Session expired. Please sign in again.");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await verifyOtp(email, codeString, tempToken);
+      const response = await verifyOtp(userId, codeString);
       
-      // Store tokens (Handle nested data wrapper and varied key names)
+      // Store tokens
       const accessToken = response.access_token || response.access || 
                           response.data?.access_token || response.data?.access;
       const refreshToken = response.refresh_token || response.refresh || 
                            response.data?.refresh_token || response.data?.refresh;
       
-      if (accessToken && typeof accessToken === 'string') localStorage.setItem("access_token", accessToken);
-      if (refreshToken && typeof refreshToken === 'string') localStorage.setItem("refresh_token", refreshToken);
+      if (accessToken) localStorage.setItem("access_token", String(accessToken));
+      if (refreshToken) localStorage.setItem("refresh_token", String(refreshToken));
       
       const isOnboarded = response.is_onboarded ?? response.data?.is_onboarded ?? false;
       localStorage.setItem("is_onboarded", String(isOnboarded));
@@ -73,7 +78,6 @@ export function VerifyForm({
       onSuccess(isOnboarded);
     } catch (err: any) {
       console.error("Verification error:", err);
-      // Sanitize backend message to replace 'OTP' with 'code'
       const msg = (err.message || "Invalid verification code. Please try again.")
         .replace(/OTP/g, "code")
         .replace(/otp/g, "code");
@@ -84,13 +88,15 @@ export function VerifyForm({
   };
 
   const handleResend = async () => {
-    console.log("Resend requested. tempToken:", tempToken, "email:", email);
-    if (!tempToken && !email) return;
+    if (!userId) {
+      setError("Session error: User ID missing. Please go back and try again.");
+      return;
+    }
     
     setIsLoading(true);
     setError(null);
     try {
-      await resendOtp(email, tempToken);
+      await resendOtp(userId);
       alert("Verification code resent successfully!");
     } catch (err: any) {
       console.error("Resend error:", err);

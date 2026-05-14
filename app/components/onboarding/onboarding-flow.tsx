@@ -21,7 +21,8 @@ import {
   Lock,
   CalendarDays,
   User,
-  Phone
+  Phone,
+  Mail
 } from "lucide-react";
 import { saveOnboardingStep, completeOnboarding } from "@/lib/api/onboarding";
 
@@ -119,9 +120,6 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
       if (step < 6) {
         setDirection(1);
         setStep(step + 1);
-      } else {
-        await completeOnboarding(selectedPlan);
-        onComplete();
       }
     } catch (err: any) {
       console.error("Onboarding step error:", err);
@@ -131,16 +129,39 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
     }
   };
 
+  const [isPending, setIsPending] = useState(false);
+
   const submitPayment = async () => {
     if (!validatePayment()) return;
     setError(null);
     setIsLoading(true);
     try {
-      // Backend handles actual payment processing.
-      // Here we just complete onboarding after UI validation passes.
-      await completeOnboarding(selectedPlan);
-      onComplete();
+      
+      // Collect all data for a single consolidated submission
+      const recordId = typeof window !== 'undefined' ? localStorage.getItem("onboarding_record_id") : null;
+      const userId = typeof window !== 'undefined' ? localStorage.getItem("onboarding_user_id") : null;
+      
+      const finalData = {
+        user: userId, // Link to user
+        brand_name: values.brandName,
+        niche: values.productTypes.join(", "),
+        custom_niche: values.otherProductType || "None",
+        mission: values.goals.join(", "),
+        instagram_choice: values.instagramStatus === "Yes – connect now" ? "connect_now" : values.instagramStatus === "No, but I plan to" ? "plan_to" : "no_instagram",
+        instagram_handle: values.instagramHandle || "None",
+        plan: selectedPlan
+      };
+
+      if (!recordId) {
+        throw new Error("Onboarding record not found. Please sign up again.");
+      }
+
+      console.log("Submitting Onboarding Data for Record:", recordId, finalData);
+      await completeOnboarding(recordId, finalData);
+      console.log("Submission successful, setting pending state.");
+      setIsPending(true);
     } catch (err: any) {
+      console.error("Onboarding submission failed:", err);
       setError(err.message || "Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
@@ -184,21 +205,58 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
 
   return (
     <div className="w-full min-h-[100dvh] flex flex-col items-center justify-start bg-transparent selection:bg-[#22C55E]/30 relative">
-      {/* Step Indicator - Sticky on mobile with better spacing */}
-      <div className="flex flex-col items-center gap-3 pt-8 pb-6 sticky top-0 z-[60] bg-black/90 backdrop-blur-xl w-full border-b border-white/5">
-        <div className="flex gap-2">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={i}
-              className={`h-1 rounded-full transition-all duration-700 ease-out ${i <= step ? "w-8 bg-[#22C55E]" : "w-2 bg-white/10"
-                }`}
-            />
-          ))}
-        </div>
-        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#22C55E]">
-          Step {step} of 6
-        </span>
-      </div>
+      <AnimatePresence mode="wait">
+        {isPending ? (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex-1 flex flex-col items-center justify-center text-center px-6 max-w-lg"
+          >
+            <div className="w-20 h-20 bg-[#22C55E]/10 rounded-3xl flex items-center justify-center mb-8 border border-[#22C55E]/20">
+              <Shield className="text-[#22C55E]" size={40} />
+            </div>
+            <h2 className="text-4xl font-black text-white mb-4 tracking-tight">Application Submitted</h2>
+            <p className="text-zinc-400 text-lg font-medium mb-8 leading-relaxed">
+              We&apos;ve received your onboarding details and payment. Our team is now reviewing your application to ensure the highest quality on the Krifth network.
+            </p>
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 w-full mb-8">
+              <div className="flex items-center gap-3 text-left mb-4">
+                <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center">
+                  <Mail className="text-blue-500" size={16} />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest font-black text-zinc-500">Next Step</p>
+                  <p className="text-sm font-bold text-white">Check your email for approval</p>
+                </div>
+              </div>
+              <p className="text-xs text-zinc-500 text-left">
+                Once approved, you&apos;ll receive a secure verification code (OTP) to finalize your account setup and access your dashboard.
+              </p>
+            </div>
+            <button 
+              onClick={() => window.location.href = "/"}
+              className="px-8 h-14 rounded-2xl bg-white text-black font-black text-base transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Return to Home
+            </button>
+          </motion.div>
+        ) : (
+          <>
+            {/* Step Indicator - Sticky on mobile with better spacing */}
+            <div className="flex flex-col items-center gap-3 pt-8 pb-6 sticky top-0 z-[60] bg-black/90 backdrop-blur-xl w-full border-b border-white/5">
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-1 rounded-full transition-all duration-700 ease-out ${i <= step ? "w-8 bg-[#22C55E]" : "w-2 bg-white/10"
+                      }`}
+                  />
+                ))}
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#22C55E]">
+                Step {step} of 6
+              </span>
+            </div>
 
       <AnimatePresence mode="wait" custom={direction}>
         <motion.div
@@ -751,6 +809,12 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                   )}
                 </div>
 
+                {error && (
+                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-bold text-center">
+                    {error}
+                  </div>
+                )}
+
                 <div className="flex gap-3 pt-2">
                   <button onClick={prevStep} className="h-14 px-6 rounded-2xl border border-white/10 text-zinc-400 font-bold text-sm hover:text-white transition-all">
                     <ArrowLeft size={18} />
@@ -774,6 +838,9 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
           })()}
         </motion.div>
       </AnimatePresence>
+      </>
+    )}
+    </AnimatePresence>
     </div>
   );
 }

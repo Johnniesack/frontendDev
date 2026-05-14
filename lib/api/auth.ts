@@ -42,14 +42,15 @@ async function handleResponse(response: Response) {
 
 /**
  * LOGIN FUNCTION
+ * Postman: account/login
  */
-export async function login(email: string, password: string) {
-    const response = await fetch(`${BASE_URL}/auth/login/`, {
+export async function login(username: string, password: string) {
+    const response = await fetch(`${BASE_URL}/account/login/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
     });
 
     return handleResponse(response);
@@ -57,9 +58,10 @@ export async function login(email: string, password: string) {
 
 /**
  * REFRESH TOKEN FUNCTION
+ * Postman: account/refresh_token
  */
 export async function refreshAccessToken(refreshToken: string) {
-    const response = await fetch(`${BASE_URL}/auth/refresh/`, {
+    const response = await fetch(`${BASE_URL}/account/refresh_token/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -71,68 +73,74 @@ export async function refreshAccessToken(refreshToken: string) {
 }
 
 /**
- * SIGNUP FUNCTION
- */
-export async function signup(email: string, fullName: string, password: string, confirmPassword: string) {
-    const body = {
-        email,
-        full_name: fullName,
-        password,
-        confirm_password: confirmPassword
-    };
-    console.log("Signup Request Body:", JSON.stringify(body));
-    
-    const response = await fetch(`${BASE_URL}/auth/register/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
-        body: JSON.stringify(body),
-    });
-
-    return handleResponse(response);
-}
-
-/**
  * VERIFY OTP FUNCTION
+ * Postman: account/verify_otp
  */
-export async function verifyOtp(email: string, otp: string, tempToken?: string) {
-    const response = await fetch(`${BASE_URL}/auth/verify-otp/`, {
+export async function verifyOtp(userId: number | string, otpCode: string) {
+    const response = await fetch(`${BASE_URL}/account/verify_otp/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
         },
         body: JSON.stringify({ 
-            email, 
-            otp,
-            ...(tempToken ? { 
-                TEMP_TOKEN: tempToken,
-                temp_token: tempToken 
-            } : {})
+            user_id: userId, 
+            otp: otpCode 
         }),
     });
 
     return handleResponse(response);
 }
+
 /**
  * RESEND OTP FUNCTION
+ * Postman: account/resend_otp
  */
-export async function resendOtp(email: string, tempToken?: string) {
-    const response = await fetch(`${BASE_URL}/auth/resend-otp/`, {
+export async function resendOtp(userId: number | string) {
+    const response = await fetch(`${BASE_URL}/account/resend_otp/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Accept": "application/json",
         },
-        body: JSON.stringify({ 
-            email,
-            ...(tempToken ? { 
-                TEMP_TOKEN: tempToken,
-                temp_token: tempToken 
-            } : {})
-        }),
+        body: JSON.stringify({ user_id: userId }),
     });
+
     return handleResponse(response);
+}
+
+/**
+ * GET PROFILE FUNCTION
+ * Postman: account/get profile
+ */
+export async function getProfile() {
+    const response = await fetch(`${BASE_URL}/account/profile/`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+    });
+
+    return handleResponse(response);
+}
+
+/**
+ * UPDATE PROFILE FUNCTION
+ * Postman: account/update profile
+ */
+export async function updateProfile(profileData: any) {
+    const response = await fetch(`${BASE_URL}/account/update_profile/`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(profileData),
+    });
+
+    return handleResponse(response);
+}
+
+// Helper to get headers with token
+function getAuthHeaders(): HeadersInit {
+    if (typeof window === "undefined") return { "Content-Type": "application/json" };
+    const token = localStorage.getItem("access_token");
+    return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+    };
 }
