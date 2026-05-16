@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import DashboardClientLayout from "./DashboardClientLayout";
 
 export const viewport: Viewport = {
   themeColor: "#F5F7FA",
@@ -14,14 +15,5 @@ export default function DashboardRootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `document.documentElement.classList.add('dashboard-active');`
-        }}
-      />
-      {children}
-    </>
-  );
+  return <DashboardClientLayout>{children}</DashboardClientLayout>;
 }

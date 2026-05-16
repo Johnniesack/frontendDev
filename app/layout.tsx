@@ -46,6 +46,7 @@ export default function RootLayout({
       lang="en"
       className={`${syne.variable} ${dmSans.variable} ${dmMono.variable} h-full antialiased`}
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
     >
       <body className="min-h-full flex flex-col font-body bg-paper text-ink selection:bg-brand/20 selection:text-brand relative">
         {/* Stable Fixed Background */}

@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   Filter,
   Plus,
-  MoreVertical,
   ArrowUpDown,
   Package,
-  AlertTriangle,
   CheckCircle2,
   Globe,
   Edit3,
@@ -17,23 +15,15 @@ import {
   ChevronDown,
   ExternalLink,
   History,
-  Layers,
-  Zap,
-  Boxes,
-  ShieldAlert,
   LayoutGrid,
   CreditCard,
-  Target,
-  Activity,
   UploadCloud,
-  Image as ImageIcon,
   Eye,
   X,
   ChevronLeft,
   ChevronRight,
-  Grid,
-  List as ListIcon,
 } from "lucide-react";
+// API imports removed until backend token flow is ready
 
 interface ProductInventory {
   id: string;
@@ -41,42 +31,15 @@ interface ProductInventory {
   sku: string;
   category: string;
   basePrice: number;
-  marketPrices: Record<string, number>; // Market ID -> Price
-  stock: Record<string, number>; // Market ID -> Stock
+  marketPrices: Record<string, number>;
+  stock: Record<string, number>;
   status: "in_stock" | "low_stock" | "out_of_stock";
   image: string;
   views: number;
   trend: number[];
 }
 
-const Sparkline = ({ data, color = "#0f172a" }: { data: number[], color?: string }) => {
-  const max = Math.max(...data);
-  const min = Math.min(...data);
-  const range = max - min || 1;
-  const width = 60;
-  const height = 24;
-  
-  const points = data.map((d, i) => {
-    const x = (i / (data.length - 1)) * width;
-    const y = height - ((d - min) / range) * (height - 4) - 2;
-    return `${x},${y}`;
-  }).join(" ");
 
-  return (
-    <div className="opacity-40 group-hover:opacity-100 transition-opacity">
-      <svg width={width} height={height} className="overflow-visible">
-        <polyline
-          fill="none"
-          stroke={color}
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          points={points}
-        />
-      </svg>
-    </div>
-  );
-};
 
 const MOCK_PRODUCTS: ProductInventory[] = [
   {
@@ -141,6 +104,9 @@ const MARKETS = [
 ];
 
 export default function InventoryView() {
+  // Using mock data until the backend token flow is fully connected
+  const [products, setProducts] = useState<ProductInventory[]>(MOCK_PRODUCTS);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedMarketId, setSelectedMarketId] = useState<string>("12");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -154,10 +120,10 @@ export default function InventoryView() {
 
   const currentMarket = MARKETS.find((m) => m.id === selectedMarketId) || MARKETS[0];
 
-  const filteredProducts = MOCK_PRODUCTS.filter((product) => {
+  const filteredProducts = products.filter((product) => {
     const stock = product.stock[selectedMarketId] || 0;
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         product.sku.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (product.name || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         (product.sku || "").toLowerCase().includes(searchQuery.toLowerCase());
     
     let matchesStatus = true;
     if (filterStatus === "in_stock") matchesStatus = stock >= 20;
@@ -168,8 +134,8 @@ export default function InventoryView() {
   });
 
   const getStatusConfig = (status: string, stock: number) => {
-    if (stock === 0) return { label: "Out of Stock", color: "text-rose-500", bg: "bg-rose-50", icon: ShieldAlert };
-    if (stock < 20) return { label: "Low Stock", color: "text-orange-500", bg: "bg-orange-50", icon: Activity };
+    if (stock === 0) return { label: "Out of Stock", color: "text-rose-500", bg: "bg-rose-50", icon: Package };
+    if (stock < 20) return { label: "Low Stock", color: "text-orange-500", bg: "bg-orange-50", icon: Package };
     return { label: "In Stock", color: "text-emerald-500", bg: "bg-emerald-50", icon: CheckCircle2 };
   };
 
@@ -224,45 +190,21 @@ export default function InventoryView() {
             </div>
 
             <motion.button
-              whileHover={{ scale: 1.02, y: -1 }}
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setIsAddModalOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-slate-900 text-white rounded-2xl text-sm font-black shadow-xl shadow-slate-200 order-1 sm:order-2 w-full sm:w-auto"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-[#22C55E] text-white rounded-xl text-xs font-bold hover:bg-[#16A34A] transition-all sm:w-auto shadow-lg shadow-emerald-500/20 order-1 sm:order-2 w-full sm:w-auto"
             >
-              <Plus size={18} strokeWidth={3} />
-              Add Product
+              <div className="w-5 h-5 rounded-lg bg-white/20 flex items-center justify-center">
+                <Plus size={14} strokeWidth={3} />
+              </div>
+              <span className="hidden sm:inline">Add Product</span>
+              <span className="sm:hidden">Add</span>
             </motion.button>
           </div>
         </div>
 
-        {/* --- Stats Cards (Vercel Style) --- */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8 max-w-[1600px] mx-auto px-4 sm:px-0">
-          {[
-            { label: "Total Skus", value: "24", icon: Boxes, color: "blue" },
-            { label: "Market Stock", value: "1,240", icon: Target, color: "emerald" },
-            { label: "In Stock", value: "21", icon: CheckCircle2, color: "emerald" },
-            { label: "Low Stock", value: "3", icon: Activity, color: "orange" },
-          ].map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="p-3 sm:p-5 bg-white border border-slate-100 rounded-xl sm:rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-lg transition-all group"
-            >
-              <div className="flex items-center justify-between mb-2 sm:mb-3">
-                <div className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-${stat.color}-50 text-${stat.color}-500 group-hover:scale-110 transition-transform`}>
-                  <stat.icon size={16} className="sm:w-[18px] sm:h-[18px]" />
-                </div>
-                <div className="hidden sm:flex items-center gap-1 text-[10px] font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-full">
-                  +12% <ArrowUpDown size={10} className="rotate-0" />
-                </div>
-              </div>
-              <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
-              <p className="text-lg sm:text-2xl font-black text-slate-900">{stat.value}</p>
-            </motion.div>
-          ))}
-        </div>
+
       </div>
 
       {/* --- Main Content Area --- */}
@@ -338,7 +280,6 @@ export default function InventoryView() {
                 <thead>
                   <tr className="bg-transparent">
                     <th className="px-4 sm:px-6 py-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Product</th>
-                    <th className="px-6 py-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hidden lg:table-cell">Performance</th>
                     <th className="px-6 py-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hidden sm:table-cell">Market Price</th>
                     <th className="px-6 py-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hidden md:table-cell">Stock Level</th>
                     <th className="px-6 py-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hidden sm:table-cell">Status</th>
@@ -360,11 +301,11 @@ export default function InventoryView() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.98 }}
                           transition={{ delay: idx * 0.05 }}
+                          onClick={() => setSelectedProductDetail(product)}
                           className="group/row bg-white rounded-2xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] border border-slate-100/50 hover:border-slate-900/10 hover:bg-slate-50/30 hover:shadow-xl hover:shadow-slate-200/40 transition-all cursor-pointer"
                         >
                           <td 
-                            onClick={() => setSelectedProductDetail(product)}
-                            className="px-4 sm:px-6 py-4 sm:py-5 rounded-l-2xl border-y border-l border-transparent group-hover:border-slate-100 cursor-pointer"
+                            className="px-4 sm:px-6 py-4 sm:py-5 rounded-l-2xl border-y border-l border-transparent group-hover:border-slate-100"
                           >
                             <div className="flex items-center gap-3 sm:gap-4">
                               <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex-shrink-0">
@@ -384,12 +325,7 @@ export default function InventoryView() {
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-5 border-y border-transparent group-hover:border-slate-100 hidden lg:table-cell">
-                            <div className="flex flex-col gap-1">
-                              <Sparkline data={product.trend} color={product.status === 'low_stock' ? '#f59e0b' : product.status === 'out_of_stock' ? '#ef4444' : '#0f172a'} />
-                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">7D Trend</span>
-                            </div>
-                          </td>
+
                           <td className="px-6 py-5 border-y border-transparent group-hover:border-slate-100 hidden sm:table-cell">
                             <div className="flex flex-col">
                               <div className="flex items-center gap-1.5">
@@ -534,9 +470,6 @@ export default function InventoryView() {
                           <div className="flex items-center justify-between text-white">
                             <div className="flex flex-col">
                               <span className="text-lg font-black">{getCurrencySymbol(currentMarket.currency)}{price.toLocaleString()}</span>
-                              <div className="flex items-center gap-1 text-[9px] font-bold opacity-80 mt-0.5">
-                                <Sparkline data={product.trend} color="#ffffff" />
-                              </div>
                             </div>
                             <div className="flex items-center gap-1 text-[10px] font-bold opacity-80">
                               <Eye size={12} /> {product.views.toLocaleString()}
@@ -565,7 +498,7 @@ export default function InventoryView() {
                             />
                           </div>
                         </div>
-                        <button className="w-full py-3 bg-slate-50 text-slate-900 rounded-xl text-xs font-black hover:bg-slate-900 hover:text-white transition-all">
+                        <button className="w-full py-3 bg-gray-50 text-gray-900 rounded-xl text-xs font-bold hover:bg-gray-900 hover:text-white transition-all border border-transparent hover:border-gray-900">
                           Quick Edit Details
                         </button>
                       </div>
@@ -697,7 +630,7 @@ export default function InventoryView() {
               </div>
 
               <div className="p-8 border-t border-slate-100">
-                <button className="w-full py-4 bg-slate-900 text-white rounded-[24px] font-black shadow-xl shadow-slate-200 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                <button className="w-full py-4 bg-[#22C55E] text-white rounded-xl text-sm font-black shadow-xl shadow-emerald-500/20 hover:bg-[#16A34A] transition-all">
                   Create Product & Update Stock
                 </button>
               </div>
@@ -706,11 +639,11 @@ export default function InventoryView() {
         )}
       </AnimatePresence>
 
-      {/* --- Cross-Market Detail Modal --- */}
       <AnimatePresence>
         {selectedProductDetail && (
           <div className="fixed inset-0 z-[998] flex items-center justify-end">
             <motion.div
+              key="modal-backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -718,10 +651,11 @@ export default function InventoryView() {
               className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
             />
             <motion.div
+              key="modal-content"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              transition={{ type: "spring", damping: 30, stiffness: 300, mass: 0.8 }}
               className="relative w-full md:max-w-4xl h-full bg-white shadow-2xl flex flex-col overflow-hidden"
             >
               {/* Detail Header */}
@@ -781,22 +715,7 @@ export default function InventoryView() {
                           </div>
                         </div>
                       </div>
-                      <div className="p-5 sm:p-6 bg-slate-900 rounded-[24px] sm:rounded-[32px] text-white">
-                        <div className="flex items-center justify-between mb-3 sm:mb-4">
-                          <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Global Trend (7 Days)</span>
-                          <Zap size={14} className="text-amber-400" />
-                        </div>
-                        <div className="h-16 sm:h-20 flex items-end gap-1">
-                          {selectedProductDetail.trend.map((v, i) => (
-                            <motion.div
-                              key={i}
-                              initial={{ height: 0 }}
-                              animate={{ height: `${(v / Math.max(...selectedProductDetail.trend)) * 100}%` }}
-                              className="flex-1 bg-white/20 rounded-t-sm hover:bg-white/40 transition-colors cursor-pointer"
-                            />
-                          ))}
-                        </div>
-                      </div>
+
                     </div>
                   </div>
                 </div>
@@ -878,7 +797,7 @@ export default function InventoryView() {
                           setIsGlobalEditing(false);
                         }, 1500);
                       }}
-                      className="flex-[2] py-4 sm:py-5 bg-slate-900 text-white rounded-xl sm:rounded-[24px] text-xs sm:text-sm font-black shadow-xl shadow-slate-200 hover:bg-black transition-all flex items-center justify-center gap-2"
+                      className="flex-[2] py-4 sm:py-5 bg-gray-900 text-white rounded-xl text-xs sm:text-sm font-black shadow-xl shadow-gray-200 hover:bg-black transition-all flex items-center justify-center gap-2"
                     >
                       {isSaving ? (
                         <motion.div
@@ -892,7 +811,7 @@ export default function InventoryView() {
                     </button>
                     <button 
                       onClick={() => setIsGlobalEditing(false)}
-                      className="flex-1 py-4 sm:py-5 bg-slate-100 text-slate-900 rounded-xl sm:rounded-[24px] text-xs sm:text-sm font-black hover:bg-slate-200 transition-all"
+                      className="flex-1 py-4 sm:py-5 bg-gray-100 text-gray-900 rounded-xl text-xs sm:text-sm font-black hover:bg-gray-200 transition-all"
                     >
                       CANCEL
                     </button>
@@ -900,7 +819,7 @@ export default function InventoryView() {
                 ) : (
                   <button 
                     onClick={() => setIsGlobalEditing(true)}
-                    className="w-full py-4 sm:py-5 bg-emerald-500 text-white rounded-xl sm:rounded-[24px] text-xs sm:text-sm font-black shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
+                    className="w-full py-4 sm:py-5 bg-[#22C55E] text-white rounded-xl text-xs sm:text-sm font-black shadow-lg shadow-emerald-500/20 hover:bg-[#16A34A] transition-all flex items-center justify-center gap-2"
                   >
                     <Edit3 size={16} />
                     UPDATE GLOBAL DATA

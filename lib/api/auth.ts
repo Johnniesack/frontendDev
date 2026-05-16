@@ -1,138 +1,80 @@
-// 1. This is the main address for your backend
-const BASE_URL = "/api/proxy";
+import { apiRequest, type ApiPayload, type ApiRecord, authHeaders, cleanToken, handleResponse } from "./client";
 
-// 2. This helper helps us handle errors in a simple way
-async function handleResponse(response: Response) {
-    const contentType = response.headers.get("content-type");
-    let data;
-
-    if (contentType && contentType.includes("application/json")) {
-        try {
-            data = await response.json();
-            console.log(`API Response [${response.url}]:`, data);
-        } catch (e) {
-            console.error("Failed to parse JSON response", e);
-            throw new Error("Server returned an invalid response format.");
-        }
-    } else {
-        const text = await response.text();
-        console.error("Non-JSON response received:", text.substring(0, 200));
-        throw new Error(`Server Error: ${response.status} ${response.statusText}`);
-    }
-
-    if (!response.ok) {
-        let errorMessage = `Request failed with status ${response.status}`;
-        if (data) {
-            if (typeof data.error === 'string') errorMessage = data.error;
-            else if (typeof data.message === 'string') errorMessage = data.message;
-            else if (typeof data === 'object') {
-                // Handle cases like { "email": ["Already exists"] }
-                const firstKey = Object.keys(data)[0];
-                if (firstKey && Array.isArray(data[firstKey])) {
-                    errorMessage = `${firstKey}: ${data[firstKey][0]}`;
-                } else if (firstKey && typeof data[firstKey] === 'string') {
-                    errorMessage = data[firstKey];
-                }
-            }
-        }
-        throw new Error(errorMessage);
-    }
-    return data;
-}
+export type AuthResponse = ApiRecord;
 
 /**
  * LOGIN FUNCTION
+ * Postman: account/login
  */
-export async function login(email: string, password: string) {
-    const response = await fetch(`${BASE_URL}/auth/login/`, {
+export async function login(username: string, password: string) {
+    return apiRequest<AuthResponse>("/account/login/", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+        auth: false,
+        body: { username, password },
     });
-
-    return handleResponse(response);
 }
 
 /**
  * REFRESH TOKEN FUNCTION
+ * Postman: account/refresh_token
  */
 export async function refreshAccessToken(refreshToken: string) {
-    const response = await fetch(`${BASE_URL}/auth/refresh/`, {
+    return apiRequest<AuthResponse>("/account/refresh_token/", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refresh: refreshToken }),
+        auth: false,
+        body: { refresh: refreshToken },
     });
-
-    return handleResponse(response);
-}
-
-/**
- * SIGNUP FUNCTION
- */
-export async function signup(email: string, fullName: string, password: string, confirmPassword: string) {
-    const body = {
-        email,
-        full_name: fullName,
-        password,
-        confirm_password: confirmPassword
-    };
-    console.log("Signup Request Body:", JSON.stringify(body));
-    
-    const response = await fetch(`${BASE_URL}/auth/register/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
-        body: JSON.stringify(body),
-    });
-
-    return handleResponse(response);
 }
 
 /**
  * VERIFY OTP FUNCTION
+ * Postman: account/verify_otp
  */
-export async function verifyOtp(email: string, otp: string, tempToken?: string) {
-    const response = await fetch(`${BASE_URL}/auth/verify-otp/`, {
+export async function verifyOtp(userId: number | string, otpCode: string, tempToken?: string) {
+    const token = cleanToken(tempToken);
+    const response = await fetch(`${window.location.origin}/api/proxy/account/verify_otp/`, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
-        body: JSON.stringify({ 
-            email, 
-            otp,
-            ...(tempToken ? { 
-                TEMP_TOKEN: tempToken,
-                temp_token: tempToken 
-            } : {})
+        headers: token ? authHeaders(token) : authHeaders(null),
+        body: JSON.stringify({
+            user_id: userId,
+            otp_code: otpCode,
         }),
     });
 
-    return handleResponse(response);
+    return handleResponse<AuthResponse>(response);
 }
+
 /**
  * RESEND OTP FUNCTION
+ * Postman: account/resend_otp
  */
-export async function resendOtp(email: string, tempToken?: string) {
-    const response = await fetch(`${BASE_URL}/auth/resend-otp/`, {
+export async function resendOtp(userId: number | string) {
+    return apiRequest<AuthResponse>("/account/resend_otp/", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
-        body: JSON.stringify({ 
-            email,
-            ...(tempToken ? { 
-                TEMP_TOKEN: tempToken,
-                temp_token: tempToken 
-            } : {})
-        }),
+        auth: false,
+        body: { user_id: userId },
     });
-    return handleResponse(response);
+}
+
+/**
+ * GET PROFILE FUNCTION
+ * Postman: account/get profile
+ */
+export async function getProfile() {
+    return apiRequest<AuthResponse>("/account/profile/", {
+        method: "GET",
+        auth: true,
+    });
+}
+
+/**
+ * UPDATE PROFILE FUNCTION
+ * Postman: account/update profile
+ */
+export async function updateProfile(profileData: ApiPayload) {
+    return apiRequest<AuthResponse>("/account/update_profile/", {
+        method: "PUT",
+        auth: true,
+        body: profileData,
+    });
 }

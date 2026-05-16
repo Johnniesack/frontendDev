@@ -4,8 +4,9 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { login } from "@/lib/api/auth";
+import { extractBoolean, extractString } from "@/lib/api/client";
 
-export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (email: string, data?: any) => void, onSignUp: () => void, onForgotPassword?: () => void }) {
+export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (email: string, data?: unknown) => void, onSignUp: () => void, onForgotPassword?: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -13,14 +14,14 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [values, setValues] = useState({ email: "", password: "" });
+  const [values, setValues] = useState({ username: "", password: "" });
 
   const validate = (name: string, value: string) => {
     let error = "";
     if (!value) {
       error = `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
-    } else if (name === "email" && !/\S+@\S+\.\S+/.test(value)) {
-      error = "Please enter a valid email address";
+    } else if (name === "username" && value.length < 3) {
+      error = "Username must be at least 3 characters";
     } else if (name === "password" && value.length < 8) {
       error = "Password must be at least 8 characters";
     }
@@ -46,35 +47,33 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
     setIsSubmitted(true);
     setServerError(null);
 
-    const emailError = validate("email", values.email);
+    const usernameError = validate("username", values.username);
     const passwordError = validate("password", values.password);
 
-    if (!emailError && !passwordError) {
+    if (!usernameError && !passwordError) {
       setIsLoading(true);
       try {
         // Here we call the login function from our auth.ts file
-        const response = await login(values.email, values.password);
+        const response = await login(values.username, values.password);
         
-        const accessToken = response.access_token || response.access || 
-                            response.data?.access_token || response.data?.access;
-        const refreshToken = response.refresh_token || response.refresh || 
-                             response.data?.refresh_token || response.data?.refresh;
-        const isOnboarded = response.is_onboarded ?? response.data?.is_onboarded;
+        const accessToken = extractString(response, [["access_token"], ["access"], ["data", "access_token"], ["data", "access"]]);
+        const refreshToken = extractString(response, [["refresh_token"], ["refresh"], ["data", "refresh_token"], ["data", "refresh"]]);
+        const isOnboarded = extractBoolean(response, [["is_onboarded"], ["data", "is_onboarded"]]);
 
-        if (accessToken && typeof accessToken === 'string') localStorage.setItem("access_token", accessToken);
-        if (refreshToken && typeof refreshToken === 'string') localStorage.setItem("refresh_token", refreshToken);
+        if (accessToken) localStorage.setItem("access_token", accessToken);
+        if (refreshToken) localStorage.setItem("refresh_token", refreshToken);
         if (isOnboarded !== undefined) localStorage.setItem("is_onboarded", String(isOnboarded));
 
         // Move to the next screen, passing the full response so handleSignInNext can find what it needs
-        onNext(values.email, response);
-      } catch (err: any) {
+        onNext(values.username, response);
+      } catch (err: unknown) {
         // If login fails, we show the error message
-        const msg = err.message || "Login failed. Please check your credentials.";
+        const msg = err instanceof Error ? err.message : "Login failed. Please check your credentials.";
         
         // Try to link API error to specific fields
-        if (msg.toLowerCase().includes("email") || msg.toLowerCase().includes("user") || msg.toLowerCase().includes("account")) {
-          setErrors(prev => ({ ...prev, email: msg }));
-          setTouched(prev => ({ ...prev, email: true }));
+        if (msg.toLowerCase().includes("username") || msg.toLowerCase().includes("user") || msg.toLowerCase().includes("account")) {
+          setErrors(prev => ({ ...prev, username: msg }));
+          setTouched(prev => ({ ...prev, username: true }));
         } else if (msg.toLowerCase().includes("password")) {
           setErrors(prev => ({ ...prev, password: msg }));
           setTouched(prev => ({ ...prev, password: true }));
@@ -121,33 +120,33 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
           <div className="space-y-1.5 sm:space-y-2">
             <div className="flex justify-between items-center">
               <label className="text-[10px] uppercase tracking-widest font-bold text-zinc-500">
-                Email Address
+                Username
               </label>
             </div>
             <div className="relative group">
               <Mail
-                className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${errors.email && (touched.email || isSubmitted) ? "text-[#FF5F5F]/40" : focusedField === "email" ? "text-[#22C55E]" : "text-zinc-500"}`}
+                className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${errors.username && (touched.username || isSubmitted) ? "text-[#FF5F5F]/40" : focusedField === "username" ? "text-[#22C55E]" : "text-zinc-500"}`}
                 size={18}
               />
               <input
-                name="email"
-                type="email"
-                value={values.email}
+                name="username"
+                type="text"
+                value={values.username}
                 onChange={handleChange}
-                onFocus={() => setFocusedField("email")}
+                onFocus={() => setFocusedField("username")}
                 onBlur={handleBlur}
                 disabled={isLoading}
-                placeholder="name@krifth.com"
-                className={`w-full h-11 sm:h-12 min-[1920px]:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border transition-all font-medium text-base sm:text-base focus:outline-none placeholder:text-zinc-600 ${errors.email && (touched.email || isSubmitted) ? "border-[#FF5F5F]/20 focus:border-[#FF5F5F]/40 bg-[#FF5F5F]/5 shadow-[0_0_12px_rgba(255,95,95,0.08)]" : "border-white/5 focus:border-[#22C55E]/50 hover:bg-[#1E252D] focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"}`}
+                placeholder="krifth_user"
+                className={`w-full h-11 sm:h-12 min-[1920px]:h-14 pl-12 pr-4 rounded-xl bg-[#1A2026] border transition-all font-medium text-base sm:text-base focus:outline-none placeholder:text-zinc-600 ${errors.username && (touched.username || isSubmitted) ? "border-[#FF5F5F]/20 focus:border-[#FF5F5F]/40 bg-[#FF5F5F]/5 shadow-[0_0_12px_rgba(255,95,95,0.08)]" : "border-white/5 focus:border-[#22C55E]/50 hover:bg-[#1E252D] focus:shadow-[0_0_12px_rgba(34,197,94,0.15)]"}`}
               />
             </div>
-            {errors.email && (touched.email || isSubmitted) && (
+            {errors.username && (touched.username || isSubmitted) && (
               <motion.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="text-[10px] text-[#FF5F5F] font-bold uppercase tracking-widest pl-1"
               >
-                {errors.email}
+                {errors.username}
               </motion.p>
             )}
           </div>

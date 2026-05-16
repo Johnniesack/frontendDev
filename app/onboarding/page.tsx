@@ -5,7 +5,6 @@ import { OnboardingFlow } from "../components/onboarding/onboarding-flow";
 import { DynamicBackground } from "../components/marketing/dynamic-background";
 
 export default function OnboardingPage() {
-  const router = React.useMemo(() => typeof window !== "undefined" ? require("next/navigation").useRouter() : null, []);
 
   React.useEffect(() => {
     const accessToken = localStorage.getItem("access_token");
@@ -18,8 +17,10 @@ export default function OnboardingPage() {
   }, []);
 
   const handleComplete = () => {
-    localStorage.setItem("is_onboarded", "true");
-    window.location.href = "/dashboard";
+    localStorage.removeItem("pending_verification");
+    localStorage.setItem("registration_approved", "true");
+    localStorage.setItem("is_onboarded", "false");
+    window.location.href = "/";
   };
 
   return (

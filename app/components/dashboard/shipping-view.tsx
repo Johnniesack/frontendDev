@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Globe, Truck, DollarSign, ShieldCheck,
   Trash2, ChevronLeft, ChevronRight, SlidersHorizontal,
   Info, Monitor, Check, ChevronDown, Plus, Edit3, Settings2,
 } from "lucide-react";
+import { deleteShipping } from "@/lib/api/shipping";
 
 interface ShippingZone {
   id: string; countryCode: string; country: string;
@@ -39,7 +40,7 @@ function Sel({ label, options, placeholder, value, onChange }: {
 }) {
   const [open, setOpen] = useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
+  useEffect(() => {
     const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
     window.addEventListener("click", h);
     return () => window.removeEventListener("click", h);
@@ -71,6 +72,9 @@ function Sel({ label, options, placeholder, value, onChange }: {
 }
 
 export default function ShippingView() {
+  // Using mock data until the backend token flow is fully connected
+  const [zones, setZones] = useState<ShippingZone[]>(ZONES);
+  const [isLoading, setIsLoading] = useState(false);
   const [q, setQ] = useState("");
   const [modal, setModal] = useState(false);
   const [country, setCountry] = useState("");
@@ -80,7 +84,6 @@ export default function ShippingView() {
 
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [editingZone, setEditingZone] = useState<ShippingZone | null>(null);
-  const [zones, setZones] = useState<ShippingZone[]>(ZONES);
 
   const openEdit = (z: ShippingZone) => {
     setEditingZone(z);
@@ -92,13 +95,18 @@ export default function ShippingView() {
     setModal(true);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (isDeletingId) {
-      setZones(zones.filter(z => z.id !== isDeletingId));
-      setIsDeletingId(null);
+      try {
+        await deleteShipping(isDeletingId);
+        setZones(zones.filter(z => z.id !== isDeletingId));
+        setIsDeletingId(null);
+      } catch (err) {
+        console.error("Failed to delete shipping:", err);
+        alert("Failed to delete shipping zone. Please try again.");
+      }
     }
   };
-
 
   const [status, setStatus] = useState<"Exempted" | "Subjected">("Subjected");
   const [filterOpen, setFilterOpen] = useState(false);
@@ -106,16 +114,16 @@ export default function ShippingView() {
   const [filterCurrency, setFilterCurrency] = useState<string>("All");
   const filterRef = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const h = (e: MouseEvent) => { if (filterRef.current && !filterRef.current.contains(e.target as Node)) setFilterOpen(false); };
     window.addEventListener("click", h);
     return () => window.removeEventListener("click", h);
   }, []);
 
   const filtered = zones.filter(z => {
-    const matchesQuery = z.country.toLowerCase().includes(q.toLowerCase()) ||
-      z.id.toLowerCase().includes(q.toLowerCase()) ||
-      z.currency.toLowerCase().includes(q.toLowerCase());
+    const matchesQuery = (z.country || "").toLowerCase().includes(q.toLowerCase()) ||
+      (z.id || "").toLowerCase().includes(q.toLowerCase()) ||
+      (z.currency || "").toLowerCase().includes(q.toLowerCase());
     const matchesStatus = filterStatus === "All" || z.status === filterStatus;
     const matchesCurrency = filterCurrency === "All" || z.currency === filterCurrency;
     return matchesQuery && matchesStatus && matchesCurrency;
@@ -144,7 +152,7 @@ export default function ShippingView() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setModal(true)}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all sm:w-auto shadow-lg shadow-gray-200 shrink-0"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-[#22C55E] text-white rounded-xl text-xs font-bold hover:bg-[#16A34A] transition-all sm:w-auto shadow-lg shadow-emerald-500/20 shrink-0"
           >
             <div className="w-5 h-5 rounded-lg bg-white/10 flex items-center justify-center">
               <Plus size={14} strokeWidth={3} />
@@ -514,7 +522,7 @@ export default function ShippingView() {
                       whileTap={{ scale: 0.98 }}
                       form="shipping-form"
                       type="submit"
-                      className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                      className="w-full py-4 bg-[#22C55E] text-white rounded-2xl text-sm font-bold hover:bg-[#16A34A] transition-all shadow-xl shadow-emerald-500/20"
                     >
                       {editingZone ? "Update Configuration" : "Save Configuration"}
                     </motion.button>

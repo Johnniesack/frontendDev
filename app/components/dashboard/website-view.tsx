@@ -675,7 +675,7 @@ export function WebsiteView() {
                 </div>
                 <div className="relative">
                   <button
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-2xl text-sm font-bold hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200"
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-[#22C55E] text-white rounded-2xl text-sm font-bold hover:bg-[#16A34A] transition-all shadow-lg shadow-emerald-500/20"
                   >
                     <Plus size={18} />
                     Add New Slide

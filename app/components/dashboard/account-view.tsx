@@ -350,7 +350,7 @@ export function AccountView() {
                     <h3 className="text-2xl font-black text-gray-900">Success!</h3>
                     <p className="text-gray-500 font-medium mt-2">Your account is now on the <span className="text-gray-900 font-black">{PLANS.find(p => p.id === selectedPlan)?.label}</span> plan.</p>
                   </div>
-                  <button onClick={() => setIsDone(false)} className="px-8 py-3 bg-gray-900 text-white rounded-2xl text-sm font-black hover:bg-gray-800 transition-all shadow-lg">
+                  <button onClick={() => setIsDone(false)} className="px-8 py-3 bg-[#22C55E] text-white rounded-2xl text-sm font-black hover:bg-[#16A34A] transition-all shadow-lg shadow-emerald-500/20">
                     Return to Settings
                   </button>
                 </motion.div>

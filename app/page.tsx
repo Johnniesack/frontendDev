@@ -11,21 +11,35 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DynamicBackground } from "./components/marketing/dynamic-background";
 import { useRouter } from "next/navigation";
 import { OnboardingFlow } from "./components/onboarding/onboarding-flow";
+import { extractBoolean, extractNumberLike, extractString } from "@/lib/api/client";
 
 export default function SignInPage() {
   const router = useRouter();
   const [step, setStep] = useState<"signin" | "signup" | "verify" | "forgot-password">("signin");
   const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState<number | undefined>(undefined);
   const [tempToken, setTempToken] = useState<string | undefined>(undefined);
   const [isSignUpFlow, setIsSignUpFlow] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   React.useEffect(() => {
     const accessToken = localStorage.getItem("access_token");
+    const pendingVerification = localStorage.getItem("pending_verification") === "true";
+    const storedUserId = localStorage.getItem("user_id");
+    const storedEmail = localStorage.getItem("email") || localStorage.getItem("username") || "";
+
+    if (pendingVerification) {
+      const parsedUserId = storedUserId ? Number(storedUserId) : NaN;
+      if (Number.isFinite(parsedUserId)) setUserId(parsedUserId);
+      setEmail(storedEmail);
+      setTempToken(accessToken || undefined);
+      setIsSignUpFlow(true);
+      setStep("verify");
+      setIsCheckingAuth(false);
+      return;
+    }
     
     if (accessToken) {
-      // If signed in before, go straight to dashboard. 
-      // The dashboard can redirect back to onboarding if the profile is truly empty.
       router.push("/dashboard");
     } else {
       setIsCheckingAuth(false);
@@ -40,13 +54,21 @@ export default function SignInPage() {
     );
   }
 
-  const handleSignInNext = (emailValue: string, data?: any) => {
+  const handleSignInNext = (emailValue: string, data?: unknown) => {
+    console.log("Sign In Success Data:", data);
     setEmail(emailValue);
     setIsSignUpFlow(false);
     
-    const accessToken = data?.access_token || data?.access || 
-                        data?.data?.access_token || data?.data?.access;
-    const isOnboarded = data?.is_onboarded ?? data?.data?.is_onboarded;
+    const accessToken = extractString(data, [["access_token"], ["access"], ["data", "access_token"], ["data", "access"]]);
+    const isOnboarded = extractBoolean(data, [["is_onboarded"], ["data", "is_onboarded"]]);
+    const extractedUserId = extractNumberLike(data, [["user_id"], ["data", "user_id"], ["user", "id"], ["data", "user", "id"]]);
+    
+    console.log("Extracted User ID:", extractedUserId);
+    if (extractedUserId) {
+      const numericUserId = Number(extractedUserId);
+      setUserId(numericUserId);
+      localStorage.setItem("user_id", String(extractedUserId));
+    }
     
     if (accessToken || isOnboarded !== undefined) {
       if (isOnboarded === true) {
@@ -55,14 +77,24 @@ export default function SignInPage() {
         router.push("/onboarding");
       }
     } else {
-      const token = data?.temp_token || data?.Temp_token || data?.TEMP_TOKEN || data?.tempToken ||
-                    data?.data?.temp_token || data?.data?.Temp_token || data?.data?.TEMP_TOKEN || data?.data?.tempToken ||
-                    data?.token || data?.data?.token;
+      const token = extractString(data, [
+        ["temp_token"],
+        ["Temp_token"],
+        ["TEMP_TOKEN"],
+        ["tempToken"],
+        ["data", "temp_token"],
+        ["data", "Temp_token"],
+        ["data", "TEMP_TOKEN"],
+        ["data", "tempToken"],
+        ["token"],
+        ["data", "token"],
+      ]);
                     
-      if (token) {
+      if (token || extractedUserId) {
         setTempToken(token);
         setStep("verify");
       } else {
+        console.warn("No token or user ID found in sign-in response, defaulting to dashboard");
         router.push("/dashboard");
       }
     }
@@ -80,21 +112,21 @@ export default function SignInPage() {
     setStep("forgot-password");
   };
 
-  const handleSignUpSuccess = (emailValue: string, token?: string) => {
+  const handleSignUpSuccess = (emailValue: string, userIdValue?: number, token?: string) => {
+    console.log("Sign Up Success - Email:", emailValue, "User ID:", userIdValue);
     setEmail(emailValue);
+    if (userIdValue) setUserId(userIdValue);
     setTempToken(token);
     setIsSignUpFlow(true);
-    setStep("verify");
+    
+    // Redirect to onboarding as per new backend flow
+    router.push("/onboarding");
   };
 
   const handleVerifySuccess = (isOnboarded: boolean) => {
-    // If it's a sign-in flow, always go to dashboard as per user request
-    // If it's a sign-up flow, go to onboarding
-    if (isSignUpFlow) {
-      router.push("/onboarding");
-    } else {
-      router.push("/dashboard");
-    }
+    localStorage.removeItem("pending_verification");
+    localStorage.setItem("is_onboarded", String(isOnboarded || isSignUpFlow));
+    router.push("/dashboard");
   };
 
   const renderForm = () => {
@@ -104,7 +136,7 @@ export default function SignInPage() {
       case "signup":
         return <SignUpForm onSignIn={handleBackToSignIn} onSignUpSuccess={handleSignUpSuccess} />;
       case "verify":
-        return <VerifyForm email={email} tempToken={tempToken} onBack={handleBackToSignIn} onSuccess={handleVerifySuccess} />;
+        return <VerifyForm email={email} userId={userId} tempToken={tempToken} onBack={handleBackToSignIn} onSuccess={handleVerifySuccess} />;
       case "forgot-password":
         return <ForgotPasswordForm onBack={handleBackToSignIn} />;
     }
