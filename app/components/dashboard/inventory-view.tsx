@@ -23,12 +23,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { 
-  getInventory, 
-  addInventory, 
-  deleteInventory, 
-  editInventory 
-} from "@/lib/api/inventory";
+// API imports removed until backend token flow is ready
 
 interface ProductInventory {
   id: string;
@@ -109,8 +104,9 @@ const MARKETS = [
 ];
 
 export default function InventoryView() {
-  const [products, setProducts] = useState<ProductInventory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Using mock data until the backend token flow is fully connected
+  const [products, setProducts] = useState<ProductInventory[]>(MOCK_PRODUCTS);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedMarketId, setSelectedMarketId] = useState<string>("12");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -121,32 +117,6 @@ export default function InventoryView() {
   const [selectedProductDetail, setSelectedProductDetail] = useState<ProductInventory | null>(null);
   const [isGlobalEditing, setIsGlobalEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    const fetchInventory = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getInventory();
-        // If the API returns a 'data' wrapper or direct array
-        const fetchedProducts = response.data || response;
-        
-        if (Array.isArray(fetchedProducts) && fetchedProducts.length > 0) {
-          setProducts(fetchedProducts);
-        } else {
-          // Fallback to mock data for demonstration if API is empty
-          console.log("No products from API, using mock data");
-          setProducts(MOCK_PRODUCTS);
-        }
-      } catch (err) {
-        console.error("Failed to fetch inventory:", err);
-        setProducts(MOCK_PRODUCTS);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchInventory();
-  }, []);
 
   const currentMarket = MARKETS.find((m) => m.id === selectedMarketId) || MARKETS[0];
 

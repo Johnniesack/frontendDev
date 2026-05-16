@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DynamicBackground } from "./components/marketing/dynamic-background";
 import { useRouter } from "next/navigation";
 import { OnboardingFlow } from "./components/onboarding/onboarding-flow";
+import { extractBoolean, extractNumberLike, extractString } from "@/lib/api/client";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -23,6 +24,20 @@ export default function SignInPage() {
 
   React.useEffect(() => {
     const accessToken = localStorage.getItem("access_token");
+    const pendingVerification = localStorage.getItem("pending_verification") === "true";
+    const storedUserId = localStorage.getItem("user_id");
+    const storedEmail = localStorage.getItem("email") || localStorage.getItem("username") || "";
+
+    if (pendingVerification) {
+      const parsedUserId = storedUserId ? Number(storedUserId) : NaN;
+      if (Number.isFinite(parsedUserId)) setUserId(parsedUserId);
+      setEmail(storedEmail);
+      setTempToken(accessToken || undefined);
+      setIsSignUpFlow(true);
+      setStep("verify");
+      setIsCheckingAuth(false);
+      return;
+    }
     
     if (accessToken) {
       router.push("/dashboard");
@@ -39,18 +54,21 @@ export default function SignInPage() {
     );
   }
 
-  const handleSignInNext = (emailValue: string, data?: any) => {
+  const handleSignInNext = (emailValue: string, data?: unknown) => {
     console.log("Sign In Success Data:", data);
     setEmail(emailValue);
     setIsSignUpFlow(false);
     
-    const accessToken = data?.access_token || data?.access || 
-                        data?.data?.access_token || data?.data?.access;
-    const isOnboarded = data?.is_onboarded ?? data?.data?.is_onboarded;
-    const extractedUserId = data?.user_id || data?.data?.user_id || data?.user?.id || data?.data?.user?.id;
+    const accessToken = extractString(data, [["access_token"], ["access"], ["data", "access_token"], ["data", "access"]]);
+    const isOnboarded = extractBoolean(data, [["is_onboarded"], ["data", "is_onboarded"]]);
+    const extractedUserId = extractNumberLike(data, [["user_id"], ["data", "user_id"], ["user", "id"], ["data", "user", "id"]]);
     
     console.log("Extracted User ID:", extractedUserId);
-    if (extractedUserId) setUserId(extractedUserId);
+    if (extractedUserId) {
+      const numericUserId = Number(extractedUserId);
+      setUserId(numericUserId);
+      localStorage.setItem("user_id", String(extractedUserId));
+    }
     
     if (accessToken || isOnboarded !== undefined) {
       if (isOnboarded === true) {
@@ -59,9 +77,18 @@ export default function SignInPage() {
         router.push("/onboarding");
       }
     } else {
-      const token = data?.temp_token || data?.Temp_token || data?.TEMP_TOKEN || data?.tempToken ||
-                    data?.data?.temp_token || data?.data?.Temp_token || data?.data?.TEMP_TOKEN || data?.data?.tempToken ||
-                    data?.token || data?.data?.token;
+      const token = extractString(data, [
+        ["temp_token"],
+        ["Temp_token"],
+        ["TEMP_TOKEN"],
+        ["tempToken"],
+        ["data", "temp_token"],
+        ["data", "Temp_token"],
+        ["data", "TEMP_TOKEN"],
+        ["data", "tempToken"],
+        ["token"],
+        ["data", "token"],
+      ]);
                     
       if (token || extractedUserId) {
         setTempToken(token);
@@ -85,10 +112,10 @@ export default function SignInPage() {
     setStep("forgot-password");
   };
 
-  const handleSignUpSuccess = (emailValue: string, userIdValue: number, token?: string) => {
+  const handleSignUpSuccess = (emailValue: string, userIdValue?: number, token?: string) => {
     console.log("Sign Up Success - Email:", emailValue, "User ID:", userIdValue);
     setEmail(emailValue);
-    setUserId(userIdValue);
+    if (userIdValue) setUserId(userIdValue);
     setTempToken(token);
     setIsSignUpFlow(true);
     
@@ -97,11 +124,9 @@ export default function SignInPage() {
   };
 
   const handleVerifySuccess = (isOnboarded: boolean) => {
-    if (isSignUpFlow) {
-      router.push("/onboarding");
-    } else {
-      router.push("/dashboard");
-    }
+    localStorage.removeItem("pending_verification");
+    localStorage.setItem("is_onboarded", String(isOnboarded || isSignUpFlow));
+    router.push("/dashboard");
   };
 
   const renderForm = () => {

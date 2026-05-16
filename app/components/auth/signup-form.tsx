@@ -2,10 +2,11 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, Lock, Eye, EyeOff, ArrowRight, Check, Loader2, Phone, Hash, AtSign } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Check, Loader2, Phone, AtSign } from "lucide-react";
 import { signUp } from "@/lib/api/onboarding";
+import { cleanToken, extractNumberLike, extractString } from "@/lib/api/client";
 
-export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void, onSignUpSuccess: (username: string, userId: number, tempToken?: string) => void }) {
+export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void, onSignUpSuccess: (username: string, userId?: number, tempToken?: string) => void }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -13,7 +14,7 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [values, setValues] = useState({ username: "", email: "", phone: "", password: "", confirmPassword: "" });
+  const [values, setValues] = useState({ username: "", name: "", email: "", phone: "", password: "", confirmPassword: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -65,14 +66,17 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
 
       signUp({
         username: values.username,
+        name: values.name || values.username,
         password: values.password,
         email: values.email,
         phone: values.phone
       })
         .then((response) => {
-          const token = response.temp_token || response.data?.temp_token || response.token;
-          const userId = response.user_id || response.data?.user_id || response.id || response.data?.id;
-          const onboardingId = response.data?.id || response.id; // The RequestJoin ID
+          const token = cleanToken(extractString(response, [["temp_token"], ["data", "temp_token"], ["token"], ["data", "token"]]));
+          const userId = extractNumberLike(response, [["user_id"], ["data", "user_id"], ["user", "id"], ["data", "user", "id"]]);
+          const onboardingId = extractNumberLike(response, [["data", "id"], ["id"]]);
+          const numericUserId = Number(userId);
+          const numericOnboardingId = Number(onboardingId);
 
           console.log("Signup Response Details:", {
             fullResponse: response,
@@ -82,16 +86,21 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
           });
 
           // Save token to allow onboarding access
-          if (token && typeof token === 'string') {
+          if (token) {
             localStorage.setItem("access_token", token);
           }
 
-          // Save all signup fields for the final onboarding payload
-          if (values.username) localStorage.setItem("onboarding_username", values.username);
-          if (userId) localStorage.setItem("onboarding_user_id", userId.toString());
-          if (onboardingId) localStorage.setItem("onboarding_record_id", onboardingId.toString());
+          // Save essential data for the onboarding flow
+          if (Number.isFinite(numericUserId)) localStorage.setItem("user_id", String(numericUserId));
+          if (Number.isFinite(numericOnboardingId)) {
+            localStorage.setItem("onboarding_record_id", String(numericOnboardingId));
+            localStorage.setItem("onboarding_user_id", String(Number.isFinite(numericUserId) ? numericUserId : numericOnboardingId));
+          }
+          if (values.username) localStorage.setItem("username", values.username);
+          if (values.email) localStorage.setItem("email", values.email);
+          if (values.phone) localStorage.setItem("phone", values.phone);
 
-          onSignUpSuccess(values.email, userId, token);
+          onSignUpSuccess(values.email, Number.isFinite(numericUserId) ? numericUserId : undefined, token ?? undefined);
         })
         .catch((err) => {
           console.error("Sign up error:", err);

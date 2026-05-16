@@ -2,15 +2,18 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, RotateCcw, HelpCircle, Loader2 } from "lucide-react";
 import { verifyOtp, resendOtp } from "@/lib/api/auth";
+import { extractBoolean, extractString } from "@/lib/api/client";
 
 export function VerifyForm({
   email = "a***n@krifth.com",
   userId,
+  tempToken,
   onBack,
   onSuccess
 }: {
   email?: string;
   userId?: number;
+  tempToken?: string;
   onBack: () => void;
   onSuccess: (isOnboarded: boolean) => void;
 }) {
@@ -52,7 +55,9 @@ export function VerifyForm({
       return;
     }
 
-    if (!userId) {
+    const effectiveUserId = userId ?? getStoredUserId();
+
+    if (!effectiveUserId) {
       setError("Session expired. Please sign in again.");
       return;
     }
@@ -61,24 +66,22 @@ export function VerifyForm({
     setError(null);
 
     try {
-      const response = await verifyOtp(userId, codeString);
+      const response = await verifyOtp(effectiveUserId, codeString, tempToken);
       
       // Store tokens
-      const accessToken = response.access_token || response.access || 
-                          response.data?.access_token || response.data?.access;
-      const refreshToken = response.refresh_token || response.refresh || 
-                           response.data?.refresh_token || response.data?.refresh;
+      const accessToken = extractString(response, [["access_token"], ["access"], ["data", "access_token"], ["data", "access"]]);
+      const refreshToken = extractString(response, [["refresh_token"], ["refresh"], ["data", "refresh_token"], ["data", "refresh"]]);
       
       if (accessToken) localStorage.setItem("access_token", String(accessToken));
       if (refreshToken) localStorage.setItem("refresh_token", String(refreshToken));
       
-      const isOnboarded = response.is_onboarded ?? response.data?.is_onboarded ?? false;
+      const isOnboarded = extractBoolean(response, [["is_onboarded"], ["data", "is_onboarded"]]) ?? false;
       localStorage.setItem("is_onboarded", String(isOnboarded));
       
       onSuccess(isOnboarded);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Verification error:", err);
-      const msg = (err.message || "Invalid verification code. Please try again.")
+      const msg = (err instanceof Error ? err.message : "Invalid verification code. Please try again.")
         .replace(/OTP/g, "code")
         .replace(/otp/g, "code");
       setError(msg);
@@ -88,7 +91,9 @@ export function VerifyForm({
   };
 
   const handleResend = async () => {
-    if (!userId) {
+    const effectiveUserId = userId ?? getStoredUserId();
+
+    if (!effectiveUserId) {
       setError("Session error: User ID missing. Please go back and try again.");
       return;
     }
@@ -96,11 +101,14 @@ export function VerifyForm({
     setIsLoading(true);
     setError(null);
     try {
-      await resendOtp(userId);
+      await resendOtp(effectiveUserId);
       alert("Verification code resent successfully!");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Resend error:", err);
-      const msg = (err.message || "Failed to resend code. Please try again.")
+      const rawMessage = err instanceof Error ? err.message : "Failed to resend code. Please try again.";
+      const msg = (rawMessage.includes("404") || rawMessage.toLowerCase().includes("not found")
+        ? "Resend is not available yet. Please sign in again to request a new code."
+        : rawMessage)
         .replace(/OTP/g, "code")
         .replace(/otp/g, "code");
       setError(msg);
@@ -118,7 +126,7 @@ export function VerifyForm({
           Check your email
         </h2>
         <p className="text-[13px] sm:text-[14px] text-zinc-400 font-medium leading-relaxed max-w-sm mx-auto">
-          We've sent a 6-digit verification code to <span className="text-[#22C55E]">{email}</span>.
+          We&apos;ve sent a 6-digit verification code to <span className="text-[#22C55E]">{email}</span>.
           Please enter it below to access your core identity.
         </p>
       </motion.div>
@@ -180,7 +188,7 @@ export function VerifyForm({
 
           <div className="text-center space-y-3 min-[1920px]:space-y-4">
             <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.15em]">
-              Haven't received the Code?
+              Haven&apos;t received the Code?
             </p>
             <button 
               disabled={isLoading}
@@ -210,4 +218,13 @@ export function VerifyForm({
       </div>
     </div>
   );
+}
+
+function getStoredUserId() {
+  if (typeof window === "undefined") return undefined;
+
+  const rawUserId = localStorage.getItem("user_id");
+  const parsedUserId = rawUserId ? Number(rawUserId) : NaN;
+
+  return Number.isFinite(parsedUserId) ? parsedUserId : undefined;
 }

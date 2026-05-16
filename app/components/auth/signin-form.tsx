@@ -4,8 +4,9 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { login } from "@/lib/api/auth";
+import { extractBoolean, extractString } from "@/lib/api/client";
 
-export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (email: string, data?: any) => void, onSignUp: () => void, onForgotPassword?: () => void }) {
+export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (email: string, data?: unknown) => void, onSignUp: () => void, onForgotPassword?: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -55,21 +56,19 @@ export function SignInForm({ onNext, onSignUp, onForgotPassword }: { onNext: (em
         // Here we call the login function from our auth.ts file
         const response = await login(values.username, values.password);
         
-        const accessToken = response.access_token || response.access || 
-                            response.data?.access_token || response.data?.access;
-        const refreshToken = response.refresh_token || response.refresh || 
-                             response.data?.refresh_token || response.data?.refresh;
-        const isOnboarded = response.is_onboarded ?? response.data?.is_onboarded;
+        const accessToken = extractString(response, [["access_token"], ["access"], ["data", "access_token"], ["data", "access"]]);
+        const refreshToken = extractString(response, [["refresh_token"], ["refresh"], ["data", "refresh_token"], ["data", "refresh"]]);
+        const isOnboarded = extractBoolean(response, [["is_onboarded"], ["data", "is_onboarded"]]);
 
-        if (accessToken && typeof accessToken === 'string') localStorage.setItem("access_token", accessToken);
-        if (refreshToken && typeof refreshToken === 'string') localStorage.setItem("refresh_token", refreshToken);
+        if (accessToken) localStorage.setItem("access_token", accessToken);
+        if (refreshToken) localStorage.setItem("refresh_token", refreshToken);
         if (isOnboarded !== undefined) localStorage.setItem("is_onboarded", String(isOnboarded));
 
         // Move to the next screen, passing the full response so handleSignInNext can find what it needs
         onNext(values.username, response);
-      } catch (err: any) {
+      } catch (err: unknown) {
         // If login fails, we show the error message
-        const msg = err.message || "Login failed. Please check your credentials.";
+        const msg = err instanceof Error ? err.message : "Login failed. Please check your credentials.";
         
         // Try to link API error to specific fields
         if (msg.toLowerCase().includes("username") || msg.toLowerCase().includes("user") || msg.toLowerCase().includes("account")) {

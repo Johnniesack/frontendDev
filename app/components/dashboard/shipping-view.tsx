@@ -7,12 +7,7 @@ import {
   Trash2, ChevronLeft, ChevronRight, SlidersHorizontal,
   Info, Monitor, Check, ChevronDown, Plus, Edit3, Settings2,
 } from "lucide-react";
-import { 
-  getShipping, 
-  addShipping, 
-  deleteShipping, 
-  editShipping 
-} from "@/lib/api/shipping";
+import { deleteShipping } from "@/lib/api/shipping";
 
 interface ShippingZone {
   id: string; countryCode: string; country: string;
@@ -77,8 +72,9 @@ function Sel({ label, options, placeholder, value, onChange }: {
 }
 
 export default function ShippingView() {
-  const [zones, setZones] = useState<ShippingZone[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Using mock data until the backend token flow is fully connected
+  const [zones, setZones] = useState<ShippingZone[]>(ZONES);
+  const [isLoading, setIsLoading] = useState(false);
   const [q, setQ] = useState("");
   const [modal, setModal] = useState(false);
   const [country, setCountry] = useState("");
@@ -88,29 +84,6 @@ export default function ShippingView() {
 
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
   const [editingZone, setEditingZone] = useState<ShippingZone | null>(null);
-
-  useEffect(() => {
-    const fetchShipping = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getShipping();
-        const fetchedZones = response.data || response;
-        if (Array.isArray(fetchedZones) && fetchedZones.length > 0) {
-          setZones(fetchedZones);
-        } else {
-          console.log("No shipping zones from API, using mock data");
-          setZones(ZONES);
-        }
-      } catch (err) {
-        console.error("Failed to fetch shipping:", err);
-        setZones(ZONES);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchShipping();
-  }, []);
 
   const openEdit = (z: ShippingZone) => {
     setEditingZone(z);

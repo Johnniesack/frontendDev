@@ -17,8 +17,10 @@ export default function OnboardingPage() {
   }, []);
 
   const handleComplete = () => {
-    localStorage.setItem("is_onboarded", "true");
-    window.location.href = "/dashboard";
+    localStorage.removeItem("pending_verification");
+    localStorage.setItem("registration_approved", "true");
+    localStorage.setItem("is_onboarded", "false");
+    window.location.href = "/";
   };
 
   return (
