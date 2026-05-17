@@ -28,8 +28,11 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
       error = "Username must be at least 3 characters";
     } else if (name === "phone" && !/^\+?[0-9]{10,15}$/.test(value)) {
       error = "Please enter a valid phone number";
-    } else if (name === "password" && value.length < 8) {
-      error = "Password must be at least 8 characters";
+    } else if (name === "password") {
+      if (value.length < 8) error = "Password must be at least 8 characters";
+      else if (!/[A-Z]/.test(value)) error = "Password must contain an uppercase letter";
+      else if (!/[0-9]/.test(value)) error = "Password must contain a number";
+      else if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) error = "Password must contain a special character";
     } else if (name === "confirmPassword" && value !== values.password) {
       error = "Passwords do not match";
     }
@@ -163,6 +166,7 @@ export function SignUpForm({ onSignIn, onSignUpSuccess }: { onSignIn: () => void
                 <input name="password" type={showPassword ? "text" : "password"} value={values.password} onChange={handleChange} onFocus={() => setFocusedField("password")} onBlur={handleBlur} placeholder="••••••••" className={`w-full h-11 pl-12 pr-10 rounded-xl bg-[#1A2026] border text-base transition-all font-medium focus:outline-none ${errors.password && (touched.password || isSubmitted) ? "border-[#FF5F5F]/20 bg-[#FF5F5F]/5" : "border-white/5 focus:border-[#22C55E]/50"}`} />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors">{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
               </div>
+              <p className="text-[10px] text-zinc-500 pt-1 font-medium leading-tight">Must be at least 8 characters with 1 uppercase, 1 number, & 1 special character.</p>
             </div>
 
             <div className="space-y-1.5">

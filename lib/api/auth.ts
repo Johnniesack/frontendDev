@@ -78,3 +78,46 @@ export async function updateProfile(profileData: ApiPayload) {
         body: profileData,
     });
 }
+
+/**
+ * FORGOT PASSWORD FUNCTION
+ * Postman: account/forgot_password
+ */
+export async function forgotPassword(email: string) {
+    return apiRequest<AuthResponse>("/account/forgot_password/", {
+        method: "POST",
+        auth: false,
+        body: { email },
+    });
+}
+
+/**
+ * RESET PASSWORD FUNCTION
+ * Postman: account/reset_password
+ */
+export async function resetPassword(userId: number | string, otpCode: string | number, newPassword: string) {
+    return apiRequest<AuthResponse>("/account/reset_password/", {
+        method: "POST",
+        auth: false,
+        body: { 
+            user_id: userId,
+            otp_code: otpCode,
+            new_password: newPassword
+        },
+    });
+}
+
+/**
+ * LOGOUT FUNCTION
+ * Postman: account/logout
+ */
+export async function logout(refreshToken: string) {
+    return apiRequest<AuthResponse>("/account/logout/", {
+        method: "POST",
+        auth: true,
+        body: { 
+            refresh: refreshToken
+        },
+    });
+}
+

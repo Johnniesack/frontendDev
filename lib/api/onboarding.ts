@@ -69,3 +69,16 @@ export async function getOnboarding(userId: string | number) {
         query: { user_id: userId },
     });
 }
+
+/**
+ * SEND LOGIN OTP
+ * Postman: onboarding/send_login_otp
+ */
+export async function sendLoginOtp(userId: number | string) {
+    return apiRequest<ApiRecord>("/onboarding/send_login_otp/", {
+        method: "POST",
+        auth: false,
+        body: { user_id: userId },
+    });
+}
+

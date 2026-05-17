@@ -17,7 +17,7 @@ export default function OnboardingPage() {
   }, []);
 
   const handleComplete = () => {
-    localStorage.removeItem("pending_verification");
+    localStorage.setItem("pending_verification", "true");
     localStorage.setItem("registration_approved", "true");
     localStorage.setItem("is_onboarded", "false");
     window.location.href = "/";

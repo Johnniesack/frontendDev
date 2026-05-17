@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Mail, ArrowLeft, Send } from "lucide-react";
+import { Mail, ArrowLeft, Send, Loader2, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
+import { forgotPassword, resetPassword } from "@/lib/api/auth";
+import { extractNumberLike } from "@/lib/api/client";
 
 export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -10,10 +12,39 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isResetComplete, setIsResetComplete] = useState(false);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [code, setCode] = useState<string[]>(new Array(6).fill(""));
+  const [activeInput, setActiveInput] = useState(0);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [newPassword, setNewPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleCodeChange = (value: string, index: number) => {
+    const newCode = [...code];
+    newCode[index] = value.substring(value.length - 1);
+    setCode(newCode);
+
+    // Move to next input
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+      setActiveInput(index + 1);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === "Backspace" && !code[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+      setActiveInput(index - 1);
+    }
+  };
+
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitted(true);
+    setError("");
 
     if (!email) {
       setError("Email is required");
@@ -23,10 +54,66 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
       return;
     }
 
-    // Simulate API request to send reset link
-    setTimeout(() => {
+    try {
+      setIsLoading(true);
+      const response = await forgotPassword(email);
+      
+      const extractedUserId = extractNumberLike(response, [["user_id"], ["data", "user_id"], ["user", "id"], ["data", "user", "id"], ["id"]]);
+      
+      if (extractedUserId) {
+        setUserId(Number(extractedUserId));
+      } else {
+        console.warn("No user ID found in forgot_password response. Reset might fail if backend requires it.");
+      }
+      
       setIsSuccess(true);
-    }, 800);
+    } catch (err: any) {
+      setError(err.message || "Failed to send reset code. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    
+    const otpString = code.join("");
+    if (otpString.length !== 6) {
+      setError("Please enter the complete 6-digit code");
+      return;
+    }
+    if (newPassword.length < 8) {
+      setError("Password must be at least 8 chars");
+      return;
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      setError("Password requires an uppercase letter");
+      return;
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      setError("Password requires a number");
+      return;
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+      setError("Password requires a special character");
+      return;
+    }
+    
+    if (!userId) {
+       setError("System error: Missing User ID.");
+       return;
+    }
+
+    try {
+      setIsLoading(true);
+      await resetPassword(userId, otpString, newPassword);
+      setIsResetComplete(true);
+    } catch (err: any) {
+      setError(err.message || "Failed to reset password. Check your OTP.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -42,38 +129,126 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
 
         <div className="text-center mb-6 min-[1920px]:mb-10 relative z-10">
           <div className="w-12 h-12 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/20 mx-auto mb-5 flex items-center justify-center">
-            <Mail className="text-[#22C55E]" size={20} />
+            {isSuccess ? <Lock className="text-[#22C55E]" size={20} /> : <Mail className="text-[#22C55E]" size={20} />}
           </div>
           <h2 className="text-2xl sm:text-[32px] font-bold text-white mb-2 tracking-tight">
-            Forgot Password?
+            {isSuccess ? "Reset Password" : "Forgot Password?"}
           </h2>
           <p className="text-xs sm:text-sm text-zinc-400 font-medium px-4">
-            No worries, we'll send you reset instructions.
+            {isSuccess ? "Enter the 6-digit code sent to your email." : "No worries, we'll send you a reset code."}
           </p>
         </div>
 
-        {isSuccess ? (
+        {isResetComplete ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center justify-center space-y-6 relative z-10 py-4"
+            className="flex flex-col items-center justify-center space-y-6 relative z-10 py-6"
           >
+            <div className="w-16 h-16 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/20 flex items-center justify-center mb-2">
+              <CheckCircle className="text-[#22C55E]" size={32} />
+            </div>
+            
             <div className="text-center space-y-2">
-              <p className="text-sm text-zinc-300 font-medium">Reset link sent to:</p>
-              <p className="text-base font-bold text-white tracking-tight">{email}</p>
+              <h3 className="text-2xl font-bold text-white tracking-tight">Password Reset</h3>
+              <p className="text-sm text-zinc-400 font-medium px-4 leading-relaxed max-w-[280px]">
+                Your password has been successfully updated. You can now use your new password to sign in.
+              </p>
             </div>
 
-            <p className="text-[11px] text-zinc-500 max-w-xs text-center leading-relaxed">
-              Didn't receive the email? Check your spam filter, or try another email address.
-            </p>
-
-            <button
-              onClick={() => setIsSuccess(false)}
-              className="text-[#22C55E] text-xs font-bold uppercase tracking-widest hover:underline mt-2"
+            <motion.button
+              onClick={onBack}
+              whileHover={{ scale: 1.02, backgroundColor: "#4ADE80" }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full h-11 sm:h-12 min-[1920px]:h-14 mt-4 rounded-xl bg-[#22C55E] text-black font-bold text-sm sm:text-base transition-colors flex items-center justify-center shadow-[0_4px_20px_rgba(34,197,94,0.2)]"
             >
-              Try another email
-            </button>
+              Continue to Sign In
+            </motion.button>
           </motion.div>
+        ) : isSuccess ? (
+          <form className="space-y-4 min-[1920px]:space-y-6 relative z-10" onSubmit={onResetSubmit}>
+             <div className="space-y-1.5 sm:space-y-2">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-zinc-500">
+                    OTP Code
+                  </label>
+                  {error && (
+                    <motion.span
+                      initial={{ opacity: 0, x: 5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="text-[10px] font-bold text-red-400/80 uppercase tracking-tight pt-0.5 pr-1"
+                    >
+                      {error}
+                    </motion.span>
+                  )}
+                </div>
+                <div className="flex justify-between gap-2 sm:gap-3">
+                  {code.map((digit, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.05 * index }}
+                      className="relative flex-1"
+                    >
+                      <input
+                        ref={(el) => { inputRefs.current[index] = el; }}
+                        type="text"
+                        maxLength={1}
+                        value={digit}
+                        onChange={(e) => { handleCodeChange(e.target.value, index); if (error) setError(""); }}
+                        onKeyDown={(e) => handleKeyDown(e, index)}
+                        onFocus={() => setActiveInput(index)}
+                        disabled={isLoading}
+                        className={`w-full aspect-square sm:h-12 rounded-xl bg-[#1A2026] border text-lg sm:text-xl font-bold text-white text-center transition-all focus:outline-none ${activeInput === index
+                          ? "border-[#22C55E] ring-1 ring-[#22C55E]/20"
+                          : "border-white/5 hover:border-white/20"
+                          }`}
+                      />
+                      {!digit && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="w-1 h-1 rounded-full bg-zinc-700" />
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+             </div>
+
+             <div className="space-y-1.5 sm:space-y-2">
+                <label className="text-[10px] uppercase tracking-widest font-bold text-zinc-500 block">New Password</label>
+                <div className="relative group">
+                  <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${focusedField === "password" ? "text-[#22C55E]" : "text-zinc-500"}`} size={18} />
+                  <input 
+                     name="newPassword" 
+                     type={showPassword ? "text" : "password"} 
+                     value={newPassword} 
+                     onChange={(e) => { setNewPassword(e.target.value); if (error) setError(""); }}
+                     onFocus={() => setFocusedField("password")} 
+                     onBlur={() => setFocusedField(null)} 
+                     placeholder="••••••••" 
+                     className="w-full h-11 sm:h-12 pl-12 pr-10 rounded-xl bg-[#1A2026] border border-white/5 text-base transition-all font-medium focus:outline-none focus:border-[#22C55E]/50" 
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors">{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
+                </div>
+                <p className="text-[10px] text-zinc-500 pt-1 font-medium leading-tight">Must be at least 8 characters with 1 uppercase, 1 number, & 1 special character.</p>
+             </div>
+
+            <motion.button
+              type="submit"
+              disabled={isLoading}
+              whileHover={isLoading ? {} : { scale: 1.01, backgroundColor: "#4ADE80" }}
+              whileTap={isLoading ? {} : { scale: 0.98 }}
+              className={`w-full h-11 sm:h-12 min-[1920px]:h-14 mt-2 rounded-xl bg-[#22C55E] text-black font-bold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 group shadow-[0_4px_20px_rgba(34,197,94,0.2)] ${isLoading ? "opacity-70" : ""}`}
+            >
+              {isLoading ? <Loader2 size={16} className="animate-spin" /> : (
+                 <>
+                   <span>Confirm Reset</span>
+                   <Send size={16} className="transition-transform group-hover:translate-x-1" />
+                 </>
+              )}
+            </motion.button>
+          </form>
         ) : (
           <form className="space-y-4 min-[1920px]:space-y-6 relative z-10" onSubmit={onSubmit}>
             <div className="space-y-1.5 sm:space-y-2">
@@ -115,27 +290,34 @@ export function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
 
             <motion.button
               type="submit"
-              whileHover={{ scale: 1.01, backgroundColor: "#4ADE80" }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full h-11 sm:h-12 min-[1920px]:h-14 mt-2 rounded-xl bg-[#22C55E] text-black font-bold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 group shadow-[0_4px_20px_rgba(34,197,94,0.2)]"
+              disabled={isLoading}
+              whileHover={isLoading ? {} : { scale: 1.01, backgroundColor: "#4ADE80" }}
+              whileTap={isLoading ? {} : { scale: 0.98 }}
+              className={`w-full h-11 sm:h-12 min-[1920px]:h-14 mt-2 rounded-xl bg-[#22C55E] text-black font-bold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 group shadow-[0_4px_20px_rgba(34,197,94,0.2)] ${isLoading ? "opacity-70" : ""}`}
             >
-              <span>Reset Password</span>
-              <Send size={16} className="transition-transform group-hover:translate-x-1" />
+              {isLoading ? <Loader2 size={16} className="animate-spin" /> : (
+                 <>
+                   <span>Send Reset Code</span>
+                   <Send size={16} className="transition-transform group-hover:translate-x-1" />
+                 </>
+              )}
             </motion.button>
           </form>
         )}
 
         {/* Back to sign in */}
-        <div className="mt-5 pt-4 lg:mt-6 lg:pt-5 min-[1920px]:mt-8 min-[1920px]:pt-6 lg:border-t lg:border-white/5 flex flex-col items-center justify-center w-full relative z-10">
-          <button
-            type="button"
-            onClick={(e) => { e.preventDefault(); onBack(); }}
-            className="text-zinc-400 hover:text-white text-xs sm:text-[13px] font-bold uppercase tracking-[0.1em] flex items-center gap-2 transition-colors"
-          >
-            <ArrowLeft size={16} className="transition-transform -ml-2" />
-            <span>Back to sign in</span>
-          </button>
-        </div>
+        {!isResetComplete && (
+          <div className="mt-5 pt-4 lg:mt-6 lg:pt-5 min-[1920px]:mt-8 min-[1920px]:pt-6 lg:border-t lg:border-white/5 flex flex-col items-center justify-center w-full relative z-10">
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); onBack(); }}
+              className="text-zinc-400 hover:text-white text-xs sm:text-[13px] font-bold uppercase tracking-[0.1em] flex items-center gap-2 transition-colors"
+            >
+              <ArrowLeft size={16} className="transition-transform -ml-2" />
+              <span>Back to sign in</span>
+            </button>
+          </div>
+        )}
       </motion.div>
 
       <motion.div
