@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { logout } from "@/lib/api/auth";
 import {
   Home,
   Settings,
@@ -683,7 +684,15 @@ export function DashboardLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const refreshToken = localStorage.getItem("refresh_token");
+    if (refreshToken) {
+      try {
+        await logout(refreshToken);
+      } catch (err) {
+        console.error("Logout API failed, continuing local logout...", err);
+      }
+    }
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("is_onboarded");

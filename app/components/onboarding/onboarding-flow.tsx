@@ -24,7 +24,7 @@ import {
   Phone,
   Mail
 } from "lucide-react";
-import { completeOnboarding, updateOnboardingStatus } from "@/lib/api/onboarding";
+import { completeOnboarding, updateOnboardingStatus, sendLoginOtp } from "@/lib/api/onboarding";
 import { getShopCategories, getBrandGoals, getPlans } from "@/lib/api/general";
 import { type ApiPayload } from "@/lib/api/client";
 
@@ -276,7 +276,7 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
             </div>
             <h2 className="text-4xl font-black text-white mb-4 tracking-tight">Payment Successful</h2>
             <p className="text-zinc-400 text-lg font-medium mb-8 leading-relaxed">
-              Your payment has been securely processed and your account is now fully approved on the Krifth.
+              Your payment for the <span className="text-white font-bold">{selectedPlan === "basic" ? "Starter" : selectedPlan === "standard" ? "Growth" : "Scale"} Plan</span> has been received successfully. Your Krifth account is now active and fully approved.
             </p>
             <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 w-full mb-8">
               <div className="flex items-center gap-3 text-left mb-4">
@@ -293,10 +293,26 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
               </p>
             </div>
             <button
-              onClick={() => onComplete()}
-              className="px-8 h-14 rounded-2xl bg-white text-black font-black text-base transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              disabled={isLoading}
+              onClick={async () => {
+                try {
+                  setIsLoading(true);
+                  const userId = typeof window !== 'undefined' ? localStorage.getItem("user_id") || localStorage.getItem("onboarding_user_id") : null;
+                  if (userId) {
+                    await sendLoginOtp(Number(userId));
+                  }
+                  onComplete();
+                } catch (err) {
+                  console.error("Failed to send OTP:", err);
+                  // Proceed anyway so user isn't stuck if it already sent earlier
+                  onComplete();
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+              className="px-8 h-14 rounded-2xl bg-white text-black font-black text-base transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              Continue to Verification
+              {isLoading ? <Loader2 size={20} className="animate-spin text-black" /> : "Continue to Verification"}
             </button>
           </motion.div>
         ) : (
